@@ -52,11 +52,11 @@ export default {
     return {
       menulist: [],
       iconsObj: {
-        125: 'iconfont icon-user',
-        103: 'iconfont icon-tijikongjian',
-        101: 'iconfont icon-shangpin',
-        102: 'iconfont icon-danju',
-        145: 'iconfont icon-baobiao'
+        101: 'iconfont icon-user',
+        201: 'iconfont icon-tijikongjian',
+        301: 'iconfont icon-shangpin',
+        401: 'iconfont icon-danju',
+        501: 'iconfont icon-baobiao'
       },
       // 是否折叠
       isCollapse: false,

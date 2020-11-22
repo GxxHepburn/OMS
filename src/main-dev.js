@@ -24,7 +24,7 @@ import bus from './assets/js/bus'
 
 import axios from 'axios'
 // 配置请求的根路径
-axios.defaults.baseURL = 'http://127.0.0.1:8888/api/private/v1'
+axios.defaults.baseURL = 'https://www.donghuastar.com/OSM'
 // 在 request 拦截器中，展示进度条 NProgress.start ()
 axios.interceptors.request.use(config => {
   NProgress.start()
