@@ -17,6 +17,15 @@ import NProgress from 'nprogress'
 // 引入bus总线
 import bus from './assets/js/bus'
 
+// 引入判断两对象是否相等
+import isEqual from './assets/js/isEqual'
+
+// 引入mathjs
+import * as math from 'mathjs'
+
+// 引入qrcodejs2
+import QRCode from 'qrcodejs2'
+
 import axios from 'axios'
 // 配置请求的根路径
 axios.defaults.baseURL = 'https://www.donghuastar.com/OSM'
@@ -35,10 +44,16 @@ Vue.prototype.$http = axios
 
 Vue.prototype.bus = bus
 
+Vue.prototype.$isEqual = isEqual
+
+Vue.prototype.$math = math
+
 Vue.config.productionTip = false
 Vue.component('tree-table', TreeTable)
 // 将富文本编辑器,注册为全局可用的组件
 Vue.use(VueQuillEditor)
+
+Vue.prototype.QRCode = QRCode
 
 Vue.filter('dateFormat', function (originVal) {
   const dt = new Date(originVal)

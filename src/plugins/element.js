@@ -22,9 +22,16 @@ import {
   Steps, Step,
   CheckboxGroup, Checkbox,
   Upload,
-  Timeline, TimelineItem
+  Timeline, TimelineItem,
+  Image,
+  Dropdown, DropdownMenu, DropdownItem,
+  Radio,
+  Backtop,
+  TimeSelect, TimePicker,
+  Popover
 } from 'element-ui'
 
+Vue.use(Popover)
 Vue.use(Button)
 Vue.use(Form)
 Vue.use(FormItem)
@@ -65,3 +72,11 @@ Vue.use(Timeline)
 Vue.use(TimelineItem)
 Vue.prototype.$message = Message
 Vue.prototype.$confirm = MessageBox.confirm
+Vue.use(Image)
+Vue.use(Dropdown)
+Vue.use(DropdownMenu)
+Vue.use(DropdownItem)
+Vue.use(Radio)
+Vue.use(Backtop)
+Vue.use(TimeSelect)
+Vue.use(TimePicker)

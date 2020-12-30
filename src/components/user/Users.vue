@@ -2,7 +2,7 @@
     <div>
         <!-- 面包屑导航区域 -->
         <el-breadcrumb separator-class="el-icon-arrow-right">
-          <el-breadcrumb-item :to="{ path: '/static/home' }" @click.native="returnhome">首页</el-breadcrumb-item>
+          <el-breadcrumb-item :to="{ path: '/static/home' }">首页</el-breadcrumb-item>
           <el-breadcrumb-item>用户管理</el-breadcrumb-item>
           <el-breadcrumb-item>用户列表</el-breadcrumb-item>
         </el-breadcrumb>
@@ -12,7 +12,7 @@
           <!-- 搜索与添加区域 -->
           <el-row :gutter="20">
             <el-col :span="7">
-              <el-input placeholder="请输入内容" v-model="queryInfo.query" :clearable="true" @clear="getSearchUserList" @keyup.enter.native="getSearchUserList">
+              <el-input placeholder="请输入检索ID前几位" v-model="queryInfo.query" :clearable="true" @clear="getSearchUserList" @keyup.enter.native="getSearchUserList">
                 <el-button slot="append" icon="el-icon-search" @click="getSearchUserList"></el-button>
               </el-input>
             </el-col>
@@ -42,7 +42,7 @@
           </el-pagination>
         </el-card>
         <!-- 分配角色对话框 -->
-        <el-dialog title="用户订单" :visible.sync="userOrderListDialogVisible" width="50%" @close="userOrderListClosed">
+        <el-dialog title="用户订单" :visible.sync="userOrderListDialogVisible" width="55%" @close="userOrderListClosed">
            <!-- 底部区 -->
            <div>
              <el-card>
@@ -79,6 +79,7 @@
                  <el-table-column type="index"></el-table-column>
                  <el-table-column label="检索 ID" prop="O_UniqSearchID" width="210"></el-table-column>
                  <el-table-column label="餐桌" prop="T_Name"></el-table-column>
+                 <el-table-column label="餐桌分类" prop="TT_Name"></el-table-column>
                  <el-table-column label="金额 (元)" prop="O_TotlePrice"></el-table-column>
                  <el-table-column label="支付状态">
                    <!-- 修改成tag -->
@@ -154,9 +155,6 @@ export default {
         return
       }
       this.$set(this.userOrdersList[index], 'orderDetail', res.data)
-    },
-    returnhome () {
-      this.bus.$emit('rehome')
     },
     async getUserList () {
       const { data: res } = await this.$http.get('users', { params: this.queryInfo })

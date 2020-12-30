@@ -1,113 +1,129 @@
 <template>
-    <div>
-        <!-- 面包屑导航区域 -->
-        <el-breadcrumb separator-class="el-icon-arrow-right">
-          <el-breadcrumb-item :to="{ path: '/static/home' }">首页</el-breadcrumb-item>
-          <el-breadcrumb-item>商品管理</el-breadcrumb-item>
-          <el-breadcrumb-item>商品列表</el-breadcrumb-item>
-        </el-breadcrumb>
+  <div>
+    <!-- 面包屑导航区域 -->
+    <el-breadcrumb separator-class="el-icon-arrow-right">
+      <el-breadcrumb-item :to="{ path: '/static/home' }">首页</el-breadcrumb-item>
+      <el-breadcrumb-item>商品管理</el-breadcrumb-item>
+      <el-breadcrumb-item>商品检索</el-breadcrumb-item>
+    </el-breadcrumb>
 
-        <!-- 卡片视图区域 -->
-        <el-card>
-            <el-row :gutter="20">
-                <el-col :span="8">
-                    <el-input placeholder="请输商品名称（支持模糊查询,输入凉拌，可搜索凉拌黄瓜等)
-                    )" v-model="queryInfo.query" :clearable="true"
-                    @clear="getNewGoodsList" @keyup.enter.native="getNewGoodsList">
-                        <el-button slot="append" icon="el-icon-search" @click="getNewGoodsList"></el-button>
-                    </el-input>
-                </el-col>
-                <el-col :span="4">
-                    <el-button type="primary" @click="goAddpage">添加商品</el-button>
-                </el-col>
-            </el-row>
+    <!-- 卡片视图区域 -->
+    <el-card>
+        <el-row :gutter="20" class="innerHeaderRow">
+          <el-col :span="8">
+            商品名检索
+          </el-col>
+          <el-col :span="4">
+            分类检索选择
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+            <el-col :span="8">
+                <el-input placeholder="请输商品名称（支持模糊查询,输入凉拌，可搜索凉拌黄瓜等)
+                )" v-model="queryInfo.query" :clearable="true"
+                @clear="getNewGoodsList" @keyup.enter.native="getNewGoodsList">
+                    <el-button slot="append" icon="el-icon-search" @click="getNewGoodsList"></el-button>
+                </el-input>
+            </el-col>
+            <el-col :span="4">
+              <el-select v-model="queryInfo.FT_ID" placeholder="请选择" :clearable="true"  @change="cateChange">
+                <el-option
+                    v-for="item in catesList"
+                    :key="item.FT_ID"
+                    :label="item.FT_Name"
+                    :value="item.FT_ID">
+                </el-option>
+              </el-select>
+              <!-- 清空，选择触发刷新事件；label -->
+            </el-col>
+        </el-row>
 
-            <!-- table 表格区域 -->
-            <el-table :data="goodslist" :border="true" :stripe="true">
-                <el-table-column type="index"></el-table-column>
-                <el-table-column label="商品名称" prop="F_Name"></el-table-column>
-                <el-table-column label="商品价格 (元)" prop="F_Price" width="95px"></el-table-column>
-                <el-table-column label="图片 (点击预览)" width="110px">
-                    <template slot-scope="scope">
-                        <el-image style="width: 30px; height: 30px"
-                          :src="scope.row.F_ImageUrl"
-                          :preview-src-list="[scope.row.F_ImageUrl]"
-                          @click.stop="handleClickItem">
-                        </el-image>
-                    </template>
-                </el-table-column>
-                <el-table-column label="商品库存" prop="F_Stock" width="70px">
-                  <template slot-scope="scope">
-                        <el-tag size="mini" v-if="scope.row.F_Stock === -1">不限量</el-tag>
-                        <el-tag type="danger" size="mini" v-else-if="scope.row.F_Stock === 0">售罄</el-tag>
-                        <el-tag type="warning" size="mini" v-else-if="scope.row.F_Stock < 5">{{scope.row.F_Stock}}</el-tag>
-                        <el-tag type="success" size="mini" v-else>{{scope.row.F_Stock}}</el-tag>
-                    </template>
-                </el-table-column>
-                <el-table-column label="销量" prop="F_SalesVolume" width="50px"></el-table-column>
-                <el-table-column label="商品单位" prop="F_Unit" width="70px"></el-table-column>
-                <el-table-column label="营销标签 （不超过四个字)" prop="F_Tag" width="170px"></el-table-column>
-                <el-table-column label="规格" width="300px">
-                    <template slot-scope="scope">
-                      <span v-for="item in scope.row.F_Specs" :key="item.FS_ID">
-                        <el-tag class="FS_Tag" size="mini">{{item.FS_Key}} : {{$math.chain($math.bignumber(Number(item.FS_Value))).add($math.bignumber(Number(scope.row.F_Price)))/*Number(item.FS_Value) + Number(scope.row.F_Price)*/}} 元</el-tag>
-                      </span>
-                    </template>
-                </el-table-column>
-                <el-table-column label="属性" width="210px">
-                    <template slot-scope="scope">
-                      <el-dropdown v-for="item in scope.row.F_Properties" :key="item.FP_ID">
-                        <el-button type="primary" size="mini">
+        <!-- table 表格区域 -->
+        <el-table :data="goodslist" :border="true" :stripe="true">
+            <el-table-column type="index"></el-table-column>
+            <el-table-column label="商品名称" prop="F_Name"></el-table-column>
+            <el-table-column label="商品价格 (元)" prop="F_Price" width="95px"></el-table-column>
+            <el-table-column label="图片 (点击预览)" width="110px">
+                <template slot-scope="scope">
+                    <el-image style="width: 30px; height: 30px"
+                        :src="scope.row.F_ImageUrl"
+                        :preview-src-list="[scope.row.F_ImageUrl]"
+                        @click.stop="handleClickItem">
+                    </el-image>
+                </template>
+            </el-table-column>
+            <el-table-column label="商品库存" prop="F_Stock" width="70px">
+                <template slot-scope="scope">
+                    <el-tag size="mini" v-if="scope.row.F_Stock === -1">不限量</el-tag>
+                    <el-tag type="danger" size="mini" v-else-if="scope.row.F_Stock === 0">售罄</el-tag>
+                    <el-tag type="warning" size="mini" v-else-if="scope.row.F_Stock < 5">{{scope.row.F_Stock}}</el-tag>
+                    <el-tag type="success" size="mini" v-else>{{scope.row.F_Stock}}</el-tag>
+                </template>
+            </el-table-column>
+            <el-table-column label="销量" prop="F_SalesVolume" width="50px"></el-table-column>
+            <el-table-column label="商品单位" prop="F_Unit" width="70px"></el-table-column>
+            <el-table-column label="营销标签 （不超过四个字)" prop="F_Tag" width="170px"></el-table-column>
+            <el-table-column label="规格" width="300px">
+                <template slot-scope="scope">
+                    <span v-for="item in scope.row.F_Specs" :key="item.FS_ID">
+                      <el-tag class="FS_Tag" size="mini">{{item.FS_Key}} : {{$math.chain($math.bignumber(Number(item.FS_Value))).add($math.bignumber(Number(scope.row.F_Price)))/*Number(item.FS_Value) + Number(scope.row.F_Price)*/}} 元</el-tag>
+                    </span>
+                </template>
+            </el-table-column>
+            <el-table-column label="属性" width="210px">
+                <template slot-scope="scope">
+                    <el-dropdown v-for="item in scope.row.F_Properties" :key="item.FP_ID">
+                      <el-button type="primary" size="mini">
                           {{item.FP_Name}}<i class="el-icon-arrow-down el-icon--right"></i>
-                        </el-button>
-                        <el-dropdown-menu slot="dropdown">
+                      </el-button>
+                      <el-dropdown-menu slot="dropdown">
                           <el-dropdown-item v-if="item.FP_ValueOne">{{item.FP_ValueOne}}</el-dropdown-item>
                           <el-dropdown-item v-if="item.FP_ValueTwo">{{item.FP_ValueTwo}}</el-dropdown-item>
                           <el-dropdown-item v-if="item.FP_ValueThree">{{item.FP_ValueThree}}</el-dropdown-item>
                           <el-dropdown-item v-if="item.FP_ValueFour">{{item.FP_ValueFour}}</el-dropdown-item>
                           <el-dropdown-item v-if="item.FP_ValueFive">{{item.FP_ValueFive}}</el-dropdown-item>
-                        </el-dropdown-menu>
-                      </el-dropdown>
-                    </template>
-                </el-table-column>
-                <el-table-column label="所属分类" prop="F_FTName"></el-table-column>
-                <el-table-column label="操作" width="130px">
-                    <template slot-scope="scope">
-                        <el-button type="primary" icon="el-icon-edit" size="mini" @click="showEditDialog(scope.row)"></el-button>
-                        <el-button type="danger" icon="el-icon-delete" size="mini" @click="removeById(scope.row)"></el-button>
-                    </template>
-                </el-table-column>
-            </el-table>
+                      </el-dropdown-menu>
+                    </el-dropdown>
+                </template>
+            </el-table-column>
+            <el-table-column label="所属分类" prop="F_FTName"></el-table-column>
+            <el-table-column label="操作" width="130px">
+                <template slot-scope="scope">
+                    <el-button type="primary" icon="el-icon-edit" size="mini" @click="showEditDialog(scope.row)"></el-button>
+                    <el-button type="danger" icon="el-icon-delete" size="mini" @click="removeById(scope.row)"></el-button>
+                </template>
+            </el-table-column>
+        </el-table>
 
-            <!-- 分页区域 -->
-            <el-pagination
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-            :current-page="queryInfo.pagenum"
-            :page-sizes="[5, 10, 15, 20]"
-            :page-size="queryInfo.pagesize"
-            layout="total, sizes, prev, pager, next, jumper"
-            :total="total" :background="true">
-            </el-pagination>
+        <!-- 分页区域 -->
+        <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="queryInfo.pagenum"
+        :page-sizes="[5, 10, 15, 20]"
+        :page-size="queryInfo.pagesize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total" :background="true">
+        </el-pagination>
 
-            <!-- 修改商品对话框 -->
-            <el-dialog title="修改商品信息" :visible.sync="editDialogVidsible" @close="editDialogClosed" class="editDialog">
-              <!-- 内容主体区 -->
-              <el-form :model="editForm" :rules="editFormRules" ref="editFormRef" label-width="200px">
-                <el-form-item label="商品名称" prop='F_Name'>
+        <!-- 修改商品对话框 -->
+        <el-dialog title="修改商品信息" :visible.sync="editDialogVidsible" @close="editDialogClosed" class="editDialog">
+            <!-- 内容主体区 -->
+            <el-form :model="editForm" :rules="editFormRules" ref="editFormRef" label-width="200px">
+              <el-form-item label="商品名称" prop='F_Name'>
                   <el-input placeholder="请输入商品名称" v-model="editForm.F_Name" @blur="editForm.F_Name = editForm.F_Name.trim()"></el-input>
-                </el-form-item>
-                <el-form-item label="商品价格 (元)" prop="F_Price">
+              </el-form-item>
+              <el-form-item label="商品价格 (元)" prop="F_Price">
                   <el-input placeholder="请输入商品价格" v-model="editForm.F_Price"></el-input>
-                </el-form-item>
-                <el-form-item label="原图片 (点击预览)" class="editDialogImgFormItem">
+              </el-form-item>
+              <el-form-item label="原图片 (点击预览)" class="editDialogImgFormItem">
                   <el-image style="width: 30px; height: 30px"
                       :src="editForm.F_ImageUrl"
                       :preview-src-list="[editForm.F_ImageUrl]"
                       @click.stop="handleClickItem">
-                    </el-image>
-                </el-form-item>
-                <el-form-item label="上传新图片">
+                  </el-image>
+              </el-form-item>
+              <el-form-item label="上传新图片">
                   <el-upload
                       class="avatar-uploader"
                       action="https://www.donghuastar.com/OSM/uploadFoodImg"
@@ -117,46 +133,43 @@
                       :headers="uploadHeaders">
                       <img v-if="imageUrl" :src="imageUrl" class="avatar">
                       <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                    </el-upload>
-                </el-form-item>
-                <el-form-item label="商品库存" prop="F_Stock">
+                  </el-upload>
+              </el-form-item>
+              <el-form-item label="商品库存" prop="F_Stock">
                   <el-tag v-if="editForm.F_Stock == -1" :closable="true" @close="removeBottomLess" :disable-transitions="true">不限量</el-tag>
                   <div class="editForm_F_Stock_Bottom_Wrap" v-else>
                     <el-input placeholder="请输入商品库存" class="editForm_F_Stock_Input" v-model="editForm.F_Stock"></el-input>
                     <el-radio class="editForm_F_Stock_Radio" v-model="editForm.F_Stock" label=-1>不限量</el-radio>
                   </div>
-                </el-form-item>
-                <!-- <el-form-item label="销量">
-                  <el-input v-model="editForm.F_SalesVolume" :disabled="true"></el-input>
-                </el-form-item> -->
-                <el-form-item label="商品单位" prop="F_Unit">
+              </el-form-item>
+              <el-form-item label="商品单位" prop="F_Unit">
                   <el-input placeholder="请输入商品单位" v-model.trim="editForm.F_Unit" @blur="editForm.F_Unit = editForm.F_Unit.trim()"></el-input>
-                </el-form-item>
-                <el-form-item label="营销标签 (不超过四个字)" prop="F_Tag">
+              </el-form-item>
+              <el-form-item label="营销标签 (不超过四个字)" prop="F_Tag">
                   <el-input placeholder="请输入营销标签" v-model="editForm.F_Tag" @blur="editForm.F_Tag = editForm.F_Tag.trim()"></el-input>
-                </el-form-item>
-                <el-form-item label="规格">
+              </el-form-item>
+              <el-form-item label="规格">
                   <el-tag class="FS_Tag" size="mini" v-if="editForm.F_Specs == undefined || editForm.F_Specs.length <= 0">原价 : {{editForm.F_Price}} 元</el-tag>
                   <el-tag class="FS_Tag"
-                    :disable-transitions="true"
-                    :closable="true"
-                     size="mini"
-                     v-else v-for="item in editForm.F_Specs"
-                     :key="item.FS_ID"
-                     @close="removeEditFormFSTag(item)">
-                     {{item.FS_Key}} : {{$math.chain($math.bignumber(Number(item.FS_Value))).add($math.bignumber(Number(editForm.F_Price)))}} 元</el-tag>
+                  :disable-transitions="true"
+                  :closable="true"
+                      size="mini"
+                      v-else v-for="item in editForm.F_Specs"
+                      :key="item.FS_ID"
+                      @close="removeEditFormFSTag(item)">
+                      {{item.FS_Key}} : {{$math.chain($math.bignumber(Number(item.FS_Value))).add($math.bignumber(Number(editForm.F_Price)))}} 元</el-tag>
                   <el-button v-if="(editForm.F_Specs == undefined || editForm.F_Specs.length <= 2) && !FSinputVisible"
-                    class="button-new-tag" size="small"
-                    @click="showInput">+ New</el-button>
+                  class="button-new-tag" size="small"
+                  @click="showInput">+ New</el-button>
                   <el-input
-                    class="editDialogSpecsInput"
-                    placeholder="规格名称/价格"
-                    v-if="FSinputVisible"
-                    v-model="editFormF_Specs_Input_Value"
-                    @keyup.enter.native="$event.target.blur" @blur="handleInputConfirm"
-                    ref="saveeditDialogFSInput"></el-input>
-                </el-form-item>
-                <el-form-item label="属性">
+                  class="editDialogSpecsInput"
+                  placeholder="规格名称/价格"
+                  v-if="FSinputVisible"
+                  v-model="editFormF_Specs_Input_Value"
+                  @keyup.enter.native="$event.target.blur" @blur="handleInputConfirm"
+                  ref="saveeditDialogFSInput"></el-input>
+              </el-form-item>
+              <el-form-item label="属性">
                   <el-dropdown :hide-on-click="false" v-for="item in editForm.F_Properties" :key="item.FP_ID" trigger="click">
                       <el-button type="primary" size="mini">
                         {{item.FP_Name}}
@@ -165,32 +178,32 @@
                       </el-button>
                       <el-dropdown-menu slot="dropdown" class="editDialogFPDropdownMenu">
                         <el-dropdown-item class="editDialogFPDropdownMenuItem">
-                          一：
-                          <el-input placeholder="请输入" class="editDialogFPItemInput" v-model="item.FP_ValueOne" @blur="item.FP_ValueOne = item.FP_ValueOne.trim()"></el-input>
+                            一：
+                            <el-input placeholder="请输入" class="editDialogFPItemInput" v-model="item.FP_ValueOne" @blur="item.FP_ValueOne = item.FP_ValueOne.trim()"></el-input>
                         </el-dropdown-item>
                         <el-dropdown-item class="editDialogFPDropdownMenuItem">
-                          二：
-                          <el-input placeholder="请输入" class="editDialogFPItemInput" v-model="item.FP_ValueTwo" @blur="item.FP_ValueTwo = item.FP_ValueTwo.trim()"></el-input>
+                            二：
+                            <el-input placeholder="请输入" class="editDialogFPItemInput" v-model="item.FP_ValueTwo" @blur="item.FP_ValueTwo = item.FP_ValueTwo.trim()"></el-input>
                         </el-dropdown-item>
                         <el-dropdown-item class="editDialogFPDropdownMenuItem">
-                          三：
-                          <el-input placeholder="请输入" class="editDialogFPItemInput" v-model="item.FP_ValueThree" @blur="item.FP_ValueThree = item.FP_ValueThree.trim()"></el-input>
+                            三：
+                            <el-input placeholder="请输入" class="editDialogFPItemInput" v-model="item.FP_ValueThree" @blur="item.FP_ValueThree = item.FP_ValueThree.trim()"></el-input>
                         </el-dropdown-item>
                         <el-dropdown-item class="editDialogFPDropdownMenuItem">
-                          四：
-                          <el-input placeholder="请输入" class="editDialogFPItemInput" v-model="item.FP_ValueFour" @blur="item.FP_ValueFour = item.FP_ValueFour.trim()"></el-input>
+                            四：
+                            <el-input placeholder="请输入" class="editDialogFPItemInput" v-model="item.FP_ValueFour" @blur="item.FP_ValueFour = item.FP_ValueFour.trim()"></el-input>
                         </el-dropdown-item>
                         <el-dropdown-item class="editDialogFPDropdownMenuItem">
-                          五：
-                          <el-input placeholder="请输入" class="editDialogFPItemInput" v-model="item.FP_ValueFive" @blur="item.FP_ValueFive = item.FP_ValueFive.trim()"></el-input>
+                            五：
+                            <el-input placeholder="请输入" class="editDialogFPItemInput" v-model="item.FP_ValueFive" @blur="item.FP_ValueFive = item.FP_ValueFive.trim()"></el-input>
                         </el-dropdown-item>
                       </el-dropdown-menu>
-                    </el-dropdown>
-                    <el-button v-if="(editForm.F_Properties == undefined || editForm.F_Properties.length <= 1) && !FPinputVisible"
+                  </el-dropdown>
+                  <el-button v-if="(editForm.F_Properties == undefined || editForm.F_Properties.length <= 1) && !FPinputVisible"
                       class="button-new-fp" size="small"
                       :style="editForm.F_Properties == undefined || editForm.F_Properties.length == 0?'margin-left:0;':'margin-left:20px;'"
                       @click="showProInput">+ New</el-button>
-                    <el-input
+                  <el-input
                       class="editDialogProInput"
                       placeholder="属性类别名称"
                       v-if="FPinputVisible"
@@ -198,26 +211,26 @@
                       :style="editForm.F_Properties == undefined || editForm.F_Properties.length == 0?'margin-left:0;':'margin-left:20px;'"
                       @keyup.enter.native="$event.target.blur" @blur="handleProInputConfirm"
                       ref="saveditDialogFPInput"></el-input>
-                </el-form-item>
-                <el-form-item label="所属分类">
+              </el-form-item>
+              <el-form-item label="所属分类">
                   <el-select v-model="editForm.F_FTID" placeholder="请选择">
                     <el-option
-                      v-for="item in catesList"
-                      :key="item.FT_ID"
-                      :label="item.FT_Name"
-                      :value="item.FT_ID">
+                        v-for="item in catesList"
+                        :key="item.FT_ID"
+                        :label="item.FT_Name"
+                        :value="item.FT_ID">
                     </el-option>
                   </el-select>
-                </el-form-item>
-              </el-form>
-              <!-- 底部区 -->
-              <span slot="footer" class="dialog-footer">
-                <el-button @click="editDialogVidsible = false">取 消</el-button>
-                <el-button type="primary" @click="editFood">确 定</el-button>
-              </span>
-            </el-dialog>
-        </el-card>
-    </div>
+              </el-form-item>
+            </el-form>
+            <!-- 底部区 -->
+            <span slot="footer" class="dialog-footer">
+              <el-button @click="editDialogVidsible = false">取 消</el-button>
+              <el-button type="primary" @click="editFood">确 定</el-button>
+            </span>
+        </el-dialog>
+    </el-card>
+  </div>
 </template>
 
 <script>
@@ -228,7 +241,8 @@ export default {
         query: '',
         pagenum: 1,
         pagesize: 10,
-        mmngctUserName: window.sessionStorage.mmngctUserName
+        mmngctUserName: window.sessionStorage.mmngctUserName,
+        FT_ID: ''
       },
       goodslist: [],
       total: 0,
@@ -277,8 +291,13 @@ export default {
   },
   created () {
     this.getGoodsList()
+    this.getCatesList()
   },
   methods: {
+    // 检索分类选择框发生变化
+    cateChange () {
+      this.getNewGoodsList()
+    },
     // 获取商家商品分类列表
     async getCatesList () {
       const { data: res } = await this.$http.post('cates', this.queryInfo)
@@ -330,8 +349,7 @@ export default {
       // $nextTick 方法的作用,就是当页面上元素被重新渲染之后,才会指定回调函数中的代码
       this.$nextTick(_ => {
         // 如果不再nextTick内部调用的话,会因为输入框还没来得及渲染,导致获取不到输入框
-        // this.$refs.saveditDialogFPInput.$refs.input.focus()
-        this.$refs.saveditDialogFPInput.focus()
+        this.$refs.saveditDialogFPInput.$refs.input.focus()
       })
     },
     // editDialogInput失去焦点或回车时触发
@@ -421,7 +439,7 @@ export default {
       // $nextTick 方法的作用,就是当页面上元素被重新渲染之后,才会指定回调函数中的代码
       this.$nextTick(_ => {
         // 如果不再nextTick内部调用的话,会因为输入框还没来得及渲染,导致获取不到输入框
-        this.$refs.saveeditDialogFSInput.focus()
+        this.$refs.saveeditDialogFSInput.$refs.input.focus()
       })
     },
     // 删除修改信息弹窗规格Tag
@@ -578,7 +596,7 @@ export default {
     },
     // 根据分页获取对应的商品列表
     async getGoodsList () {
-      const { data: res } = await this.$http.post('goods', this.queryInfo)
+      const { data: res } = await this.$http.post('searchGoods', this.queryInfo)
       if (res.meta.status !== 200) {
         this.$message.error('获取商品数据失败!')
         return
@@ -615,9 +633,6 @@ export default {
       }
       this.$message.success('删除成功!')
       this.getNewGoodsList()
-    },
-    goAddpage () {
-      this.$router.push('/static/goods/add')
     }
   }
 }
@@ -709,5 +724,13 @@ export default {
 // 修改信息窗口，属性类别删除
 .editDialogFPDelete:hover {
   color: #000;
+}
+.innerHeaderRow {
+  margin-bottom: 15px;
+  .el-col {
+    font-size: 17px;
+    font-weight: bold;
+    color: #909399;
+  }
 }
 </style>

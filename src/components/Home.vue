@@ -16,7 +16,7 @@
         <!-- 侧边栏菜单区 -->
         <el-menu background-color="#333744" text-color="#fff" active-text-color="#409eff"
          :unique-opened="true" :collapse="isCollapse" :collapse-transition="false"
-         :router="true" :default-active="activePath">
+         :router="true" :default-active="$route.path">
           <!-- 一级菜单 -->
           <el-submenu :index="item.id + ''" v-for="item in menulist" :key="item.id">
             <!-- 一级菜单模板区 -->
@@ -28,7 +28,7 @@
             </template>
             <!-- 二级菜单 -->
             <el-menu-item :index="'/static/' + subItem.path" v-for="subItem in item.children"
-             :key="subItem.id" @click="saveNavState('/static/' + subItem.path)">
+             :key="subItem.id">
               <template slot="title">
                 <i class="el-icon-menu"></i>
                 <span>{{ subItem.authName }}</span>
@@ -56,24 +56,17 @@ export default {
         201: 'iconfont icon-tijikongjian',
         301: 'iconfont icon-shangpin',
         401: 'iconfont icon-danju',
-        501: 'iconfont icon-baobiao'
+        501: 'iconfont icon-baobiao',
+        601: 'el-icon-s-help test'
       },
       // 是否折叠
-      isCollapse: false,
-      // 被激活的链接地址
-      activePath: ''
+      isCollapse: false
     }
   },
   created () {
     this.getMenuList()
-    this.activePath = window.sessionStorage.getItem('activePath')
   },
   mounted () {
-    // 中央总线监听bus发出的rehome事件
-    this.bus.$on('rehome', () => {
-      window.sessionStorage.setItem('activePath', '')
-      this.activePath = ''
-    })
   },
   methods: {
     logout () {
@@ -92,11 +85,6 @@ export default {
     // 点击按钮， 切换菜单的折叠与展开
     toggleCollapse () {
       this.isCollapse = !this.isCollapse
-    },
-    // 保存链接的激活状态
-    saveNavState (activePath) {
-      window.sessionStorage.setItem('activePath', activePath)
-      this.activePath = activePath
     }
   }
 }
