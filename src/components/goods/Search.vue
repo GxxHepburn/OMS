@@ -547,7 +547,6 @@ export default {
       if (res.meta.status !== 200) {
         this.$message.error('修改商品信息失败')
         // 清空对话相关数据
-        this.$refs.editFormRef.resetFields()
         this.imageUrl = ''
         this.catesList = []
         // 重新请求food列表
@@ -559,7 +558,6 @@ export default {
       // 修改成功，关闭对话框，刷数据列表
       this.$message.success('修改商品信息成功')
       // 清空对话框相关数据
-      this.$refs.editFormRef.resetFields()
       this.imageUrl = ''
       this.catesList = []
       // 重新请求food列表
@@ -576,7 +574,6 @@ export default {
     },
     // 监听修改用户对话框的关闭事件
     editDialogClosed () {
-      this.$refs.editFormRef.resetFields()
       this.imageUrl = ''
       this.catesList = []
     },

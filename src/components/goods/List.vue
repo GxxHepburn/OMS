@@ -126,9 +126,6 @@
                     <el-radio class="editForm_F_Stock_Radio" v-model="editForm.F_Stock" label=-1>不限量</el-radio>
                   </div>
                 </el-form-item>
-                <!-- <el-form-item label="销量">
-                  <el-input v-model="editForm.F_SalesVolume" :disabled="true"></el-input>
-                </el-form-item> -->
                 <el-form-item label="商品单位" prop="F_Unit">
                   <el-input placeholder="请输入商品单位" v-model.trim="editForm.F_Unit" @blur="editForm.F_Unit = editForm.F_Unit.trim()"></el-input>
                 </el-form-item>
@@ -529,7 +526,6 @@ export default {
       if (res.meta.status !== 200) {
         this.$message.error('修改商品信息失败')
         // 清空对话相关数据
-        this.$refs.editFormRef.resetFields()
         this.imageUrl = ''
         this.catesList = []
         // 重新请求food列表
@@ -541,7 +537,6 @@ export default {
       // 修改成功，关闭对话框，刷数据列表
       this.$message.success('修改商品信息成功')
       // 清空对话框相关数据
-      this.$refs.editFormRef.resetFields()
       this.imageUrl = ''
       this.catesList = []
       // 重新请求food列表
@@ -550,15 +545,14 @@ export default {
       this.editDialogVidsible = false
     },
     // 展示修改商品信息对话框
-    async showEditDialog (goodItem) {
+    showEditDialog (goodItem) {
       // 深度拷贝
       this.editForm = JSON.parse(JSON.stringify(goodItem))
-      this.editDialogVidsible = true
       this.getCatesList()
+      this.editDialogVidsible = true
     },
     // 监听修改用户对话框的关闭事件
     editDialogClosed () {
-      this.$refs.editFormRef.resetFields()
       this.imageUrl = ''
       this.catesList = []
     },

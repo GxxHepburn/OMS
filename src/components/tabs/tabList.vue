@@ -40,9 +40,9 @@
               </template>
             </el-table-column>
             <el-table-column label="操作" width="130px">
-                <template slot-scope="">
-                    <el-button type="primary" icon="el-icon-edit" size="mini"></el-button>
-                    <el-button type="danger" icon="el-icon-delete" size="mini"></el-button>
+                <template slot-scope="scope">
+                    <el-button type="primary" icon="el-icon-edit" size="mini" @click="showEditDialog(scope.row)"></el-button>
+                    <el-button type="danger" icon="el-icon-delete" size="mini" @click="removeById(scope.row)"></el-button>
                 </template>
             </el-table-column>
           </el-table>
@@ -57,6 +57,34 @@
             layout="total, sizes, prev, pager, next, jumper"
             :total="total" :background="true">
           </el-pagination>
+
+          <!-- 修改商品对话框 -->
+            <el-dialog title="修改餐桌信息" :visible.sync="editDialogVidsible" @close="editDialogClosed" class="editDialog">
+              <!-- 内容主体区 -->
+              <el-form :model="editForm" :rules="editFormRules" ref="editFormRef" label-width="200px">
+                <el-form-item label="餐桌名称" prop='t_Name'>
+                  <el-input placeholder="请输入餐桌名称" v-model="editForm.t_Name" @blur="editForm.t_Name = editForm.t_Name.trim()"></el-input>
+                </el-form-item>
+                <el-form-item label="用餐人数" prop='t_PeopleOfDiners'>
+                  <el-input placeholder="请输入用餐人数" v-model="editForm.t_PeopleOfDiners"></el-input>
+                </el-form-item>
+                <el-form-item label="所属分类">
+                  <el-select v-model="editForm.t_TTID" placeholder="请选择">
+                    <el-option
+                      v-for="item in tabtypesList"
+                      :key="item.TT_ID"
+                      :label="item.TT_Name"
+                      :value="item.TT_ID">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+              </el-form>
+              <!-- 底部区 -->
+              <span slot="footer" class="dialog-footer">
+                <el-button @click="editDialogVidsible = false">取 消</el-button>
+                <el-button type="primary" @click="editTab">确 定</el-button>
+              </span>
+            </el-dialog>
         </el-card>
     </div>
 </template>
@@ -74,14 +102,94 @@ export default {
       tabslist: [],
       total: 0,
       m_ID: '',
-      code: null,
-      qrCodeImgSrc: null
+      code: '',
+      qrCodeImgSrc: '',
+      editDialogVidsible: false,
+      editForm: {},
+      editFormRules: {
+        t_Name: [
+          { required: true, message: '请输入商品名' },
+          { min: 1, max: 10, message: '餐桌名长度在1~10个字符之间' }
+        ],
+        t_PeopleOfDiners: [
+          { required: true, message: '请输入用餐人数' },
+          { pattern: /^[1-9]$|(^[1-2][0-9]$)/, message: '请输入正确的用餐人数' }
+        ]
+      },
+      tabtypesList: []
     }
   },
   created () {
     this.getTabsList()
   },
   methods: {
+    // 修改餐桌信息并提交
+    editTab () {
+      this.$refs.editFormRef.validate(async valid => {
+        // 验证验证规则
+        if (!valid) {
+          return
+        }
+        this.realEditTab()
+      })
+    },
+    // 真正的数据请求
+    async realEditTab () {
+      const { data: res } = await this.$http.post('editTab', this.editForm)
+      if (res.meta.status !== 200) {
+        this.$message.error('修改餐桌信息失败')
+        this.catesList = []
+        // 重新请求food列表
+        this.getNewTabsList()
+        // 关闭对话框,返回food列表界面
+        this.editDialogVidsible = false
+        return
+      }
+      // 修改成功，关闭对话框，刷数据列表
+      this.$message.success('修改餐桌信息成功')
+      this.catesList = []
+      this.getNewTabsList()
+      this.editDialogVidsible = false
+    },
+    // 获取餐桌分类列表
+    async getTabType () {
+      const { data: res } = await this.$http.post('tabtypes', this.queryInfo)
+      if (res.meta.status !== 200) {
+        this.$message.error('获取餐桌分类失败!')
+        return
+      }
+      this.tabtypesList = res.data.tabtypes
+    },
+    // 监听修改用户对话框的关闭事件
+    editDialogClosed () {
+      this.tabtypesList = []
+    },
+    // 展示editDialog
+    showEditDialog (tabItem) {
+      // 深度拷贝
+      this.editForm = JSON.parse(JSON.stringify(tabItem))
+      this.getTabType()
+      this.editDialogVidsible = true
+    },
+    // 删除餐桌
+    async removeById (tabItem) {
+      const confirmResult = await this.$confirm('此操作将永久删除该餐桌,是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: ' 取消',
+        type: 'warning'
+      }).catch(err => err)
+      if (confirmResult !== 'confirm') {
+        this.$message.info('已取消删除!')
+        return
+      }
+      const { data: res } = await this.$http.post('deleteTab', tabItem)
+      if (res.meta.status !== 200) {
+        this.$message.error('删除餐桌失败!')
+        return
+      }
+      this.$message.success('删除成功!')
+      this.getNewTabsList()
+    },
     handleCurrentChange (newPage) {
       this.queryInfo.pagenum = newPage
       this.getTabsList()
@@ -105,7 +213,7 @@ export default {
     // 生成二维码
     qrCode (item) {
       this.$nextTick(function () {
-        if (this.code != null) {
+        if (this.code != null && this.code !== '') {
           this.code.clear()
         }
         document.getElementById('qrcode').innerHTML = ''
