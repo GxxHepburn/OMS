@@ -2,7 +2,7 @@
     <div>
         <!-- 面包屑导航区域 -->
         <el-breadcrumb separator-class="el-icon-arrow-right">
-          <el-breadcrumb-item :to="{ path: '/static/home' }" @click.native="returnhome">首页</el-breadcrumb-item>
+          <el-breadcrumb-item :to="{ path: '/static/home' }">首页</el-breadcrumb-item>
           <el-breadcrumb-item>餐桌管理</el-breadcrumb-item>
           <el-breadcrumb-item>餐桌检索</el-breadcrumb-item>
         </el-breadcrumb>

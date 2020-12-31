@@ -41,7 +41,7 @@
             :total="total">
           </el-pagination>
         </el-card>
-        <!-- 分配角色对话框 -->
+        <!-- 订单对话框 -->
         <el-dialog title="用户订单" :visible.sync="userOrderListDialogVisible" width="55%" @close="userOrderListClosed">
            <!-- 底部区 -->
            <div>
