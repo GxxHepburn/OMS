@@ -8,9 +8,6 @@ import './assets/fonts/iconfont.css'
 import './assets/css/global.css'
 import TreeTable from 'vue-table-with-tree-grid'
 
-// 导入富文本编辑器
-import VueQuillEditor from 'vue-quill-editor'
-
 // 导入 NProgress 包对应JS和CSS
 import NProgress from 'nprogress'
 
@@ -50,8 +47,6 @@ Vue.prototype.$math = math
 
 Vue.config.productionTip = false
 Vue.component('tree-table', TreeTable)
-// 将富文本编辑器,注册为全局可用的组件
-Vue.use(VueQuillEditor)
 
 Vue.prototype.QRCode = QRCode
 
