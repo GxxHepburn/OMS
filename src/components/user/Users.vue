@@ -50,6 +50,9 @@
                  <el-table-column type="expand">
                    <template slot-scope="scope">
                     <el-form label-position="left" class="orderDetail-table-expand">
+                      <el-form-item v-if="scope.row.O_PayStatue === 2" label="实际收入金额:">
+                        <span class="remarksSpan">{{}}</span>
+                      </el-form-item>
                       <el-form-item>
                         <el-table :data="scope.row.orderDetail" :border="false" :stripe="false">
                           <el-table-column type="index"></el-table-column>
@@ -68,6 +71,11 @@
                             </template>
                           </el-table-column>
                           <el-table-column label="数量 (份)" prop="num"></el-table-column>
+                          <el-table-column v-if="scope.row.O_PayStatue === 2" label="退款数量 (份)">
+                            <template slot-scope="OD_Item">
+                              {{OD_Item.row.num - OD_Item.row.OD_RealNum}}
+                            </template>
+                          </el-table-column>
                         </el-table>
                       </el-form-item>
                       <el-form-item label="顾客备注 :">

@@ -28,9 +28,11 @@ import {
   Radio,
   Backtop,
   TimeSelect, TimePicker,
-  Popover
+  Popover,
+  DatePicker
 } from 'element-ui'
 
+Vue.use(DatePicker)
 Vue.use(Popover)
 Vue.use(Button)
 Vue.use(Form)
