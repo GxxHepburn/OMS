@@ -19,7 +19,9 @@
                   </el-input>
               </el-col>
               <el-col :span="3.5">
-                <el-cascader v-model="cascaderModel" :options="tabAndTabTypeOptions" :props="{ checkStrictly: true }" clearable placeholder="请选择餐桌分类或餐桌"></el-cascader>
+                <el-cascader v-model="cascaderModel" :options="tabAndTabTypeOptions"
+                  :props="{ checkStrictly: true }" clearable placeholder="请选择餐桌分类或餐桌"
+                  @change="tabAndTabtypeCascaderChange"></el-cascader>
               </el-col>
               <el-col :span="3.5">
                 <el-date-picker
@@ -65,6 +67,76 @@
               <el-button type="primary" @click="searchOrderForm">搜索</el-button>
             </el-col>
           </el-row>
+          <el-table :data='orderFormList'
+             :border="true"
+             :stripe="true"
+              @expand-change="orderDetailExpand"
+              :row-key="getRowKeys"
+              :expand-row-keys="expands"
+              :row-class-name="tableRowClassName">
+              <el-table-column type="expand">
+                   <template slot-scope="scope">
+                    <el-form label-position="left" class="orderDetail-table-expand">
+                      <el-form-item v-if="scope.row.O_PayStatue === 2" label="实际收入金额:">
+                        <span class="remarksSpan">{{}}</span>
+                      </el-form-item>
+                      <el-form-item>
+                        <el-table :data="scope.row.orderDetail" :border="false" :stripe="false">
+                          <el-table-column type="index"></el-table-column>
+                          <el-table-column label="菜品名称" prop="name"></el-table-column>
+                          <el-table-column label="价格（元）" prop="price"></el-table-column>
+                          <el-table-column label="规格">
+                            <template slot-scope="specs">
+                              <el-tag type="warning" size="mini" v-if="specs.row.specs">{{specs.row.specs}}</el-tag>
+                            </template>
+                          </el-table-column>
+                          <el-table-column label="属性">
+                            <template slot-scope="property"  v-if="property.row.property[0] != ''">
+                              <span v-for="item in property.row.property" :key="item" class="propertySpan">
+                                <el-tag type="success" size="mini" v-if="item != ''">{{item}}</el-tag>
+                              </span>
+                            </template>
+                          </el-table-column>
+                          <el-table-column label="数量 (份)" prop="num"></el-table-column>
+                          <el-table-column v-if="scope.row.O_PayStatue === 2" label="退款数量 (份)">
+                            <template slot-scope="OD_Item">
+                              {{OD_Item.row.num - OD_Item.row.OD_RealNum}}
+                            </template>
+                          </el-table-column>
+                        </el-table>
+                      </el-form-item>
+                      <el-form-item label="顾客备注 :">
+                        <span class="remarksSpan">{{scope.row.O_Remarks === '' ? '客人没有特殊要求！' : scope.row.O_Remarks}}</span>
+                      </el-form-item>
+                    </el-form>
+                  </template>
+                 </el-table-column>
+              <el-table-column type="index"></el-table-column>
+              <el-table-column label="检索 ID" prop="O_UniqSearchID" width="210"></el-table-column>
+              <el-table-column label="餐桌" prop="T_Name"></el-table-column>
+              <el-table-column label="餐桌分类" prop="TT_Name"></el-table-column>
+              <el-table-column label="金额 (元)" prop="O_TotlePrice"></el-table-column>
+              <el-table-column label="支付状态">
+                <!-- 修改成tag -->
+                <template slot-scope="scope">
+                  <el-tag v-if="scope.row.O_PayStatue == 0" type="danger">未支付</el-tag>
+                  <el-tag v-if="scope.row.O_PayStatue == 1" type="primary">已完成</el-tag>
+                  <el-tag v-if="scope.row.O_PayStatue == 2 && scope.row.O_TotlePrice == 0" type="warning">全额退款</el-tag>
+                  <el-tag v-if="scope.row.O_PayStatue == 2 && scope.row.O_TotlePrice != 0" type="warning">部分退款</el-tag>
+                  <el-tag v-if="scope.row.O_PayStatue == 3" type="info">未完成</el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column label="下单时间" prop="O_OrderingTime" width="140"></el-table-column>
+              <el-table-column label="支付时间" prop="O_PayTime" width="140"></el-table-column>
+          </el-table>
+
+          <!-- 分页区域 -->
+          <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
+            :current-page="queryInfo.pagenum" :page-sizes="[1, 2, 5, 10]"
+            :page-size="queryInfo.pagesize"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="total">
+          </el-pagination>
         </el-card>
     </div>
 </template>
@@ -98,14 +170,72 @@ export default {
       ],
       cascaderModel: [],
       orderFormList: [],
-      total: ''
+      total: 0,
+      // 确保唯一expand
+      expands: [],
+      orderDetailParams: {
+        O_ID: 0
+      }
     }
   },
   created () {
     this.getTabAndTabTypeOptions()
-    // this.getOrderFormList()
+    this.getOrderFormList()
   },
   methods: {
+    // 餐桌选择框变化函数
+    tabAndTabtypeCascaderChange () {
+      if (this.cascaderModel.length === 0) {
+        this.queryInfo.TabTypeId = ''
+        this.queryInfo.TabId = ''
+      }
+      if (this.cascaderModel.length === 1) {
+        this.queryInfo.TabTypeId = this.cascaderModel[0]
+        this.queryInfo.TabId = ''
+      }
+      if (this.cascaderModel.length === 2) {
+        this.queryInfo.TabId = this.cascaderModel[1]
+        this.queryInfo.TabTypeId = ''
+      }
+    },
+    // 监听pagesize 改变的事件
+    handleSizeChange (newSize) {
+      this.queryInfo.pagesize = newSize
+      this.getNewOrderFormList()
+    },
+    // 监听 页码 改变的事件
+    handleCurrentChange (newPage) {
+      this.queryInfo.pagenum = newPage
+      this.getNewOrderFormList()
+    },
+    tableRowClassName ({ row, rowIndex }) {
+      row.row_index = rowIndex
+    },
+    getRowKeys (row) {
+      return row.O_ID
+    },
+    orderDetailExpand (row, expandedRows) {
+      var that = this
+      if (expandedRows.length) {
+        that.expands = []
+        if (row) {
+          that.expands.push(row.O_ID)
+          // 请求订单详细信息
+          that.orderDetailParams.O_ID = row.O_ID
+          that.getOrderDetail(row.row_index)
+        }
+      } else {
+        that.expands = []
+      }
+    },
+    async getOrderDetail (index) {
+      const { data: res } = await this.$http.post('orderDetails', this.orderDetailParams)
+      if (res.meta.status !== 200) {
+        this.$message.error('获取订单信息失败')
+        return
+      }
+      this.$set(this.orderFormList[index], 'orderDetail', res.data)
+    },
     async getTabAndTabTypeOptions () {
       const { data: res } = await this.$http.post('ordersTabAndTabTypeOptions', this.queryInfo)
       if (res.meta.status !== 200) {
@@ -121,14 +251,10 @@ export default {
         return
       }
       this.orderFormList = res.data.orderFormList
+      this.total = res.data.total
     },
     getNewOrderFormList () {
       this.queryInfo.pagenum = 1
-      if (this.cascaderModel.length === 1) {
-        this.queryInfo.TabTypeId = this.cascaderModel[0]
-      } if (this.cascaderModel.length === 2) {
-        this.queryInfo.TabId = this.cascaderModel[1]
-      }
       this.getOrderFormList()
     },
     searchOrderForm () {
@@ -143,6 +269,20 @@ export default {
   margin-bottom: 20px;
   &:last-child {
     margin-bottom: 0;
+  }
+}
+.propertySpan {
+  display: inline-block;
+  padding-right: 10px;
+}
+.orderDetail-table-expand {
+  /deep/ .el-form-item__label {
+    color: #F56C6C;
+    font-size: 20px;
+    font-weight: bold;
+  }
+  /deep/ .remarksSpan {
+    color: #99a9bf;
   }
 }
 </style>
