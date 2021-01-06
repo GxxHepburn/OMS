@@ -14,7 +14,7 @@
                   <el-input placeholder="订单号" v-model="queryInfo.O_UniqSearchID" :clearable="true">
                   </el-input>
               </el-col>
-              <el-col :span="4">
+              <el-col :span="7">
                   <el-input placeholder="用户号" v-model="queryInfo.U_OpenId" :clearable="true">
                   </el-input>
               </el-col>
@@ -67,6 +67,7 @@
               <el-button type="primary" @click="searchOrderForm">搜索</el-button>
             </el-col>
           </el-row>
+
           <el-table :data='orderFormList'
              :border="true"
              :stripe="true"
@@ -78,7 +79,24 @@
                    <template slot-scope="scope">
                     <el-form label-position="left" class="orderDetail-table-expand">
                       <el-form-item v-if="scope.row.O_PayStatue === 2" label="实际收入金额:">
-                        <span class="remarksSpan">{{}}</span>
+                        <span class="remarksSpan">{{scope.row.O_TotlePrice}} 元</span>
+                      </el-form-item>
+                      <el-form-item v-if="scope.row.O_PayStatue === 2" label="退款金额 (包含未支付时，已退回商品):">
+                        <span class="remarksSpan">{{returnTotalPrice(scope.row)}} 元</span>
+                      </el-form-item>
+
+                      <el-form-item v-if="scope.row.O_PayStatue === 0" label="客人应支付金额:">
+                        <span class="remarksSpan">{{scope.row.O_TotlePrice}} 元</span>
+                      </el-form-item>
+                      <el-form-item v-if="scope.row.O_PayStatue === 0" label="退点商品金额 :">
+                        <span class="remarksSpan">{{returnTotalPrice(scope.row)}} 元</span>
+                      </el-form-item>
+
+                      <el-form-item v-if="scope.row.O_PayStatue === 3" label="客人应支付金额:">
+                        <span class="remarksSpan">{{scope.row.O_TotlePrice}} 元</span>
+                      </el-form-item>
+                      <el-form-item v-if="scope.row.O_PayStatue === 3" label="退点商品金额 :">
+                        <span class="remarksSpan">{{returnTotalPrice(scope.row)}} 元</span>
                       </el-form-item>
                       <el-form-item>
                         <el-table :data="scope.row.orderDetail" :border="false" :stripe="false">
@@ -99,6 +117,11 @@
                           </el-table-column>
                           <el-table-column label="数量 (份)" prop="num"></el-table-column>
                           <el-table-column v-if="scope.row.O_PayStatue === 2" label="退款数量 (份)">
+                            <template slot-scope="OD_Item">
+                              {{OD_Item.row.num - OD_Item.row.OD_RealNum}}
+                            </template>
+                          </el-table-column>
+                          <el-table-column v-if="scope.row.O_PayStatue === 0 || scope.row.O_PayStatue === 3" label="退点数量 (份)">
                             <template slot-scope="OD_Item">
                               {{OD_Item.row.num - OD_Item.row.OD_RealNum}}
                             </template>
@@ -132,7 +155,7 @@
 
           <!-- 分页区域 -->
           <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
-            :current-page="queryInfo.pagenum" :page-sizes="[1, 2, 5, 10]"
+            :current-page="queryInfo.pagenum" :page-sizes="[5, 10, 15, 20]"
             :page-size="queryInfo.pagesize"
             layout="total, sizes, prev, pager, next, jumper"
             :total="total">
@@ -178,11 +201,34 @@ export default {
       }
     }
   },
+  computed: {
+    returnTotalPrice: function () {
+      return function (item) {
+        var returnTotalPriceInner = 0.0
+        for (var index in item.orderDetail) {
+          var foodItem = item.orderDetail[index]
+          returnTotalPriceInner += (foodItem.num - foodItem.OD_RealNum) * foodItem.price
+        }
+        return returnTotalPriceInner
+      }
+    }
+  },
   created () {
+    this.getParamsFromUsers()
     this.getTabAndTabTypeOptions()
     this.getOrderFormList()
   },
   methods: {
+    // 从用户列表页面跳转，获取用户检索id参数
+    getParamsFromUsers () {
+      // 取到路由带过来的参数
+      const routerParams = this.$route.params
+      this.queryInfo.U_OpenId = routerParams.U_OpenId
+      // 避免刷新后由于params消失，导致U_OpenId undefined
+      if (this.queryInfo.U_OpenId === undefined) {
+        this.queryInfo.U_OpenId = ''
+      }
+    },
     // 餐桌选择框变化函数
     tabAndTabtypeCascaderChange () {
       if (this.cascaderModel.length === 0) {
@@ -206,7 +252,7 @@ export default {
     // 监听 页码 改变的事件
     handleCurrentChange (newPage) {
       this.queryInfo.pagenum = newPage
-      this.getNewOrderFormList()
+      this.getOrderFormList()
     },
     tableRowClassName ({ row, rowIndex }) {
       row.row_index = rowIndex
@@ -277,12 +323,14 @@ export default {
 }
 .orderDetail-table-expand {
   /deep/ .el-form-item__label {
-    color: #F56C6C;
-    font-size: 20px;
+    color: #99a9bf;
+    font-size: 17px;
     font-weight: bold;
   }
   /deep/ .remarksSpan {
-    color: #99a9bf;
+    color: #F56C6C;
+    font-size: 20px;
+    font-weight: bold;
   }
 }
 </style>

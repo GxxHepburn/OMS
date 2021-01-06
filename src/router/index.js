@@ -88,6 +88,7 @@ const routes = [
       },
       {
         path: '/static/orders',
+        name: 'Order',
         component: Order
       },
       {

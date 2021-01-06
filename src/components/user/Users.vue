@@ -21,7 +21,7 @@
           <el-table :data='userlist' :border="true" :stripe="true">
             <el-table-column type="index"></el-table-column>
             <el-table-column label="Code" prop="U_ID"></el-table-column>
-            <el-table-column label="检索ID" prop="U_OpenId"></el-table-column>
+            <el-table-column label="检索ID" prop="U_OpenId" width="400px"></el-table-column>
             <el-table-column label="注册时间" prop="U_RegisterTime"></el-table-column>
             <el-table-column label="最后登陆时间" prop="U_LoginTime"></el-table-column>
             <el-table-column label="最近下单时间" prop="O_OrderingTime"></el-table-column>
@@ -41,66 +41,6 @@
             :total="total">
           </el-pagination>
         </el-card>
-        <!-- 订单对话框 -->
-        <el-dialog title="用户订单" :visible.sync="userOrderListDialogVisible" width="55%" @close="userOrderListClosed">
-           <!-- 底部区 -->
-           <div>
-             <el-card>
-               <el-table :data='userOrdersList' :border="true" :stripe="true" height="500" @expand-change="orderDetailExpand" :row-key="getRowKeys" :expand-row-keys="expands" :row-class-name="tableRowClassName">
-                 <el-table-column type="expand">
-                   <template slot-scope="scope">
-                    <el-form label-position="left" class="orderDetail-table-expand">
-                      <el-form-item v-if="scope.row.O_PayStatue === 2" label="实际收入金额:">
-                        <span class="remarksSpan">{{}}</span>
-                      </el-form-item>
-                      <el-form-item>
-                        <el-table :data="scope.row.orderDetail" :border="false" :stripe="false">
-                          <el-table-column type="index"></el-table-column>
-                          <el-table-column label="菜品名称" prop="name"></el-table-column>
-                          <el-table-column label="价格（元）" prop="price"></el-table-column>
-                          <el-table-column label="规格">
-                            <template slot-scope="specs">
-                              <el-tag type="warning" size="mini" v-if="specs.row.specs">{{specs.row.specs}}</el-tag>
-                            </template>
-                          </el-table-column>
-                          <el-table-column label="属性">
-                            <template slot-scope="property"  v-if="property.row.property[0] != ''">
-                              <span v-for="item in property.row.property" :key="item" class="propertySpan">
-                                <el-tag type="success" size="mini" v-if="item != ''">{{item}}</el-tag>
-                              </span>
-                            </template>
-                          </el-table-column>
-                          <el-table-column label="数量 (份)" prop="num"></el-table-column>
-                          <el-table-column v-if="scope.row.O_PayStatue === 2" label="退款数量 (份)">
-                            <template slot-scope="OD_Item">
-                              {{OD_Item.row.num - OD_Item.row.OD_RealNum}}
-                            </template>
-                          </el-table-column>
-                        </el-table>
-                      </el-form-item>
-                      <el-form-item label="顾客备注 :">
-                        <span class="remarksSpan">{{scope.row.O_Remarks === '' ? '客人没有特殊要求！' : scope.row.O_Remarks}}</span>
-                      </el-form-item>
-                    </el-form>
-                  </template>
-                 </el-table-column>
-                 <el-table-column type="index"></el-table-column>
-                 <el-table-column label="检索 ID" prop="O_UniqSearchID" width="210"></el-table-column>
-                 <el-table-column label="餐桌" prop="T_Name"></el-table-column>
-                 <el-table-column label="餐桌分类" prop="TT_Name"></el-table-column>
-                 <el-table-column label="金额 (元)" prop="O_TotlePrice"></el-table-column>
-                 <el-table-column label="支付状态">
-                   <!-- 修改成tag -->
-                   <template slot-scope="scope">
-                     <el-tag :type="scope.row.O_PayStatue === 1 ? '' : 'danger'">{{scope.row.O_PayStatue === 1 ? '已支付' : '未支付'}}</el-tag>
-                   </template>
-                 </el-table-column>
-                 <el-table-column label="下单时间" prop="O_OrderingTime" width="140"></el-table-column>
-                 <el-table-column label="支付时间" prop="O_PayTime" width="140"></el-table-column>
-               </el-table>
-             </el-card>
-           </div>
-        </el-dialog>
     </div>
 </template>
 
@@ -117,53 +57,13 @@ export default {
         mmngctUserName: window.sessionStorage.mmngctUserName
       },
       userlist: [],
-      total: 0,
-      // 控制用户订单列表对话框的显示与隐藏
-      userOrderListDialogVisible: false,
-      // 需要查询订单的用户信息
-      userInfo: {},
-      // 用户的订单列表
-      userOrdersList: [],
-      // 请求参数
-      orderDetailParams: {
-        O_ID: 0
-      },
-      // 确保唯一expand
-      expands: []
+      total: 0
     }
   },
   created () {
     this.getUserList()
   },
   methods: {
-    tableRowClassName ({ row, rowIndex }) {
-      row.row_index = rowIndex
-    },
-    getRowKeys (row) {
-      return row.O_ID
-    },
-    orderDetailExpand (row, expandedRows) {
-      var that = this
-      if (expandedRows.length) {
-        that.expands = []
-        if (row) {
-          that.expands.push(row.O_ID)
-          // 请求订单详细信息
-          that.orderDetailParams.O_ID = row.O_ID
-          that.getOrderDetail(row.row_index)
-        }
-      } else {
-        that.expands = []
-      }
-    },
-    async getOrderDetail (index) {
-      const { data: res } = await this.$http.post('orderDetails', this.orderDetailParams)
-      if (res.meta.status !== 200) {
-        this.$message.error('获取订单信息失败')
-        return
-      }
-      this.$set(this.userOrdersList[index], 'orderDetail', res.data)
-    },
     async getUserList () {
       const { data: res } = await this.$http.get('users', { params: this.queryInfo })
       if (res.meta.status !== 200) {
@@ -189,23 +89,16 @@ export default {
       this.queryInfo.pagenum = 1
       this.getUserList()
     },
-    // 展示分配角色的对话框
-    async getUserOrderList (userInfo) {
-      this.userInfo = userInfo
-      // 在展示对话框之前,获取该用户所有订单的列表
-      const { data: res } = await this.$http.post('userOrdersList', this.userInfo)
-      if (res.meta.status !== 200) {
-        this.$message.error('获取该用户订单列表失败')
-        return
-      }
-      this.userOrdersList = res.data
-      this.userOrderListDialogVisible = true
-    },
-    // 监听分配角色对话框的关闭事件
-    userOrderListClosed () {
-      this.userInfo = ''
-      this.userOrdersList = []
-      this.orderDetailParams.O_ID = 0
+    // 跳转到订单列表
+    getUserOrderList (row) {
+      // 带参数跳转到订单列表页面
+      this.$router.push({
+        path: '/static/orders',
+        name: 'Order',
+        params: {
+          U_OpenId: row.U_OpenId
+        }
+      })
     }
   }
 }
