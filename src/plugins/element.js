@@ -29,9 +29,13 @@ import {
   Backtop,
   TimeSelect, TimePicker,
   Popover,
-  DatePicker
+  DatePicker,
+  PageHeader,
+  Divider
 } from 'element-ui'
 
+Vue.use(Divider)
+Vue.use(PageHeader)
 Vue.use(DatePicker)
 Vue.use(Popover)
 Vue.use(Button)

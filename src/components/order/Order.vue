@@ -151,6 +151,11 @@
               </el-table-column>
               <el-table-column label="下单时间" prop="O_OrderingTime" width="140"></el-table-column>
               <el-table-column label="支付时间" prop="O_PayTime" width="140"></el-table-column>
+              <el-table-column label="操作" width="140">
+                <template slot-scope="scope">
+                  <el-button type="primary" icon="el-icon-setting" size="mini" @click="orderSettingButtonClick(scope.row)"></el-button>
+                </template>
+              </el-table-column>
           </el-table>
 
           <!-- 分页区域 -->
@@ -219,6 +224,10 @@ export default {
     this.getOrderFormList()
   },
   methods: {
+    // 订单操作按钮
+    orderSettingButtonClick (row) {
+      this.$router.push({ path: '/static/orderItemSetting', query: row })
+    },
     // 从用户列表页面跳转，获取用户检索id参数
     getParamsFromUsers () {
       // 取到路由带过来的参数

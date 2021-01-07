@@ -26,6 +26,10 @@ const AddCate = () => import('../components/goods/AddCate.vue')
 // import Order from '../components/order/Order.vue'
 const Order = () => import(/* webpackChunkName: "order_report" */ '../components/order/Order.vue')
 
+const OrderTaking = () => import('../components/order/OrderTaking.vue')
+
+const OrderItemSetting = () => import('../components/order/OrderItemSetting.vue')
+
 const AddTab = () => import(/* webpackChunkName: "order_report" */ '../components/tabs/addTab.vue')
 
 const AddTabType = () => import(/* webpackChunkName: "order_report" */ '../components/tabs/addTabType.vue')
@@ -90,6 +94,14 @@ const routes = [
         path: '/static/orders',
         name: 'Order',
         component: Order
+      },
+      {
+        path: '/static/nowOrders',
+        component: OrderTaking
+      },
+      {
+        path: '/static/orderItemSetting',
+        component: OrderItemSetting
       },
       {
         path: '/static/tabList',
