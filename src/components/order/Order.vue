@@ -226,7 +226,13 @@ export default {
   methods: {
     // 订单操作按钮
     orderSettingButtonClick (row) {
-      this.$router.push({ path: '/static/orderItemSetting', query: row })
+      this.$router.push({
+        path: '/static/orderItemSetting',
+        query: {
+          O_ID: row.O_ID,
+          O_PayStatue: row.O_PayStatue
+        }
+      })
     },
     // 从用户列表页面跳转，获取用户检索id参数
     getParamsFromUsers () {

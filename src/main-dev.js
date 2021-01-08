@@ -23,6 +23,8 @@ import * as math from 'mathjs'
 
 // 引入qrcodejs2
 import QRCode from 'qrcodejs2'
+// 引入打印插件
+import Print from 'vue-print-nb'
 
 import axios from 'axios'
 // 配置请求的根路径
@@ -50,6 +52,8 @@ Vue.config.productionTip = false
 Vue.component('tree-table', TreeTable)
 
 Vue.prototype.QRCode = QRCode
+
+Vue.use(Print)
 
 Vue.filter('dateFormat', function (originVal) {
   const dt = new Date(originVal)
