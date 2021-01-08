@@ -10,7 +10,8 @@ module.exports = {
         lodash: '_',
         echarts: 'echarts',
         nprogress: 'NProgress',
-        mathjs: 'math'
+        mathjs: 'math',
+        qrcodejs2: 'QRCode'
       })
       config.plugin('html').tap(args => {
         args[0].isProd = true

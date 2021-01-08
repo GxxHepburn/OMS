@@ -6,7 +6,6 @@ import router from './router'
 import './assets/fonts/iconfont.css'
 // 导入全局样式表
 import './assets/css/global.css'
-import TreeTable from 'vue-table-with-tree-grid'
 
 // 导入 NProgress 包对应JS和CSS
 import NProgress from 'nprogress'
@@ -48,7 +47,6 @@ Vue.prototype.$isEqual = isEqual
 Vue.prototype.$math = math
 
 Vue.config.productionTip = false
-Vue.component('tree-table', TreeTable)
 
 Vue.prototype.QRCode = QRCode
 
