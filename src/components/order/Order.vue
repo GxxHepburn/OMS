@@ -138,6 +138,7 @@
               <el-table-column label="检索 ID" prop="O_UniqSearchID" width="210"></el-table-column>
               <el-table-column label="餐桌" prop="T_Name"></el-table-column>
               <el-table-column label="餐桌分类" prop="TT_Name"></el-table-column>
+              <el-table-column label="用餐人数" prop="O_NumberOfDiners"></el-table-column>
               <el-table-column label="金额 (元)" prop="O_TotlePrice"></el-table-column>
               <el-table-column label="支付状态">
                 <!-- 修改成tag -->

@@ -52,6 +52,8 @@ Vue.prototype.QRCode = QRCode
 
 Vue.use(Print)
 
+Vue.prototype.$print = Print
+
 Vue.filter('dateFormat', function (originVal) {
   const dt = new Date(originVal)
 
