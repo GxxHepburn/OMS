@@ -10,7 +10,7 @@
 
         <!-- 卡片视图 -->
         <el-card>
-          <el-divider content-position="left">订单信息</el-divider>
+          <el-divider content-position="left">订单综合信息</el-divider>
 
           <el-table :data='[orderForm]'>
             <el-table-column label="检索 ID" prop="o_UniqSearchID" width="210"></el-table-column>
@@ -35,11 +35,14 @@
           <el-divider content-position="left">订单操作区域</el-divider>
 
           <el-row :gutter="20">
-            <el-col :span="3">
+            <el-col :span="2">
               <el-button type="primary" v-print="'#printST'">打印客人小票</el-button>
             </el-col>
-            <el-col :span="3">
+            <el-col :span="2">
               <el-button type="primary" v-print="'#printKT'">打印厨房餐票</el-button>
+            </el-col>
+            <el-col :span="2">
+              <el-button type="primary" v-print="'#printMT'">打印店铺底票</el-button>
             </el-col>
             <el-col :span="2.1">
               <el-button :disabled="OrderFiDisAble" type="warning">订单支付完成</el-button>
@@ -50,9 +53,12 @@
             <el-col :span="3">
               <el-button :disabled="OrderReturnDisAble" type="danger">退 款</el-button>
             </el-col>
+            <el-col :span="3">
+              <el-button :disabled="OrderReturnWithOutMoneyDisAble" type="danger">仅退餐品</el-button>
+            </el-col>
           </el-row>
 
-          <el-divider content-position="left">订单详情</el-divider>
+          <el-divider content-position="left">总订综合详情</el-divider>
 
           <el-table :data="orderDetailForm" :border="false" :stripe="false">
             <el-table-column type="index"></el-table-column>
@@ -72,13 +78,34 @@
             </el-table-column>
             <el-table-column label="实际数量 (份)" prop="OD_RealNum"></el-table-column>
             <el-table-column label="下单数量 (份)" prop="num"></el-table-column>
-            <el-table-column label="退点数量 (份)">
+            <el-table-column label="退款数量 (份)">
               <template slot-scope="OD_Item">
                 <span v-if="OD_Item.row.num - OD_Item.row.OD_RealNum == 0">0</span>
                 <el-tag v-else type="danger">{{OD_Item.row.num - OD_Item.row.OD_RealNum}}</el-tag>
               </template>
             </el-table-column>
           </el-table>
+
+        </el-card>
+
+        <el-card class="bottomElCard">
+          <el-divider content-position="left">加菜列表</el-divider>
+          <div></div>
+        </el-card>
+
+        <el-card class="bottomElCard">
+          <el-divider content-position="left">退菜列表</el-divider>
+          <div></div>
+        </el-card>
+
+        <el-card class="bottomElCard">
+          <el-divider content-position="left">支付信息</el-divider>
+          <div></div>
+        </el-card>
+
+        <el-card class="bottomElCard">
+          <el-divider content-position="left">退款信息</el-divider>
+          <div></div>
         </el-card>
 
         <el-card class="bottomElCard">
@@ -98,8 +125,8 @@
                 <p><label>用餐人数:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_NumberOfDiners}}人</label></p>
                 <div style="border-bottom:#000 dashed 1px;"></div>
                 <p><label>客人备注:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_Remarks}}</label></p>
-                <p>****************商品****************</p>
-                <div v-for="item in orderDetailForm" :key="item.id">
+                <p>*****************商品***************</p>
+                <div v-for="item in orderDetailForm"><!-- eslint-disable-line -->
                   <p>
                     <label style="font-size:20px;">{{item.name}}</label><label style="font-size:17px;margin-left:10px;"><em> {{item.specs}}</em><em v-for="proItem in item.property"> {{proItem}}</em></label><!-- eslint-disable-line -->
                   </p>
@@ -109,8 +136,14 @@
                 </div>
                 <div style="border-bottom:#000 dashed 1px;"></div>
                 <p><label style="margin-left:100px;font-size:25px;">合计:</label><label style="font-size:25px;margin-left:20px;">￥{{orderForm.o_TotlePrice}}</label></p>
+                <p>*************************************</p>
                 <div style="border-bottom:#000 dashed 1px;"></div>
                 <p><label>打印时间:</label><label style="font-size:13px;margin-left:10px;">{{new Date().toLocaleString()}}</label></p>
+                <p><label>餐厅联系电话:</label><label style="font-size:13px;margin-left:10px;">{{merForm.m_Phone}}</label></p>
+                <p><label>餐厅地址:</label><label style="font-size:13px;margin-left:10px;">{{merForm.m_Address}}</label></p>
+                <p><label style="font-size:13px;">技术供应商:</label><label style="font-size:13px;margin-left:10px;">上海俣珩科技(东华之星™)</label></p>
+                <p><label style="font-size:13px;">供应商联系方式:</label><label style="font-size:10px;margin-left:10px;">18860976772</label></p>
+                <p><label style="font-size:13px;">供应商联系方式:</label><label style="font-size:10px;margin-left:10px;">1152862327@qq.com</label></p>
               </div>
             </div>
 
@@ -124,7 +157,29 @@
                 <p><label>单号:</label><label>100006032</label></p>
                 <p><label>交易时间:</label><label>2021-01-09 13:29:23</label></p>
                 <hr/><!-- 分割线 -->
-                <div v-for="item in orderDetailForm" :key="item.id">
+                <div v-for="item in orderDetailForm"><!-- eslint-disable-line -->
+                  <p>
+                    <label>{{item.name}}</label><em> {{item.specs}}</em><em v-for="proItem in item.property"> {{proItem}}</em><!-- eslint-disable-line -->
+                  </p>
+                  <p>
+                    <label  style="margin-right:30px;margin-left:120px">x{{item.OD_RealNum}}</label><label>￥{{item.price}}</label>
+                  </p>
+                </div>
+                <hr/>
+              </div>
+            </div>
+
+            <div class="bill-preview">
+              <h3>厨房餐票预览</h3>
+              <div id="printMT" class="detail">
+                <p style="text-align:center;font-size:25px">店铺底票</p>
+                <h1 class="ST_merName">{{merForm.m_Name}}</h1>
+                <br/>
+                <hr/><!-- 分割线 -->
+                <p><label>单号:</label><label>100006032</label></p>
+                <p><label>交易时间:</label><label>2021-01-09 13:29:23</label></p>
+                <hr/><!-- 分割线 -->
+                <div v-for="item in orderDetailForm"><!-- eslint-disable-line -->
                   <p>
                     <label>{{item.name}}</label><em> {{item.specs}}</em><em v-for="proItem in item.property"> {{proItem}}</em><!-- eslint-disable-line -->
                   </p>
@@ -148,11 +203,13 @@ export default {
       orderForm: {},
       merForm: {},
       orderDetailForm: [],
+      orderAddFormList: [],
       returnTotlePrice: '',
       O_PayStatue: '',
       OrderFiDisAble: true,
       OrderNotFiDisAble: true,
       OrderReturnDisAble: true,
+      OrderReturnWithOutMoneyDisAble: true,
       printObj: {
         id: 'printMe',
         popTitle: 'good print',
@@ -176,6 +233,8 @@ export default {
         this.OrderNotFiDisAble = false
         // 已完成
         this.OrderFiDisAble = false
+        // 退点
+        this.OrderReturnWithOutMoneyDisAble = false
       } else if (this.O_PayStatue === '1') {
         // 退款
         this.OrderReturnDisAble = false
@@ -193,11 +252,18 @@ export default {
 
       const { data: res2 } = await this.$http.post('getOrderForm', { O_ID: this.O_ID })
       if (res2.meta.status !== 200) {
-        this.$message.error('获取订单信息失败')
+        this.$message.error('获取订单综合信息失败')
         return
       }
       this.orderForm = res2.data.orderForm
       this.merForm = res2.data.merForm
+
+      // const { data: res3 } = await this.$http.post('getOrderAddFormList', { O_ID: this.O_ID })
+      // if (res2.meta.status !== 200) {
+      //   this.$message.error('获取加餐信息失败')
+      //   return
+      // }
+      // this.orderAddFormList = res3.data.orderAddFormList
     }
   }
 }
