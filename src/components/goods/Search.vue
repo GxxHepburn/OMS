@@ -19,8 +19,7 @@
         </el-row>
         <el-row :gutter="20">
             <el-col :span="8">
-                <el-input placeholder="请输商品名称（支持模糊查询,输入凉拌，可搜索凉拌黄瓜等)
-                )" v-model="queryInfo.query" :clearable="true"
+                <el-input placeholder="请输商品名称（支持模糊查询,输入凉拌，可搜索凉拌黄瓜等)" v-model="queryInfo.query" :clearable="true"
                 @clear="getNewGoodsList" @keyup.enter.native="getNewGoodsList">
                     <el-button slot="append" icon="el-icon-search" @click="getNewGoodsList"></el-button>
                 </el-input>
@@ -34,8 +33,8 @@
                     :value="item.FT_ID">
                 </el-option>
               </el-select>
-              <!-- 清空，选择触发刷新事件；label -->
             </el-col>
+            <el-button style="float:right;margin-right:30px;" type="danger" @click="onePunchUpGoods">一键上货</el-button>
         </el-row>
 
         <!-- table 表格区域 -->
@@ -294,6 +293,25 @@ export default {
     this.getCatesList()
   },
   methods: {
+    // 一键上货
+    async onePunchUpGoods () {
+      const confirmResult = await this.$confirm('此操作将所有售罄商品设置为不限量,是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: ' 取消',
+        type: 'warning'
+      }).catch(err => err)
+      if (confirmResult !== 'confirm') {
+        this.$message.info('已取消删除!')
+        return
+      }
+      const { data: res } = await this.$http.post('onePunchUpGoods', this.queryInfo)
+      if (res.meta.status !== 200) {
+        this.$message.error('一键上货失败!')
+        return
+      }
+      this.$message.success('一键上货成功!')
+      this.getNewGoodsList()
+    },
     // 检索分类选择框发生变化
     cateChange () {
       this.getNewGoodsList()

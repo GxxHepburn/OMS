@@ -11,15 +11,15 @@
         <el-card>
             <el-row :gutter="20">
                 <el-col :span="8">
-                    <el-input placeholder="请输商品名称（支持模糊查询,输入凉拌，可搜索凉拌黄瓜等)
-                    )" v-model="queryInfo.query" :clearable="true"
+                    <el-input placeholder="请输商品名称（支持模糊查询,输入凉拌，可搜索凉拌黄瓜等)" v-model="queryInfo.query" :clearable="true"
                     @clear="getNewGoodsList" @keyup.enter.native="getNewGoodsList">
                         <el-button slot="append" icon="el-icon-search" @click="getNewGoodsList"></el-button>
                     </el-input>
                 </el-col>
-                <el-col :span="4">
+                <el-col :span="2">
                     <el-button type="primary" @click="goAddpage">添加商品</el-button>
                 </el-col>
+                <el-button style="float:right;margin-right:30px;" type="danger" @click="onePunchUpGoods">一键上货</el-button>
             </el-row>
 
             <!-- table 表格区域 -->
@@ -276,6 +276,25 @@ export default {
     this.getGoodsList()
   },
   methods: {
+    // 一键上货
+    async onePunchUpGoods () {
+      const confirmResult = await this.$confirm('此操作将所有售罄商品设置为不限量,是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: ' 取消',
+        type: 'warning'
+      }).catch(err => err)
+      if (confirmResult !== 'confirm') {
+        this.$message.info('已取消删除!')
+        return
+      }
+      const { data: res } = await this.$http.post('onePunchUpGoods', this.queryInfo)
+      if (res.meta.status !== 200) {
+        this.$message.error('一键上货失败!')
+        return
+      }
+      this.$message.success('一键上货成功!')
+      this.getNewGoodsList()
+    },
     // 获取商家商品分类列表
     async getCatesList () {
       const { data: res } = await this.$http.post('cates', this.queryInfo)
@@ -673,12 +692,6 @@ export default {
   display: inline-block;
   width: 200px;
 }
-// .editDialogFPItemDelete {
-//   margin-left: 10px;
-//   height: 25px;
-//   width: 50px;
-//   padding: 0 0 0 0;
-// }
 .editDialogFPDropdownMenuItem:hover {
   background-color: #ffffff;
 }

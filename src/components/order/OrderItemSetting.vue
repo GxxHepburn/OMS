@@ -376,6 +376,13 @@ export default {
         this.$message.info('未选择退点餐品')
       } else {
         // 发送请求，在失败中提示，退点餐品失败，在成功中刷新页面
+        const { data: res } = await this.$http.post('onlyReturnGoods', { onlyReturnGoodOrderDetailForm: this.onlyReturnGoodOrderDetailForm, O_ID: this.O_ID })
+        if (res.meta.status !== 200) {
+          this.$message.error('退点餐品失败')
+          return
+        }
+        this.$message.success('退点餐品成功')
+        this.initOrderDetailForm()
       }
       this.onlyReturnGoodDialogVisible = false
     },
@@ -390,21 +397,6 @@ export default {
     // 初始化订单操作界面数据
     async initOrderDetailForm () {
       this.O_ID = this.$route.query.O_ID
-      this.O_PayStatue = this.$route.query.O_PayStatue
-      if (this.O_PayStatue === '0') {
-        // 未完成
-        this.OrderNotFiDisAble = false
-        // 已完成
-        this.OrderFiDisAble = false
-        // 退点
-        this.OrderReturnWithOutMoneyDisAble = false
-      } else if (this.O_PayStatue === '1') {
-        // 退款
-        this.OrderReturnDisAble = false
-      } else if (this.O_PayStatue === '2') {
-        // 退款
-        this.OrderReturnDisAble = false
-      }
 
       const { data: res } = await this.$http.post('orderDetails', { O_ID: this.O_ID })
       if (res.meta.status !== 200) {
@@ -420,6 +412,26 @@ export default {
       }
       this.orderForm = res2.data.orderForm
       this.merForm = res2.data.merForm
+      // 根据最新订单情况，更新按钮
+      this.OrderFiDisAble = true
+      this.OrderNotFiDisAble = true
+      this.OrderReturnDisAble = true
+      this.OrderReturnWithOutMoneyDisAble = true
+      this.O_PayStatue = this.orderForm.o_PayStatue
+      if (this.O_PayStatue === 0) {
+        // 未完成
+        this.OrderNotFiDisAble = false
+        // 已完成
+        this.OrderFiDisAble = false
+        // 退点
+        this.OrderReturnWithOutMoneyDisAble = false
+      } else if (this.O_PayStatue === 1) {
+        // 退款
+        this.OrderReturnDisAble = false
+      } else if (this.O_PayStatue === 2) {
+        // 退款
+        this.OrderReturnDisAble = false
+      }
 
       const { data: res3 } = await this.$http.post('getOrderAddFormList', { O_ID: this.O_ID })
       if (res2.meta.status !== 200) {

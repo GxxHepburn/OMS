@@ -230,8 +230,7 @@ export default {
       this.$router.push({
         path: '/static/orderItemSetting',
         query: {
-          O_ID: row.O_ID,
-          O_PayStatue: row.O_PayStatue
+          O_ID: row.O_ID
         }
       })
     },
