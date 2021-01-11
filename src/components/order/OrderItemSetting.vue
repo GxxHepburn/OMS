@@ -42,7 +42,7 @@
               <el-button type="primary" v-print="'#printKT'">打印厨房餐票</el-button>
             </el-col>
             <el-col :span="2">
-              <el-button type="primary" v-print="'#printMT'">打印店铺底票</el-button>
+              <el-button type="primary" v-print="'#printMT'">打印餐厅底票</el-button>
             </el-col>
             <el-col :span="2.1">
               <el-button :disabled="OrderFiDisAble" type="warning">订单支付完成</el-button>
@@ -54,11 +54,11 @@
               <el-button :disabled="OrderReturnDisAble" type="danger">退 款</el-button>
             </el-col>
             <el-col :span="3">
-              <el-button :disabled="OrderReturnWithOutMoneyDisAble" type="danger">仅退餐品</el-button>
+              <el-button :disabled="OrderReturnWithOutMoneyDisAble" type="danger" @click="onlyReturnGood">仅退餐品</el-button>
             </el-col>
           </el-row>
 
-          <el-divider content-position="left">总订综合详情</el-divider>
+          <el-divider content-position="left">订单综合详情</el-divider>
 
           <el-table :data="orderDetailForm" :border="false" :stripe="false">
             <el-table-column type="index"></el-table-column>
@@ -89,8 +89,43 @@
         </el-card>
 
         <el-card class="bottomElCard">
-          <el-divider content-position="left">加菜列表</el-divider>
-          <div></div>
+          <el-divider content-position="left">点菜列表</el-divider>
+          <div v-for="item in orderAddFormList" :key="item.OA_ID" style="margin-bottom:50px;">
+            <h4 style="display:inline;">第 {{item.OA_Sort}} 次点菜</h4>
+            <span style="margin-left:20px;font-size:15px;color:#909399;font-weight:bold;"><label>下单时间: </label>{{item.OA_OrderingTime}}</span>
+            <span style="margin-left:20px;font-size:15px;color:#909399;font-weight:bold;"><label>金额: </label>{{item.OA_TotlePrice}}</span>
+            <el-button style="margin-left:30px;" type="primary" v-print="'#'+ 'printST' + item.OA_Sort">打印本次客人小票</el-button>
+            <el-button style="margin-left:30px;" type="primary" v-print="'#'+ 'printKT' + item.OA_Sort">打印本次厨房餐票</el-button>
+            <el-button style="margin-left:30px;" type="primary" v-print="'#'+ 'printMT' + item.OA_Sort">打印本次餐厅底票</el-button>
+            <el-table :data="item.orderDetails" :border="false" :stripe="false">
+              <el-table-column type="index"></el-table-column>
+              <el-table-column label="菜品名称" prop="OD_FName"></el-table-column>
+              <el-table-column label="价格（元）" prop="OD_RealPrice"></el-table-column>
+              <el-table-column label="规格">
+                <template slot-scope="specs">
+                  <el-tag type="warning" size="mini" v-if="specs.row.OD_Spec">{{specs.row.OD_Spec}}</el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column label="属性">
+                <template slot-scope="property"  v-if="property.row.OD_PropOne != ''">
+                  <span class="propertySpan" v-if="property.row.OD_PropOne != ''">
+                    <el-tag type="success" size="mini">{{property.row.OD_PropOne}}</el-tag>
+                  </span>
+                  <span class="propertySpan" v-if="property.row.OD_PropTwo != ''">
+                    <el-tag type="success" size="mini">{{property.row.OD_PropTwo}}</el-tag>
+                  </span>
+                </template>
+              </el-table-column>
+              <el-table-column label="实际数量 (份)" prop="OD_RealNum"></el-table-column>
+              <el-table-column label="下单数量 (份)" prop="OD_Num"></el-table-column>
+              <el-table-column label="退款数量 (份)">
+                <template slot-scope="OD_Item">
+                  <span v-if="OD_Item.row.OD_Num - OD_Item.row.OD_RealNum == 0">0</span>
+                  <el-tag v-else type="danger">{{OD_Item.row.OD_Num - OD_Item.row.OD_RealNum}}</el-tag>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
         </el-card>
 
         <el-card class="bottomElCard">
@@ -170,7 +205,7 @@
             </div>
 
             <div class="bill-preview">
-              <h3>厨房餐票预览</h3>
+              <h3>店铺底票预览</h3>
               <div id="printMT" class="detail">
                 <p style="text-align:center;font-size:25px">店铺底票</p>
                 <h1 class="ST_merName">{{merForm.m_Name}}</h1>
@@ -190,8 +225,114 @@
                 <hr/>
               </div>
             </div>
+
+            <div class="bill-preview" v-for="item in orderAddFormList" :key="item.OA_ID">
+              <h3>第 {{item.OA_Sort}} 次点菜 客人小票预览</h3>
+              <div :id="'printST' + item.OA_Sort" class="detail">
+                <p style="text-align:center;font-size:25px">客人小票</p>
+                <h1 class="ST_merName">{{merForm.m_Name}}</h1>
+                <br/>
+                <hr/><!-- 分割线 -->
+                <p><label>单号:</label><label>100006032</label></p>
+                <p><label>交易时间:</label><label>2021-01-09 13:29:23</label></p>
+                <hr/><!-- 分割线 -->
+                <div v-for="item2 in item.orderDetails"><!-- eslint-disable-line -->
+                  <p>
+                    <label>{{item2.OD_FName}}</label><em> {{item2.OD_Spec}}</em><em v-if="item2.OD_PropOne != ''"> {{item2.OD_PropOne}}</em><em v-if="item2.OD_PropTwo != ''"> {{item2.OD_PropTwo}}</em>
+                  </p>
+                  <p>
+                    <label  style="margin-right:30px;margin-left:120px">x{{item2.OD_RealNum}}</label><label>￥{{item2.OD_RealPrice}}</label>
+                  </p>
+                </div>
+                <hr/>
+              </div>
+            </div>
+
+            <div class="bill-preview" v-for="item in orderAddFormList" :key="item.OA_ID + '1'">
+              <h3>第 {{item.OA_Sort}} 次点菜 厨房餐票预览</h3>
+              <div :id="'printKT' + item.OA_Sort" class="detail">
+                <p style="text-align:center;font-size:25px">厨房餐票</p>
+                <h1 class="ST_merName">{{merForm.m_Name}}</h1>
+                <br/>
+                <hr/><!-- 分割线 -->
+                <p><label>单号:</label><label>100006032</label></p>
+                <p><label>交易时间:</label><label>2021-01-09 13:29:23</label></p>
+                <hr/><!-- 分割线 -->
+                <div v-for="item2 in item.orderDetails"><!-- eslint-disable-line -->
+                  <p>
+                    <label>{{item2.OD_FName}}</label><em> {{item2.OD_Spec}}</em><em v-if="item2.OD_PropOne != ''"> {{item2.OD_PropOne}}</em><em v-if="item2.OD_PropTwo != ''"> {{item2.OD_PropTwo}}</em>
+                  </p>
+                  <p>
+                    <label  style="margin-right:30px;margin-left:120px">x{{item2.OD_RealNum}}</label><label>￥{{item2.OD_RealPrice}}</label>
+                  </p>
+                </div>
+                <hr/>
+              </div>
+            </div>
+
+            <div class="bill-preview" v-for="item in orderAddFormList" :key="item.OA_ID + '2'">
+              <h3>第 {{item.OA_Sort}} 次点菜 餐厅底票预览</h3>
+              <div :id="'printMT' + item.OA_Sort" class="detail">
+                <p style="text-align:center;font-size:25px">餐厅底票</p>
+                <h1 class="ST_merName">{{merForm.m_Name}}</h1>
+                <br/>
+                <hr/><!-- 分割线 -->
+                <p><label>单号:</label><label>100006032</label></p>
+                <p><label>交易时间:</label><label>2021-01-09 13:29:23</label></p>
+                <hr/><!-- 分割线 -->
+                <div v-for="item2 in item.orderDetails"><!-- eslint-disable-line -->
+                  <p>
+                    <label>{{item2.OD_FName}}</label><em> {{item2.OD_Spec}}</em><em v-if="item2.OD_PropOne != ''"> {{item2.OD_PropOne}}</em><em v-if="item2.OD_PropTwo != ''"> {{item2.OD_PropTwo}}</em>
+                  </p>
+                  <p>
+                    <label  style="margin-right:30px;margin-left:120px">x{{item2.OD_RealNum}}</label><label>￥{{item2.OD_RealPrice}}</label>
+                  </p>
+                </div>
+                <hr/>
+              </div>
+            </div>
+
           </div>
         </el-card>
+
+        <el-dialog title="仅退餐品" :visible.sync="onlyReturnGoodDialogVisible" width="70%">
+
+          <el-table :data="onlyReturnGoodOrderDetailForm" :border="false" :stripe="false">
+            <el-table-column type="index"></el-table-column>
+            <el-table-column label="菜品名称" prop="name"></el-table-column>
+            <el-table-column label="价格（元）" prop="price"></el-table-column>
+            <el-table-column label="规格">
+              <template slot-scope="specs">
+                <el-tag type="warning" size="mini" v-if="specs.row.specs">{{specs.row.specs}}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="属性">
+              <template slot-scope="property"  v-if="property.row.property[0] != ''">
+                <span v-for="item in property.row.property" :key="item" class="propertySpan">
+                  <el-tag type="success" size="mini" v-if="item != ''">{{item}}</el-tag>
+                </span>
+              </template>
+            </el-table-column>
+            <el-table-column label="实际数量 (份)" prop="OD_RealNum"></el-table-column>
+            <el-table-column label="已下单数量 (份)" prop="num"></el-table-column>
+            <el-table-column label="已退款数量 (份)">
+              <template slot-scope="OD_Item">
+                <span v-if="OD_Item.row.num - OD_Item.row.OD_RealNum == 0">0</span>
+                <el-tag v-else type="danger">{{OD_Item.row.num - OD_Item.row.OD_RealNum}}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="本次仅退餐品数量" width="170">
+              <template slot-scope="scope">
+                <el-input-number size="small" v-model="scope.row.onlyReturnNum" :min="0" :max="scope.row.OD_RealNum"></el-input-number>
+              </template>
+            </el-table-column>
+          </el-table>
+
+          <span slot="footer" class="dialog-footer">
+            <el-button @click="onlyReturnGoodDialogVisible = false">取 消</el-button>
+            <el-button type="primary" @click="ensureOnlyReturnGood">确 定</el-button>
+          </span>
+        </el-dialog>
     </div>
 </template>
 
@@ -215,7 +356,9 @@ export default {
         popTitle: 'good print',
         extraCss: '',
         extraHead: '<meta http-equiv="Content-Language"content="zh-cn"/>'
-      }
+      },
+      onlyReturnGoodDialogVisible: false,
+      onlyReturnGoodOrderDetailForm: []
     }
   },
   computed: {
@@ -224,6 +367,26 @@ export default {
     this.initOrderDetailForm()
   },
   methods: {
+    async ensureOnlyReturnGood () {
+      var onlyReturnGoodTotleNum = 0
+      for (var index in this.onlyReturnGoodOrderDetailForm) {
+        onlyReturnGoodTotleNum += this.onlyReturnGoodOrderDetailForm[index].onlyReturnNum
+      }
+      if (onlyReturnGoodTotleNum === 0) {
+        this.$message.info('未选择退点餐品')
+      } else {
+        // 发送请求，在失败中提示，退点餐品失败，在成功中刷新页面
+      }
+      this.onlyReturnGoodDialogVisible = false
+    },
+    // 仅退餐品
+    onlyReturnGood () {
+      this.onlyReturnGoodOrderDetailForm = JSON.parse(JSON.stringify(this.orderDetailForm))
+      for (var index in this.onlyReturnGoodOrderDetailForm) {
+        this.$set(this.onlyReturnGoodOrderDetailForm[index], 'onlyReturnNum', 0)
+      }
+      this.onlyReturnGoodDialogVisible = true
+    },
     // 初始化订单操作界面数据
     async initOrderDetailForm () {
       this.O_ID = this.$route.query.O_ID
@@ -258,12 +421,12 @@ export default {
       this.orderForm = res2.data.orderForm
       this.merForm = res2.data.merForm
 
-      // const { data: res3 } = await this.$http.post('getOrderAddFormList', { O_ID: this.O_ID })
-      // if (res2.meta.status !== 200) {
-      //   this.$message.error('获取加餐信息失败')
-      //   return
-      // }
-      // this.orderAddFormList = res3.data.orderAddFormList
+      const { data: res3 } = await this.$http.post('getOrderAddFormList', { O_ID: this.O_ID })
+      if (res2.meta.status !== 200) {
+        this.$message.error('获取加餐信息失败')
+        return
+      }
+      this.orderAddFormList = res3.data.orderAddFormList
     }
   }
 }
@@ -286,6 +449,7 @@ body{
 }
 .BillTicketWrapper {
   display: flex;
+  flex-wrap: wrap;
 }
 .detail {
   width: 270px;
@@ -306,14 +470,16 @@ body{
 
     height: 32px;
     line-height: 32px;
-    background-color: #666;
+    background-color: #83AF9B;
     font-size: 14px;
     font-weight: normal;
     color: #fff;
     padding-left: 20px;
   }
   width:270px;
-  margin-right: 100px;
+  margin-right: 50px;
+  margin-bottom: 50px;
+  border-bottom: #000000 dashed 1px;
 }
 .bottomElCard {
   margin-top: 30px;

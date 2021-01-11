@@ -31,9 +31,11 @@ import {
   Popover,
   DatePicker,
   PageHeader,
-  Divider
+  Divider,
+  InputNumber
 } from 'element-ui'
 
+Vue.use(InputNumber)
 Vue.use(Divider)
 Vue.use(PageHeader)
 Vue.use(DatePicker)
