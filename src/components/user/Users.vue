@@ -11,9 +11,9 @@
         <el-card>
           <!-- 搜索与添加区域 -->
           <el-row :gutter="20">
-            <el-col :span="7">
-              <el-input placeholder="请输入检索ID前几位" v-model="queryInfo.query" :clearable="true" @clear="getSearchUserList" @keyup.enter.native="getSearchUserList">
-                <el-button slot="append" icon="el-icon-search" @click="getSearchUserList"></el-button>
+            <el-col :span="8">
+              <el-input placeholder="请输入检索ID(完整字符串)" v-model="queryInfo.query" :clearable="true" @clear="getNewUserList" @keyup.enter.native="getNewUserList">
+                <el-button slot="append" icon="el-icon-search" @click="getNewUserList"></el-button>
               </el-input>
             </el-col>
           </el-row>
@@ -25,6 +25,18 @@
             <el-table-column label="注册时间" prop="U_RegisterTime"></el-table-column>
             <el-table-column label="最后登陆时间" prop="U_LoginTime"></el-table-column>
             <el-table-column label="最近下单时间" prop="O_OrderingTime"></el-table-column>
+            <el-table-column label="用户状态">
+              <template slot-scope="scope">
+                <el-switch
+                  v-model="scope.row.U_Status"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949"
+                  :active-value="1"
+                  :inactive-value="0"
+                  @change="changeWechatUserStatus($event, scope.row)">
+                </el-switch>
+              </template>
+            </el-table-column>
             <el-table-column width="180px" label="操作">
               <template slot-scope="scope">
                 <el-tooltip effect="dark" content="查看订单" placement="top" :enterable="false">
@@ -64,6 +76,16 @@ export default {
     this.getUserList()
   },
   methods: {
+    // 用户禁用
+    async changeWechatUserStatus (event, row) {
+      const { data: res } = await this.$http.post('changeWechatUserStatus', row)
+      if (res.meta.status !== 200) {
+        this.$message.error('修改用户状态失败!')
+        return
+      }
+      this.$message.success('修改用户状态成功!')
+      this.getUserList()
+    },
     async getUserList () {
       const { data: res } = await this.$http.get('users', { params: this.queryInfo })
       if (res.meta.status !== 200) {
@@ -77,7 +99,7 @@ export default {
     // 监听pagesize 改变的事件
     handleSizeChange (newSize) {
       this.queryInfo.pagesize = newSize
-      this.getSearchUserList()
+      this.getNewUserList()
     },
     // 监听 页码 改变的事件
     handleCurrentChange (newPage) {
@@ -85,7 +107,7 @@ export default {
       this.getUserList()
     },
     // 获取搜索框-先重置到首页
-    getSearchUserList () {
+    getNewUserList () {
       this.queryInfo.pagenum = 1
       this.getUserList()
     },

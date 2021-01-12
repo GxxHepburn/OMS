@@ -205,9 +205,9 @@
             </div>
 
             <div class="bill-preview">
-              <h3>店铺底票预览</h3>
+              <h3>餐厅底票预览</h3>
               <div id="printMT" class="detail">
-                <p style="text-align:center;font-size:25px">店铺底票</p>
+                <p style="text-align:center;font-size:25px">餐厅底票</p>
                 <h1 class="ST_merName">{{merForm.m_Name}}</h1>
                 <br/>
                 <hr/><!-- 分割线 -->

@@ -73,7 +73,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column label="所属分类" prop="F_FTName"></el-table-column>
-                <el-table-column label="禁用状态">
+                <el-table-column label="商品状态">
                   <template slot-scope="scope">
                     <el-switch
                       v-model="scope.row.F_Statue"
