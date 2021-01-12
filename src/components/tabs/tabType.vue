@@ -123,6 +123,7 @@ export default {
         }
         item.TT_Name = this.TT_Name
         this.$message.success('修改分类名称成功!')
+        this.getTabTypesList()
       }
 
       item.inputVisible = false

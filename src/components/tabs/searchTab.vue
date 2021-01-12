@@ -161,7 +161,7 @@ export default {
         this.$message.error('修改餐桌信息失败')
         this.catesList = []
         // 重新请求food列表
-        this.getNewTabsList()
+        this.getTabsList()
         // 关闭对话框,返回food列表界面
         this.editDialogVidsible = false
         return
@@ -169,7 +169,7 @@ export default {
       // 修改成功，关闭对话框，刷数据列表
       this.$message.success('修改餐桌信息成功')
       this.catesList = []
-      this.getNewTabsList()
+      this.getTabsList()
       this.editDialogVidsible = false
     },
     // 获取餐桌分类列表

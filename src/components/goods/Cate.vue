@@ -95,8 +95,7 @@ export default {
           return
         }
         item.FT_Name = this.FT_Name
-        // 没有必要刷新一次网络请求
-        // this.getNewCatesList()
+        this.getCatesList()
         this.$message.success('修改分类名称成功!')
       }
       item.inputVisible = false

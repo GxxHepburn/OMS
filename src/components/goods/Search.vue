@@ -86,6 +86,18 @@
                 </template>
             </el-table-column>
             <el-table-column label="所属分类" prop="F_FTName"></el-table-column>
+            <el-table-column label="禁用状态">
+              <template slot-scope="scope">
+                <el-switch
+                  v-model="scope.row.F_Statue"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949"
+                  :active-value="1"
+                  :inactive-value="0"
+                  @change="changeFoodStatue($event, scope.row)">
+                </el-switch>
+              </template>
+            </el-table-column>
             <el-table-column label="操作" width="130px">
                 <template slot-scope="scope">
                     <el-button type="primary" icon="el-icon-edit" size="mini" @click="showEditDialog(scope.row)"></el-button>
@@ -293,6 +305,16 @@ export default {
     this.getCatesList()
   },
   methods: {
+    // 商品禁用
+    async changeFoodStatue (event, row) {
+      const { data: res } = await this.$http.post('changeFoodStatue', row)
+      if (res.meta.status !== 200) {
+        this.$message.error('修改商品状态失败!')
+        return
+      }
+      this.$message.success('修改商品状态成功!')
+      this.getGoodsList()
+    },
     // 一键上货
     async onePunchUpGoods () {
       const confirmResult = await this.$confirm('此操作将所有售罄商品设置为不限量,是否继续?', '提示', {
@@ -310,7 +332,7 @@ export default {
         return
       }
       this.$message.success('一键上货成功!')
-      this.getNewGoodsList()
+      this.getGoodsList()
     },
     // 检索分类选择框发生变化
     cateChange () {
@@ -568,7 +590,7 @@ export default {
         this.imageUrl = ''
         this.catesList = []
         // 重新请求food列表
-        this.getNewGoodsList()
+        this.getGoodsList()
         // 关闭对话框,返回food列表界面
         this.editDialogVidsible = false
         return
@@ -579,7 +601,7 @@ export default {
       this.imageUrl = ''
       this.catesList = []
       // 重新请求food列表
-      this.getNewGoodsList()
+      this.getGoodsList()
       // 关闭对话框,返回food列表界面
       this.editDialogVidsible = false
     },
