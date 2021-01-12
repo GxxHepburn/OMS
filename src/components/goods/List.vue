@@ -21,7 +21,7 @@
                 </el-col>
                 <el-button style="float:right;margin-right:30px;" type="danger" @click="onePunchUpGoods">一键上货</el-button>
                 <el-button style="float:right;margin-right:30px;" size="small" type="danger" plain @click="onePunchDisableOrAble(0)">一键禁用</el-button>
-                <el-button style="float:right;margin-right:30px;" size="small" type="success" plain @click="onePunchDisableOrAble(1)">一键激活</el-button>
+                <el-button style="float:right;margin-right:30px;" size="small" type="primary" plain @click="onePunchDisableOrAble(1)">一键激活</el-button>
             </el-row>
 
             <!-- table 表格区域 -->
