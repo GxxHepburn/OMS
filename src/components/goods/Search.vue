@@ -35,6 +35,8 @@
               </el-select>
             </el-col>
             <el-button style="float:right;margin-right:30px;" type="danger" @click="onePunchUpGoods">一键上货</el-button>
+            <el-button style="float:right;margin-right:30px;" size="small" type="danger" plain @click="onePunchDisableOrAble(0)">一键禁用</el-button>
+            <el-button style="float:right;margin-right:30px;" size="small" type="success" plain @click="onePunchDisableOrAble(1)">一键激活</el-button>
         </el-row>
 
         <!-- table 表格区域 -->
@@ -305,6 +307,32 @@ export default {
     this.getCatesList()
   },
   methods: {
+    // 一键禁用/激活
+    async onePunchDisableOrAble (statue) {
+      var localMsg = ''
+      this.queryInfo.statue = statue
+      if (statue === 0) {
+        localMsg = '禁用'
+      } else {
+        localMsg = '激活'
+      }
+      const confirmResult = await this.$confirm('此操作将所有商品' + localMsg + ',是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: ' 取消',
+        type: 'warning'
+      }).catch(err => err)
+      if (confirmResult !== 'confirm') {
+        this.$message.info('已取消' + localMsg + '!')
+        return
+      }
+      const { data: res } = await this.$http.post('onePunchDisableOrAble', this.queryInfo)
+      if (res.meta.status !== 200) {
+        this.$message.error('一键' + localMsg + '失败!')
+        return
+      }
+      this.$message.success('一键' + localMsg + '成功!')
+      this.getGoodsList()
+    },
     // 商品禁用
     async changeFoodStatue (event, row) {
       const { data: res } = await this.$http.post('changeFoodStatue', row)
