@@ -92,8 +92,8 @@
           <el-divider content-position="left">点菜列表</el-divider>
           <div v-for="item in orderAddFormList" :key="item.OA_ID" style="margin-bottom:50px;">
             <h4 style="display:inline;">第 {{item.OA_Sort}} 次点菜</h4>
-            <span style="margin-left:20px;font-size:15px;color:#909399;font-weight:bold;"><label>下单时间: </label>{{item.OA_OrderingTime}}</span>
-            <span style="margin-left:20px;font-size:15px;color:#909399;font-weight:bold;"><label>金额: </label>{{item.OA_TotlePrice}}</span>
+            <span style="margin-left:20px;font-size:15px;color:#909399;font-weight:bold;"><label>下单时间: </label><label style="font-size:20px;color:#F56C6C;">{{item.OA_OrderingTime}}</label></span>
+            <span style="margin-left:20px;font-size:15px;color:#909399;font-weight:bold;"><label>金额: </label><label style="font-size:20px;color:#F56C6C;">{{item.OA_TotlePrice}}</label> 元</span>
             <el-button style="margin-left:30px;" type="primary" v-print="'#'+ 'printST' + item.OA_Sort">打印本次客人小票</el-button>
             <el-button style="margin-left:30px;" type="primary" v-print="'#'+ 'printKT' + item.OA_Sort">打印本次厨房餐票</el-button>
             <el-button style="margin-left:30px;" type="primary" v-print="'#'+ 'printMT' + item.OA_Sort">打印本次餐厅底票</el-button>
@@ -135,6 +135,24 @@
 
         <el-card class="bottomElCard">
           <el-divider content-position="left">支付信息</el-divider>
+          <div v-if="JSON.stringify(orderPayForm) != '{}'">
+            <span style="margin-left:20px;font-size:15px;color:#909399;font-weight:bold;"><label>支付时间: </label><label style="font-size:20px;color:#F56C6C;">{{orderPayForm.p_Time_End}}</label></span>
+            <span style="margin-left:20px;font-size:15px;color:#909399;font-weight:bold;"><label>支付金额: </label><label style="font-size:20px;color:#F56C6C;">{{orderPayForm.p_Totle_Fee/100}}</label> 元</span>
+            <el-button style="margin-left:30px;" type="primary" v-print="'#printPT'">打印支付票据</el-button>
+            <el-table :data="[orderPayForm]" :border="false" :stripe="false">
+              <el-table-column type="index"></el-table-column>
+              <el-table-column label="支付单号" prop="p_Transaction_Id"></el-table-column>
+              <el-table-column label="支付金额(元)">
+                <template slot-scope="scope">
+                  {{scope.row.p_Totle_Fee/100}}
+                </template>
+              </el-table-column>
+              <el-table-column label="支付类型" prop="p_Trade_Type"></el-table-column>
+              <el-table-column label="银行类型" prop="p_Bank_Type"></el-table-column>
+              <el-table-column label="币种" prop="p_Fee_Type"></el-table-column>
+              <el-table-column label="支付时间" prop="p_Time_End"></el-table-column>
+            </el-table>
+          </div>
           <div></div>
         </el-card>
 
@@ -187,20 +205,25 @@
               <div id="printKT" class="detail">
                 <p style="text-align:center;font-size:25px">厨房餐票</p>
                 <h1 class="ST_merName">{{merForm.m_Name}}</h1>
-                <br/>
-                <hr/><!-- 分割线 -->
-                <p><label>单号:</label><label>100006032</label></p>
-                <p><label>交易时间:</label><label>2021-01-09 13:29:23</label></p>
-                <hr/><!-- 分割线 -->
+                <div style="border-bottom:#000 dashed 1px;"></div>
+                <p><label>单号:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_UniqSearchID}}</label></p>
+                <p><label>下单时间:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_OrderingTime}}</label></p>
+                <p><label>支付时间:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_PayTime}}</label></p>
+                <p><label>餐桌区域:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.TT_Name}}</label></p>
+                <p><label>餐桌:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.t_Name}}</label></p>
+                <p><label>用餐人数:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_NumberOfDiners}}人</label></p>
+                <div style="border-bottom:#000 dashed 1px;"></div>
+                <p><label>客人备注:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_Remarks}}</label></p>
+                <p>*****************商品***************</p>
                 <div v-for="item in orderDetailForm"><!-- eslint-disable-line -->
                   <p>
-                    <label>{{item.name}}</label><em> {{item.specs}}</em><em v-for="proItem in item.property"> {{proItem}}</em><!-- eslint-disable-line -->
+                    <label style="font-size:23px;">{{item.name}}</label><label style="font-size:17px;margin-left:10px;"><em> {{item.specs}}</em><em v-for="proItem in item.property"> {{proItem}}</em></label><!-- eslint-disable-line -->
                   </p>
                   <p>
-                    <label  style="margin-right:30px;margin-left:120px">x{{item.OD_RealNum}}</label><label>￥{{item.price}}</label>
+                    <label  style="margin-left:150px"><span style="font-size:22px;">【<span style="font-size:20px;">x</span></span><span style="font-size:30px;">{{item.OD_RealNum}}</span><span style="font-size:22px;">】</span></label>
                   </p>
                 </div>
-                <hr/>
+                <p>*************************************</p>
               </div>
             </div>
 
@@ -223,6 +246,34 @@
                   </p>
                 </div>
                 <hr/>
+              </div>
+            </div>
+
+            <div class="bill-preview">
+              <h3>支付票据预览</h3>
+              <div id="printPT" class="detail">
+                <p style="text-align:center;font-size:25px">支付票据</p>
+                <h1 class="ST_merName">{{merForm.m_Name}}</h1>
+                <div style="border-bottom:#000 dashed 1px;"></div>
+                <p><label>单号:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_UniqSearchID}}</label></p>
+                <p><label>下单时间:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_OrderingTime}}</label></p>
+                <p><label>餐桌区域:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.TT_Name}}</label></p>
+                <p><label>餐桌:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.t_Name}}</label></p>
+                <p><label>用餐人数:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_NumberOfDiners}}人</label></p>
+                <div style="border-bottom:#000 dashed 1px;"></div>
+                <p><label style="margin-left:10px;font-size:15px;">支付单号:</label></p>
+                <p><label style="font-size:12px;margin-left:20px;">{{orderPayForm.p_Transaction_Id}}</label></p>
+                <p><label style="margin-left:10px;font-size:17px;">支付金额:</label><label style="font-size:15px;margin-left:10px;">{{orderPayForm.p_Totle_Fee/100}} 元</label></p>
+                <p><label style="margin-left:10px;font-size:17px;">支付类型:</label><label style="font-size:15px;margin-left:10px;">{{orderPayForm.p_Trade_Type}}</label></p>
+                <p><label style="margin-left:10px;font-size:17px;">支付时间:</label><label style="font-size:15px;margin-left:10px;">{{orderPayForm.p_Time_End}}</label></p>
+                <p><label style="margin-left:10px;font-size:17px;">银行类型:</label><label style="font-size:15px;margin-left:10px;">{{orderPayForm.p_Bank_Type}}</label></p>
+                <div style="border-bottom:#000 dashed 1px;"></div>
+                <p><label>打印时间:</label><label style="font-size:13px;margin-left:10px;">{{new Date().toLocaleString()}}</label></p>
+                <p><label>餐厅联系电话:</label><label style="font-size:13px;margin-left:10px;">{{merForm.m_Phone}}</label></p>
+                <p><label>餐厅地址:</label><label style="font-size:13px;margin-left:10px;">{{merForm.m_Address}}</label></p>
+                <p><label style="font-size:13px;">技术供应商:</label><label style="font-size:13px;margin-left:10px;">上海俣珩科技(东华之星™)</label></p>
+                <p><label style="font-size:13px;">供应商联系方式:</label><label style="font-size:10px;margin-left:10px;">18860976772</label></p>
+                <p><label style="font-size:13px;">供应商联系方式:</label><label style="font-size:10px;margin-left:10px;">1152862327@qq.com</label></p>
               </div>
             </div>
 
@@ -342,6 +393,7 @@ export default {
     return {
       O_ID: '',
       orderForm: {},
+      orderPayForm: {},
       merForm: {},
       orderDetailForm: [],
       orderAddFormList: [],
@@ -434,11 +486,18 @@ export default {
       }
 
       const { data: res3 } = await this.$http.post('getOrderAddFormList', { O_ID: this.O_ID })
-      if (res2.meta.status !== 200) {
+      if (res3.meta.status !== 200) {
         this.$message.error('获取加餐信息失败')
         return
       }
       this.orderAddFormList = res3.data.orderAddFormList
+
+      const { data: res4 } = await this.$http.post('getOrderPayForm', { O_ID: this.O_ID })
+      if (res4.meta.status !== 200) {
+        this.$message.error('获取支付信息失败')
+        return
+      }
+      this.orderPayForm = res4.data.orderPayForm
     }
   }
 }

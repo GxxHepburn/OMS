@@ -43,7 +43,7 @@
         <router-view></router-view>
       </el-main>
     </el-container>
-    <el-backtop bottom="100">
+    <el-backtop :bottom="100">
       <div
         style="{
           height: 100%;
