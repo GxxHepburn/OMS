@@ -85,10 +85,17 @@ export default {
   },
   created () {
     this.getMenuList()
+    this.isNeedToConnectWebSocket()
   },
   mounted () {
   },
   methods: {
+    // 检查是否需要开启websocket
+    isNeedToConnectWebSocket () {
+      if (window.sessionStorage.getItem('isNeedToConnectWebSocket') === '1') {
+        this.$connectWebSocket.openWebSocket()
+      }
+    },
     logout () {
       window.sessionStorage.clear()
       this.$router.push('/static/login')

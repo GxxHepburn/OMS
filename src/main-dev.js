@@ -17,6 +17,12 @@ import bus from './assets/js/bus'
 // 引入判断两对象是否相等
 import isEqual from './assets/js/isEqual'
 
+// 引入创建webSocket
+import connectWebSocket from './assets/js/connectWebSocket'
+
+// 引入语音播报
+import * as voicePromptFun from './assets/js/voicePrompt'
+
 // 引入mathjs
 import * as math from 'mathjs'
 
@@ -45,6 +51,10 @@ Vue.prototype.bus = bus
 
 Vue.prototype.$isEqual = isEqual
 
+Vue.prototype.$connectWebSocket = connectWebSocket
+
+Vue.prototype.$voicePromptFun = voicePromptFun
+
 Vue.prototype.$math = math
 
 Vue.config.productionTip = false
@@ -69,7 +79,10 @@ Vue.filter('dateFormat', function (originVal) {
   return `${y}-${m}-${d} ${hh}:${mm}:${ss}`
 })
 
-new Vue({
+var VueThat = new Vue({
   router,
   render: h => h(App)
 }).$mount('#app')
+
+export default VueThat
+window.VueThat = VueThat
