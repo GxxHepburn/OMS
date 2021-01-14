@@ -90,6 +90,7 @@ export default {
   created () {
     this.getMenuList()
     this.isNeedToConnectWebSocket()
+    this.welcome()
   },
   computed: {
   },
@@ -103,15 +104,34 @@ export default {
     })
   },
   methods: {
+    // 欢迎界面-为了让用户点击，以确保
+    welcome () {
+      this.$confirm('您好，欢迎使用, 请注意餐厅状态', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'info'
+      }).then(() => {
+      }).catch(() => {
+      })
+    },
     // 检查是否需要开启websocket
     isNeedToConnectWebSocket () {
       if (window.sessionStorage.getItem('isNeedToConnectWebSocket') === '1') {
         this.$connectWebSocket.openWebSocket()
+        // this.isWebSocket = '在线'
       }
     },
     logout () {
       window.sessionStorage.clear()
       this.$router.push('/static/login')
+      // 检查关闭websocket
+      if (window.wbss === undefined) {
+        return
+      }
+      if (window.wbss.readyState !== 1) {
+        return
+      }
+      window.wbss.close()
     },
     // 获取所有的菜单
     async getMenuList () {

@@ -30,15 +30,17 @@ function openWebSocket () {
   window.wbss = new WebSocket('wss://www.donghuastar.com/websocketOrdering?name=' + name + '&token=' + token)
 
   window.wbss.addEventListener('open', function (event) {
+    heartCheck.reset().start()
     window.VueThat.$message.success('websocket连接成功')
     console.log('websocket connected.')
+    console.log(new Date())
     window.$bus.$emit('isWebSocketing', 1)
-    heartCheck.reset().start()
     // 重置重连次数
     window.reConNum = 0
   })
 
   window.wbss.addEventListener('message', function (event) {
+    heartCheck.reset().start()
     console.log('message: ', event.data)
     var data = JSON.parse(event.data)
     if (data.type === '1') {
@@ -48,7 +50,6 @@ function openWebSocket () {
         window.$bus.$emit('updateOrderItemSetting', 'updateOrderItemSetting')
       }
     }
-    heartCheck.reset().start()
   })
 
   window.wbss.addEventListener('close', function (e) {
@@ -60,6 +61,7 @@ function openWebSocket () {
       console.log('websocket未知原因关闭，正在重启')
     } else {
       window.VueThat.$message.success('websocket关闭成功')
+      heartCheck.reset()
       console.log('websocket关闭成功')
     }
   })
@@ -77,6 +79,7 @@ function openWebSocket () {
   var heartCheck = {
     // 50s发一次
     timeout: 50000,
+    closeTimeout: 58000,
     timeoutObj: null,
     serverTimeoutObj: null,
     reset: function () {
@@ -85,6 +88,7 @@ function openWebSocket () {
       return this
     },
     start: function () {
+      console.log('开启了发送定时器')
       var self = this
       this.timeoutObj = setTimeout(function () {
         // 这里发送一个心跳，后端收到后，返回一个心跳消息，
@@ -96,7 +100,8 @@ function openWebSocket () {
           // 语音报告后端断开了
           window.wbss.close()
           console.log('定时器,未接收到消息，主动关闭')
-        }, self.timeout)
+          console.log(new Date())
+        }, self.closeTimeout)
       }, this.timeout)
     }
   }
