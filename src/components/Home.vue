@@ -4,7 +4,10 @@
     <el-header>
       <div>
         <img src="../assets/logo.png" alt="">
-        <span>点菜宝智慧云餐厅</span>
+        <span>点菜宝智慧云餐厅 |</span>
+        <label style="margin-left:10px;font-size:15px;">餐厅在线状态-</label>
+        <label v-if="isWebSocket === '在线'" style="font-size:20px;margin-left:10px;color:#409EFF;font-weight:bold;">{{isWebSocket}}</label>
+        <label v-if="isWebSocket === '休息'" style="font-size:20px;margin-left:10px;color:#F56C6C;font-weight:bold;">{{isWebSocket}}</label>
       </div>
       <el-button type="info" @click="logout">退出</el-button>
     </el-header>
@@ -80,14 +83,24 @@ export default {
         601: 'el-icon-s-help test'
       },
       // 是否折叠
-      isCollapse: false
+      isCollapse: false,
+      isWebSocket: '休息'
     }
   },
   created () {
     this.getMenuList()
     this.isNeedToConnectWebSocket()
   },
+  computed: {
+  },
   mounted () {
+    window.$bus.$on('isWebSocketing', (val) => {
+      if (val === 1) {
+        this.isWebSocket = '在线'
+      } else {
+        this.isWebSocket = '休息'
+      }
+    })
   },
   methods: {
     // 检查是否需要开启websocket

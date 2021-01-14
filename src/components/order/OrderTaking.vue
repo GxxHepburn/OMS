@@ -51,12 +51,11 @@ export default {
         return
       }
       if (window.wbss.readyState !== 1) {
-        this.$message.error('websocket未连接')
+        this.$message.error('websocket未连接,请不要重复关闭')
         return
       }
-      window.wbss.close()
-      this.$message.success('websocket关闭成功')
       window.sessionStorage.setItem('isNeedToConnectWebSocket', 0)
+      window.wbss.close()
     }
   }
 }
