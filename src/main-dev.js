@@ -61,6 +61,9 @@ Vue.config.productionTip = false
 
 Vue.prototype.QRCode = QRCode
 
+// 语音播放列表
+Vue.prototype.$voiceList = []
+
 Vue.use(Print)
 
 Vue.prototype.$print = Print

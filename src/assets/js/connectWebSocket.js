@@ -4,9 +4,14 @@ export default {
     var token = window.sessionStorage.getItem('token')
 
     // 对这两个值加密，然后在服务器端解密-没这个必要，因为请求要先验证token，所以拿到这两个值也没用。再其次，加密之后解密，等于做了无用功！
-
+    console.log(window.wbss)
+    if (window.wbss !== undefined && window.wbss.readyState === 1) {
+      window.VueThat.$message.error('websocket已连接')
+      return
+    }
     window.wbss = new WebSocket('wss://www.donghuastar.com/websocketOrdering?name=' + name + '&token=' + token)
     console.log(window.wbss)
+    window.VueThat.$message.success('websocket连接成功')
 
     window.wbss.addEventListener('open', function (event) {
       console.log('websocket connected.')
@@ -18,17 +23,26 @@ export default {
       var data = JSON.parse(event.data)
       if (data.type === '1') {
         window.VueThat.$voicePromptFun.voicePrompt(data.voiceText)
+        // 判断是不是再订单详情界面路由，如果是，并且OID相同则刷新该页面
+        if (window.VueThat.$route.path === '/static/orderItemSetting' && window.VueThat.$route.query.O_ID === '' + data.O_ID) {
+          window.$bus.$emit('updateOrderItemSetting', 'updateOrderItemSetting')
+        }
       }
       heartCheck.reset().start()
     })
 
     window.wbss.addEventListener('close', function () {
       console.log('websocket closed.')
+      if (window.sessionStorage.getItem('isNeedToConnectWebSocket') === '1') {
+        window.VueThat.$connectWebSocket.openWebSocket()
+        window.VueThat.error('websocket未知原因关闭，正在重启')
+      }
     })
 
     window.wbss.addEventListener('error', function () {
       if (window.sessionStorage.getItem('isNeedToConnectWebSocket') === '1') {
-        this.$connectWebSocket.openWebSocket()
+        window.VueThat.$connectWebSocket.openWebSocket()
+        window.VueThat.error('websocket出错了，正在重启')
       }
     })
 

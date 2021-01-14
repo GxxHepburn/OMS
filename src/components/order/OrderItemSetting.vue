@@ -418,6 +418,11 @@ export default {
   created () {
     this.initOrderDetailForm()
   },
+  mounted () {
+    window.$bus.$on('updateOrderItemSetting', (val) => {
+      this.initOrderDetailForm()
+    })
+  },
   methods: {
     async ensureOnlyReturnGood () {
       var onlyReturnGoodTotleNum = 0
@@ -448,6 +453,7 @@ export default {
     },
     // 初始化订单操作界面数据
     async initOrderDetailForm () {
+      console.log('我出发了刷新')
       this.O_ID = this.$route.query.O_ID
 
       const { data: res } = await this.$http.post('orderDetails', { O_ID: this.O_ID })
