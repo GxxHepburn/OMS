@@ -28,13 +28,19 @@ export default {
   },
   methods: {
     voicePro () {
-      this.$voicePromptFun.voicePrompt('123456789')
+      this.$voicePromptFun.voicePrompt('欢迎下次光临')
     },
     openWs () {
       this.$connectWebSocket.openWebSocket()
       window.sessionStorage.setItem('isNeedToConnectWebSocket', 1)
     },
     closeWs () {
+      if (window.wbss === undefined) {
+        return
+      }
+      if (window.wbss.readyState !== 1) {
+        return
+      }
       window.wbss.close()
       window.sessionStorage.setItem('isNeedToConnectWebSocket', 0)
     }
