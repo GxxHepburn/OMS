@@ -81,21 +81,7 @@
                       <el-form-item v-if="scope.row.O_PayStatue === 2" label="实际收入金额:">
                         <span class="remarksSpan">{{scope.row.O_TotlePrice}} 元</span>
                       </el-form-item>
-                      <el-form-item v-if="scope.row.O_PayStatue === 2" label="退款金额 (包含未支付时，已退回商品):">
-                        <span class="remarksSpan">{{returnTotalPrice(scope.row)}} 元</span>
-                      </el-form-item>
-
-                      <el-form-item v-if="scope.row.O_PayStatue === 0" label="客人应支付金额:">
-                        <span class="remarksSpan">{{scope.row.O_TotlePrice}} 元</span>
-                      </el-form-item>
-                      <el-form-item v-if="scope.row.O_PayStatue === 0" label="退点商品金额 :">
-                        <span class="remarksSpan">{{returnTotalPrice(scope.row)}} 元</span>
-                      </el-form-item>
-
-                      <el-form-item v-if="scope.row.O_PayStatue === 3" label="客人应支付金额:">
-                        <span class="remarksSpan">{{scope.row.O_TotlePrice}} 元</span>
-                      </el-form-item>
-                      <el-form-item v-if="scope.row.O_PayStatue === 3" label="退点商品金额 :">
+                      <el-form-item v-if="scope.row.O_PayStatue === 2" label="退款金额:">
                         <span class="remarksSpan">{{returnTotalPrice(scope.row)}} 元</span>
                       </el-form-item>
                       <el-form-item>

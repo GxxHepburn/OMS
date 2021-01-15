@@ -54,7 +54,7 @@
                     placement="top-start"
                     title="客人备注"
                     width="200"
-                    trigger="focus"
+                    trigger="click"
                     :content="scope.row.o_Remarks==''?'客人没有特殊要求':scope.row.o_Remarks">
                     <el-button size="mini" type="info" slot="reference" plain>备注</el-button>
                   </el-popover>
