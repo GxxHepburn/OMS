@@ -80,7 +80,8 @@ export default {
         301: 'iconfont icon-shangpin',
         401: 'iconfont icon-danju',
         501: 'iconfont icon-baobiao',
-        601: 'el-icon-s-help test'
+        601: 'el-icon-s-help',
+        701: 'el-icon-s-finance'
       },
       // 是否折叠
       isCollapse: false,

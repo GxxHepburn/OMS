@@ -30,6 +30,14 @@ const OrderTaking = () => import('../components/order/OrderTaking.vue')
 
 const OrderItemSetting = () => import('../components/order/OrderItemSetting.vue')
 
+const LastOrder = () => import('../components/order/LastOrder.vue')
+
+const ReturnOrder = () => import('../components/order/ReturnOrder.vue')
+
+const NotFiOrder = () => import('../components/order/NotFiOrder.vue')
+
+const FiOrder = () => import('../components/order/FiOrder.vue')
+
 const AddTab = () => import(/* webpackChunkName: "order_report" */ '../components/tabs/addTab.vue')
 
 const AddTabType = () => import(/* webpackChunkName: "order_report" */ '../components/tabs/addTabType.vue')
@@ -39,6 +47,12 @@ const SearchTab = () => import(/* webpackChunkName: "order_report" */ '../compon
 const TabList = () => import(/* webpackChunkName: "order_report" */ '../components/tabs/tabList.vue')
 
 const TabType = () => import(/* webpackChunkName: "order_report" */ '../components/tabs/tabType.vue')
+
+const FlowRecord = () => import('../components/finance/FlowRecord.vue')
+
+const PayRecord = () => import('../components/finance/PayRecord.vue')
+
+const RefundRecord = () => import('../components/finance/RefundRecord.vue')
 
 // import Mer
 const MerInfoList = () => import('../components/mer/MerInfo.vue')
@@ -104,6 +118,22 @@ const routes = [
         component: OrderItemSetting
       },
       {
+        path: '/static/lastOrders',
+        component: LastOrder
+      },
+      {
+        path: '/static/returnOrders',
+        component: ReturnOrder
+      },
+      {
+        path: '/static/notFiOrders',
+        component: NotFiOrder
+      },
+      {
+        path: '/static/fiOrders',
+        component: FiOrder
+      },
+      {
         path: '/static/tabList',
         component: TabList
       },
@@ -130,6 +160,18 @@ const routes = [
       {
         path: '/static/reports',
         component: Report
+      },
+      {
+        path: '/static/flowRecord',
+        component: FlowRecord
+      },
+      {
+        path: '/static/payRecord',
+        component: PayRecord
+      },
+      {
+        path: '/static/refundRecord',
+        component: RefundRecord
       }
     ]
   }

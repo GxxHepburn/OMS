@@ -8,8 +8,8 @@
         </el-breadcrumb>
 
          <!-- 卡片视图 -->
-        <el-card>
-          <p style="font-family:Helvetica Neue;font-weight:bold;font-size:18px;">操作</p>
+        <el-card class="topElCard">
+          <el-divider content-position="left">店铺操作</el-divider>
           <el-row :gutter="0" type="flex">
             <el-col :xl="2" :lg="3" :md="3" :sm="3" :xs="3">
               <el-button type="danger" @click="openWs">上线接单</el-button>
@@ -27,7 +27,7 @@
         </el-card>
 
         <!-- 卡片视图 -->
-        <el-card>
+        <el-card class="bottomElCard">
         </el-card>
     </div>
 </template>
@@ -36,6 +36,7 @@
 export default {
   data () {
     return {
+      notTakingOrerFormList: []
     }
   },
   computed: {
@@ -84,4 +85,10 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.bottomElCard {
+  margin-top: 30px;
+}
+.topElCard {
+  padding-bottom: 20px;
+}
 </style>
