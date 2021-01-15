@@ -90,13 +90,25 @@
 
         <el-card class="bottomElCard">
           <el-divider content-position="left">点菜列表</el-divider>
-          <div v-for="item in orderAddFormList" :key="item.OA_ID" style="margin-bottom:50px;">
+          <div v-for="item in orderAddFormList" :key="item.OA_ID" style="margin-bottom:50px;min-width:1200px;">
             <h4 style="display:inline;">第 {{item.OA_Sort}} 次点菜</h4>
             <span style="margin-left:20px;font-size:15px;color:#909399;font-weight:bold;"><label>下单时间: </label><label style="font-size:20px;color:#F56C6C;">{{item.OA_OrderingTime}}</label></span>
             <span style="margin-left:20px;font-size:15px;color:#909399;font-weight:bold;"><label>金额: </label><label style="font-size:20px;color:#F56C6C;">{{item.OA_TotlePrice}}</label> 元</span>
             <el-button style="margin-left:30px;" type="primary" v-print="'#'+ 'printST' + item.OA_Sort">打印本次客人小票</el-button>
             <el-button style="margin-left:30px;" type="primary" v-print="'#'+ 'printKT' + item.OA_Sort">打印本次厨房餐票</el-button>
             <el-button style="margin-left:30px;" type="primary" v-print="'#'+ 'printMT' + item.OA_Sort">打印本次餐厅底票</el-button>
+            <span style="margin-left:20px;font-size:15px;color:#909399;font-weight:bold;">
+              <label style="margin-right:20px;">接单状态</label>
+              <el-switch
+                v-model="item.OA_IsTaking"
+                active-color="#13ce66"
+                inactive-color="#ff4949"
+                active-value="1"
+                inactive-value="0"
+                :disabled="item.OA_IsTaking==0?false:true"
+                @change="takingOrder($event, item)">
+              </el-switch>
+            </span>
             <el-table :data="item.orderDetails" :border="false" :stripe="false">
               <el-table-column type="index"></el-table-column>
               <el-table-column label="菜品名称" prop="OD_FName"></el-table-column>
@@ -424,6 +436,16 @@ export default {
     })
   },
   methods: {
+    // 接单
+    async takingOrder (event, item) {
+      const { data: res } = await this.$http.post('takingOrder', item)
+      if (res.meta.status !== 200) {
+        this.$message.error('接单失败!')
+        return
+      }
+      this.$message.success('接单成功!')
+      this.initOrderDetailForm()
+    },
     async ensureOnlyReturnGood () {
       var onlyReturnGoodTotleNum = 0
       for (var index in this.onlyReturnGoodOrderDetailForm) {
@@ -453,7 +475,6 @@ export default {
     },
     // 初始化订单操作界面数据
     async initOrderDetailForm () {
-      console.log('我出发了刷新')
       this.O_ID = this.$route.query.O_ID
 
       const { data: res } = await this.$http.post('orderDetails', { O_ID: this.O_ID })

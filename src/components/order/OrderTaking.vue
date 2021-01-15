@@ -41,7 +41,7 @@ export default {
         pagesize: 10,
         mmngctUserName: window.sessionStorage.mmngctUserName
       },
-      notTakingOrerFormList: []
+      notTakingOrerAddFormList: []
     }
   },
   computed: {
@@ -52,6 +52,7 @@ export default {
   },
   methods: {
     // 获取未结单列表
+
     // 发送测试
     sendMsg () {
       var testMsg = {
