@@ -32,6 +32,8 @@ const OrderItemSetting = () => import('../components/order/OrderItemSetting.vue'
 
 const LastOrder = () => import('../components/order/LastOrder.vue')
 
+const NotPayOrder = () => import('../components/order/NotPayOrder.vue')
+
 const ReturnOrder = () => import('../components/order/ReturnOrder.vue')
 
 const NotFiOrder = () => import('../components/order/NotFiOrder.vue')
@@ -116,6 +118,10 @@ const routes = [
       {
         path: '/static/orderItemSetting',
         component: OrderItemSetting
+      },
+      {
+        path: '/static/notPayOrders',
+        component: NotPayOrder
       },
       {
         path: '/static/lastOrders',

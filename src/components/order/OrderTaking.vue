@@ -36,6 +36,11 @@
 export default {
   data () {
     return {
+      queryInfo: {
+        pagenum: 1,
+        pagesize: 10,
+        mmngctUserName: window.sessionStorage.mmngctUserName
+      },
       notTakingOrerFormList: []
     }
   },
@@ -46,6 +51,8 @@ export default {
   mounted () {
   },
   methods: {
+    // 获取未结单列表
+    // 发送测试
     sendMsg () {
       var testMsg = {
         type: 3
@@ -57,10 +64,12 @@ export default {
         this.$message.error('测试: 服务器未连接')
       }
     },
+    // 语音测试
     voicePro () {
       this.$voicePromptFun.voicePrompt('正在测试')
       this.$voicePromptFun.voicePrompt('串行播放,正常')
     },
+    // 上线接单
     openWs () {
       if (window.wbss !== undefined && window.wbss.readyState !== 1) {
         this.$message.info('正在连接服务器')
@@ -68,6 +77,7 @@ export default {
       this.$connectWebSocket.openWebSocket()
       window.sessionStorage.setItem('isNeedToConnectWebSocket', 1)
     },
+    // 下线休息
     closeWs () {
       if (window.wbss === undefined) {
         this.$message.error('websocket不能存在')
