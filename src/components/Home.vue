@@ -129,6 +129,7 @@ export default {
         return
       }
       if (window.wbss.readyState !== 1) {
+        window.wbss = undefined
         return
       }
       window.wbss.close()

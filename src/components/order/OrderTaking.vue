@@ -7,12 +7,27 @@
           <el-breadcrumb-item>接单列表</el-breadcrumb-item>
         </el-breadcrumb>
 
+         <!-- 卡片视图 -->
+        <el-card>
+          <p style="font-family:Helvetica Neue;font-weight:bold;font-size:18px;">操作</p>
+          <el-row :gutter="20">
+            <el-col :span="2">
+              <el-button type="danger" @click="openWs">上线接单</el-button>
+            </el-col>
+            <el-col :span="3">
+              <el-button type="warning" @click="closeWs">下线休息</el-button>
+            </el-col>
+            <el-col :span="2">
+              <el-button @click="voicePro" type="info" size="mini" plain>语音测试</el-button>
+            </el-col>
+            <el-col :span="2">
+              <el-button @click="sendMsg" type="info" size="mini" plain>连接测试</el-button>
+            </el-col>
+          </el-row>
+        </el-card>
+
         <!-- 卡片视图 -->
         <el-card>
-          <el-button @click="openWs">打开websocket</el-button>
-          <el-button @click="closeWs">关闭websocket</el-button>
-          <el-button @click="voicePro">语音播报</el-button>
-          <el-button @click="sendMsg">发送信息</el-button>
         </el-card>
     </div>
 </template>
@@ -27,21 +42,28 @@ export default {
   },
   created () {
   },
+  mounted () {
+  },
   methods: {
     sendMsg () {
-      window.wbss.send('主动发送信息')
+      var testMsg = {
+        type: 3
+      }
+      if (window.wbss !== undefined && window.wbss.readyState === 1) {
+        window.wbss.send(JSON.stringify(testMsg))
+        this.$message.info('测试: 已发送数据')
+      } else {
+        this.$message.error('测试: 服务器未连接')
+      }
     },
     voicePro () {
-      this.$voicePromptFun.voicePrompt('欢迎下次光临')
-      this.$voicePromptFun.voicePrompt('1111欢迎下次光临')
-      this.$voicePromptFun.voicePrompt('1111欢迎下次光临')
-      this.$voicePromptFun.voicePrompt('1111欢迎下次光临')
-      this.$voicePromptFun.voicePrompt('1111欢迎下次光临')
-      this.$voicePromptFun.voicePrompt('1111欢迎下次光临')
-      this.$voicePromptFun.voicePrompt('1111欢迎下次光临')
-      this.$voicePromptFun.voicePrompt('1111欢迎下次光临')
+      this.$voicePromptFun.voicePrompt('正在测试')
+      this.$voicePromptFun.voicePrompt('串行播放,正常')
     },
     openWs () {
+      if (window.wbss !== undefined && window.wbss.readyState !== 1) {
+        this.$message.info('正在连接服务器')
+      }
       this.$connectWebSocket.openWebSocket()
       window.sessionStorage.setItem('isNeedToConnectWebSocket', 1)
     },

@@ -11,8 +11,8 @@
         <el-card>
           <el-row :gutter="20">
               <el-col :span="5">
-                  <el-input placeholder="订单号" v-model="queryInfo.O_UniqSearchID" :clearable="true">
-                  </el-input>
+                <el-input placeholder="订单号" v-model="queryInfo.O_UniqSearchID" :clearable="true">
+                </el-input>
               </el-col>
               <el-col :span="7">
                   <el-input placeholder="用户号" v-model="queryInfo.U_OpenId" :clearable="true">

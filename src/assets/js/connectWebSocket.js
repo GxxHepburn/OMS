@@ -50,6 +50,9 @@ function openWebSocket () {
         window.$bus.$emit('updateOrderItemSetting', 'updateOrderItemSetting')
       }
     }
+    if (data.type === '3') {
+      window.VueThat.$voicePromptFun.voicePrompt(data.voiceText)
+    }
   })
 
   window.wbss.addEventListener('close', function (e) {
@@ -76,6 +79,10 @@ function openWebSocket () {
     }
   })
 
+  var heartMsg = {
+    type: 0
+  }
+
   var heartCheck = {
     // 50s发一次
     timeout: 50000,
@@ -93,7 +100,7 @@ function openWebSocket () {
       this.timeoutObj = setTimeout(function () {
         // 这里发送一个心跳，后端收到后，返回一个心跳消息，
         // onmessage拿到返回的心跳就说明连接正常
-        window.wbss.send('发送维持连接消息')
+        window.wbss.send(JSON.stringify(heartMsg))
         console.log('发送维持连接消息！')
         // 如果超过一定时间还没重置，说明后端主动断开了
         self.serverTimeoutObj = setTimeout(function () {
