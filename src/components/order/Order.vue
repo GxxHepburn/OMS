@@ -300,7 +300,7 @@ export default {
     async getTabAndTabTypeOptions () {
       const { data: res } = await this.$http.post('ordersTabAndTabTypeOptions', this.queryInfo)
       if (res.meta.status !== 200) {
-        this.$message.error('获取餐桌数据数据失败!')
+        this.$message.error('获取餐桌数据失败!')
         return
       }
       this.tabAndTabTypeOptions = res.data.ordersTabAndTabTypeOptions
