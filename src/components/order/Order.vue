@@ -9,7 +9,7 @@
 
         <!-- 卡片视图 -->
         <el-card>
-          <el-row :gutter="20">
+          <el-row :gutter="20" type="flex">
               <el-col :span="5">
                 <el-input placeholder="订单号" v-model="queryInfo.O_UniqSearchID" :clearable="true">
                 </el-input>

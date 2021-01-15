@@ -10,11 +10,11 @@
          <!-- 卡片视图 -->
         <el-card>
           <p style="font-family:Helvetica Neue;font-weight:bold;font-size:18px;">操作</p>
-          <el-row :gutter="20">
-            <el-col :span="2">
+          <el-row :gutter="0" type="flex">
+            <el-col :xl="2" :lg="3" :md="3" :sm="3" :xs="3">
               <el-button type="danger" @click="openWs">上线接单</el-button>
             </el-col>
-            <el-col :span="3">
+            <el-col :xl="3" :lg="3" :md="3" :sm="3" :xs="3">
               <el-button type="warning" @click="closeWs">下线休息</el-button>
             </el-col>
             <el-col :span="2">

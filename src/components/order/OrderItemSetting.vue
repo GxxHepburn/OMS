@@ -34,26 +34,26 @@
 
           <el-divider content-position="left">订单操作区域</el-divider>
 
-          <el-row :gutter="20">
-            <el-col :span="2">
+          <el-row :gutter="20" type="flex">
+            <el-col :span="2" :lg="3" :md="3" :sm="3" :xs="3">
               <el-button type="primary" v-print="'#printST'">打印客人小票</el-button>
             </el-col>
-            <el-col :span="2">
+            <el-col :span="2" :lg="3" :md="3" :sm="3" :xs="3">
               <el-button type="primary" v-print="'#printKT'">打印厨房餐票</el-button>
             </el-col>
-            <el-col :span="2">
+            <el-col :span="2" :lg="3" :md="3" :sm="3" :xs="3">
               <el-button type="primary" v-print="'#printMT'">打印餐厅底票</el-button>
             </el-col>
-            <el-col :span="2.1">
+            <el-col :span="2.1" :lg="3.1" :md="3.1" :sm="3.1" :xs="3.1">
               <el-button :disabled="OrderFiDisAble" type="warning">订单支付完成</el-button>
             </el-col>
-            <el-col :span="2">
+            <el-col :span="2" :lg="3" :md="3" :sm="3" :xs="3">
               <el-button :disabled="OrderNotFiDisAble" type="warning">订单未完成</el-button>
             </el-col>
-            <el-col :span="3">
+            <el-col :span="3" :lg="4" :md="4" :sm="4" :xs="4">
               <el-button :disabled="OrderReturnDisAble" type="danger">退 款</el-button>
             </el-col>
-            <el-col :span="3">
+            <el-col :span="3" :lg="4" :md="4" :sm="4" :xs="4">
               <el-button :disabled="OrderReturnWithOutMoneyDisAble" type="danger" @click="onlyReturnGood">仅退餐品</el-button>
             </el-col>
           </el-row>
