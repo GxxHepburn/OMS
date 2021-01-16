@@ -60,7 +60,7 @@
                   </el-popover>
                 </template>
               </el-table-column>
-              <el-table-column label="订单类型">
+              <el-table-column label="订单类型" min-width="110">
                 <template slot-scope="scope">
                   <el-tag v-if="scope.row.OA_Sort==1" type="warning" style="font-weight:bold;">初次下单</el-tag>
                   <el-tag v-if="scope.row.OA_Sort!=1" type="danger" style="font-weight:bold;">再次加菜</el-tag>
@@ -119,6 +119,9 @@ export default {
     this.getNotTakingOrderAddFormList()
   },
   mounted () {
+    window.$bus.$on('updateOrderTaking', (val) => {
+      this.getNewNotTakingOrderAddFormList()
+    })
   },
   methods: {
     // 订单操作按钮

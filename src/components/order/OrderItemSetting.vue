@@ -189,10 +189,10 @@
                 <p><label>餐桌:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.t_Name}}</label></p>
                 <p><label>用餐人数:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_NumberOfDiners}}人</label></p>
                 <div style="border-bottom:#000 dashed 1px;"></div>
-                <p><label>客人备注:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_Remarks}}</label></p>
+                <p style="width:230px;word-wrap:break-word;"><label>客人备注:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_Remarks}}</label></p>
                 <p>*****************商品***************</p>
                 <div v-for="item in orderDetailForm"><!-- eslint-disable-line -->
-                  <p>
+                  <p style="width:230px;word-wrap:break-word;">
                     <label style="font-size:20px;">{{item.name}}</label><label style="font-size:17px;margin-left:10px;"><em> {{item.specs}}</em><em v-for="proItem in item.property"> {{proItem}}</em></label><!-- eslint-disable-line -->
                   </p>
                   <p>
@@ -225,10 +225,10 @@
                 <p><label>餐桌:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.t_Name}}</label></p>
                 <p><label>用餐人数:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_NumberOfDiners}}人</label></p>
                 <div style="border-bottom:#000 dashed 1px;"></div>
-                <p><label>客人备注:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_Remarks}}</label></p>
+                <p style="width:230px;word-wrap:break-word;"><label>客人备注:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_Remarks}}</label></p>
                 <p>*****************商品***************</p>
                 <div v-for="item in orderDetailForm"><!-- eslint-disable-line -->
-                  <p>
+                  <p style="width:230px;word-wrap:break-word;">
                     <label style="font-size:23px;">{{item.name}}</label><label style="font-size:17px;margin-left:10px;"><em> {{item.specs}}</em><em v-for="proItem in item.property"> {{proItem}}</em></label><!-- eslint-disable-line -->
                   </p>
                   <p>

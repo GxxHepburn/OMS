@@ -53,6 +53,17 @@ function openWebSocket () {
     if (data.type === '3') {
       window.VueThat.$voicePromptFun.voicePrompt(data.voiceText)
     }
+    if (data.type === '2') {
+      window.VueThat.$voicePromptFun.voicePrompt(data.voiceText)
+      // 判断是不是在接单界面，如果是，就刷新数据，如果不是，就路由到接单界面
+      if (window.VueThat.$route.path === '/static/nowOrders') {
+        window.$bus.$emit('updateOrderTaking', 'updateOrderTaking')
+      } else {
+        window.VueThat.$router.push({
+          path: '/static/nowOrders'
+        })
+      }
+    }
   })
 
   window.wbss.addEventListener('close', function (e) {
