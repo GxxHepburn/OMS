@@ -1,5 +1,5 @@
 function voicePrompt (text) {
-  var audioVar = new Audio('http://tts.baidu.com/text2audio?lan=zh&ie=UTF-8&spd=5&per=4&text=' + text)
+  var audioVar = new Audio('https://tts.baidu.com/text2audio?lan=zh&ie=UTF-8&spd=5&per=4&text=' + text)
   window.VueThat.$voiceList.push(audioVar)
   audioVar.addEventListener('ended', function () {
     window.VueThat.$voiceList.splice(window.VueThat.$voiceList.indexOf(audioVar), 1)
