@@ -45,7 +45,7 @@
               <el-button type="primary" v-print="'#printMT'">打印餐厅底票</el-button>
             </el-col>
             <el-col :span="2.1" :lg="3.1" :md="3.1" :sm="3.1" :xs="3.1">
-              <el-button :disabled="OrderFiDisAble" type="warning">订单支付完成</el-button>
+              <el-button :disabled="OrderFiDisAble" type="warning" @click="orderFiUnderLine">订单线下支付完成</el-button>
             </el-col>
             <el-col :span="2" :lg="3" :md="3" :sm="3" :xs="3">
               <el-button :disabled="OrderNotFiDisAble" type="warning">订单未完成</el-button>
@@ -436,6 +436,15 @@ export default {
     })
   },
   methods: {
+    // 订单支付完成
+    async orderFiUnderLine () {
+      const { data: res } = await this.$http.post('orderFiUnderLine', { O_ID: this.O_ID })
+      if (res.meta.status !== 200) {
+        this.$message.error('标记线下支付失败，请重试!')
+        return
+      }
+      this.$message.success('标记线下支付成功!')
+    },
     // 接单
     async takingOrder (event, item) {
       const { data: res } = await this.$http.post('takingOrder', item)
