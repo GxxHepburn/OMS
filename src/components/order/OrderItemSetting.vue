@@ -436,14 +436,20 @@ export default {
     })
   },
   methods: {
+    //
     // 订单支付完成
     async orderFiUnderLine () {
-      const { data: res } = await this.$http.post('orderFiUnderLine', { O_ID: this.O_ID })
+      const { data: res } = await this.$http.post('orderFiUnderLine', this.orderForm)
       if (res.meta.status !== 200) {
-        this.$message.error('标记线下支付失败，请重试!')
+        if (res.meta.status !== 500) {
+          this.$message.error('客户正在付款，请稍后重试!')
+          return
+        }
+        this.$message.error('标记线下支付失败!')
         return
       }
       this.$message.success('标记线下支付成功!')
+      this.initOrderDetailForm()
     },
     // 接单
     async takingOrder (event, item) {
