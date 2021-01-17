@@ -48,7 +48,7 @@
               <el-button :disabled="OrderFiDisAble" type="warning" @click="orderFiUnderLine">订单线下支付完成</el-button>
             </el-col>
             <el-col :span="2" :lg="3" :md="3" :sm="3" :xs="3">
-              <el-button :disabled="OrderNotFiDisAble" type="warning">订单未完成</el-button>
+              <el-button :disabled="OrderNotFiDisAble" type="warning" @click="orderNotFiUnderLine">订单未完成</el-button>
             </el-col>
             <el-col :span="3" :lg="4" :md="4" :sm="4" :xs="4">
               <el-button :disabled="OrderReturnDisAble" type="danger">退 款</el-button>
@@ -275,7 +275,7 @@
                 <div style="border-bottom:#000 dashed 1px;"></div>
                 <p><label style="margin-left:10px;font-size:15px;">支付单号:</label></p>
                 <p><label style="font-size:12px;margin-left:20px;">{{orderPayForm.p_Transaction_Id}}</label></p>
-                <p><label style="margin-left:10px;font-size:17px;">支付金额:</label><label style="font-size:15px;margin-left:10px;">{{orderPayForm.p_Totle_Fee/100}} 元</label></p>
+                <p><label style="margin-left:10px;font-size:17px;">支付金额:</label><label style="font-size:15px;margin-left:10px;">{{orderPayForm.p_Totle_Fee == undefined? '':orderPayForm.p_Totle_Fee/100}} 元</label></p>
                 <p><label style="margin-left:10px;font-size:17px;">支付类型:</label><label style="font-size:15px;margin-left:10px;">{{orderPayForm.p_Trade_Type}}</label></p>
                 <p><label style="margin-left:10px;font-size:17px;">支付时间:</label><label style="font-size:15px;margin-left:10px;">{{orderPayForm.p_Time_End}}</label></p>
                 <p><label style="margin-left:10px;font-size:17px;">银行类型:</label><label style="font-size:15px;margin-left:10px;">{{orderPayForm.p_Bank_Type}}</label></p>
@@ -436,7 +436,20 @@ export default {
     })
   },
   methods: {
-    //
+    // 订单未完成，主动操作按钮
+    async orderNotFiUnderLine () {
+      const { data: res } = await this.$http.post('orderNotFiUnderLine', this.orderForm)
+      if (res.meta.status !== 200) {
+        if (res.meta.status !== 500) {
+          this.$message.error('客户正在付款，请稍后重试!')
+          return
+        }
+        this.$message.error('标记订单未完成失败!')
+        return
+      }
+      this.$message.success('标记订单未完成成功!')
+      this.initOrderDetailForm()
+    },
     // 订单支付完成
     async orderFiUnderLine () {
       const { data: res } = await this.$http.post('orderFiUnderLine', this.orderForm)
