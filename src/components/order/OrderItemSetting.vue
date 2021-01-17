@@ -30,6 +30,18 @@
             </el-table-column>
             <el-table-column label="下单时间" prop="o_OrderingTime" width="230"></el-table-column>
             <el-table-column label="支付时间" prop="o_PayTime" width="230"></el-table-column>
+            <el-table-column label="备注">
+                <template slot-scope="scope">
+                  <el-popover
+                    placement="top-start"
+                    title="客人备注"
+                    width="200"
+                    trigger="click"
+                    :content="scope.row.o_Remarks==''?'客人没有特殊要求':scope.row.o_Remarks">
+                    <el-button size="mini" type="info" slot="reference" plain>备注</el-button>
+                  </el-popover>
+                </template>
+              </el-table-column>
           </el-table>
 
           <el-divider content-position="left">订单操作区域</el-divider>
