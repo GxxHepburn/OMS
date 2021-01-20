@@ -93,7 +93,7 @@ export default {
       })
       if (res.meta.status !== 200) {
         // 根据阿里云返回的情况，要分别提示
-        this.$message.error('发送验证码失败！')
+        this.$message.error(res.meta.msg)
         return
       }
 
@@ -110,6 +110,7 @@ export default {
           clearInterval(timer)
         }
       }, 1000)
+      this.$message.success(res.meta.msg)
     },
     // 点击重置按钮，重置登陆表单
     resetLoginForm () {

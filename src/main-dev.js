@@ -48,6 +48,15 @@ axios.interceptors.request.use(config => {
 axios.interceptors.response.use(config => {
   NProgress.done()
   return config
+}, err => {
+  NProgress.done()
+  if (err.response.status === 400) {
+    window.VueThat.$message.error('token过期，请重新登陆')
+  } else if (err.response.status === 401) {
+    window.VueThat.$message.error('非法请求')
+  } else {
+    window.VueThat.$message.error('未知错误，请联系管理员！')
+  }
 })
 Vue.prototype.$http = axios
 
