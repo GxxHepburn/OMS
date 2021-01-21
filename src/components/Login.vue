@@ -34,7 +34,7 @@
               <el-button class="getCheckNumButton" :disabled="checkDialogButtonDisalbe" type="primary" plain @click="getCheckNumButtonClick">{{checkNumButtonText}}</el-button>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" class="checkDialogConfirmButton">确 定</el-button>
+              <el-button type="primary" class="checkDialogConfirmButton" @click="realCheckNumButtonClick">确 定</el-button>
             </el-form-item>
           </el-form>
         </el-dialog>
@@ -83,6 +83,10 @@ export default {
     }
   },
   methods: {
+    realCheckNumButtonClick () {
+      // valid验证
+      console.log(this.checkForm)
+    },
     // 获取验证码
     async getCheckNumButtonClick () {
       // 发送获取验证码逻辑,需要携带token（在heaers中)
