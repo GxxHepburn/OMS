@@ -36,7 +36,7 @@ axios.defaults.baseURL = 'https://www.donghuastar.com/OSM'
 // 在 request 拦截器中，展示进度条 NProgress.start ()
 axios.interceptors.request.use(config => {
   NProgress.start()
-  if (config.headers.Authorization !== undefined || config.headers.Authorization !== '') {
+  if (config.headers.Authorization !== undefined && config.headers.Authorization !== '') {
     return config
   }
 

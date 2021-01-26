@@ -63,7 +63,7 @@
               <el-button :disabled="OrderNotFiDisAble" type="warning" @click="orderNotFiUnderLine">订单未完成</el-button>
             </el-col>
             <el-col :span="3" :lg="4" :md="4" :sm="4" :xs="4">
-              <el-button :disabled="OrderReturnDisAble" type="danger">退 款</el-button>
+              <el-button :disabled="OrderReturnDisAble" type="danger" @click="returnGoodWithMoney">退 款</el-button>
             </el-col>
             <el-col :span="3" :lg="4" :md="4" :sm="4" :xs="4">
               <el-button :disabled="OrderReturnWithOutMoneyDisAble" type="danger" @click="onlyReturnGood">仅退餐品</el-button>
@@ -408,6 +408,55 @@
             <el-button type="primary" @click="ensureOnlyReturnGood">确 定</el-button>
           </span>
         </el-dialog>
+
+        <el-dialog title="退款" :visible.sync="returnGoodWithMoneyDialogVisible" width="70%">
+
+          <el-table :data="returnGoodWithMoneyOrderDetailForm" :border="true" :stripe="false" class="returnGoodWithMoneyDialogTab">
+            <el-table-column label="点餐列表">
+              <template slot-scope="scope">
+                <div class="returnGoodWithMoneyDialogTabTitle"><span>第{{scope.row.OA_Sort}}次点餐</span></div>
+                <el-table :data="scope.row.orderDetails">
+                  <el-table-column type="index" label="序号"></el-table-column>
+                  <el-table-column label="菜品名称" prop="OD_FName"></el-table-column>
+                  <el-table-column label="价格（元）" prop="OD_RealPrice"></el-table-column>
+                  <el-table-column label="规格">
+                    <template slot-scope="specs">
+                      <el-tag type="warning" size="mini" v-if="specs.row.OD_Spec">{{specs.row.OD_Spec}}</el-tag>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="属性">
+                    <template slot-scope="property"  v-if="property.row.OD_PropOne != ''">
+                      <span class="propertySpan" v-if="property.row.OD_PropOne != ''">
+                        <el-tag type="success" size="mini">{{property.row.OD_PropOne}}</el-tag>
+                      </span>
+                      <span class="propertySpan" v-if="property.row.OD_PropTwo != ''">
+                        <el-tag type="success" size="mini">{{property.row.OD_PropTwo}}</el-tag>
+                      </span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="实际数量 (份)" prop="OD_RealNum"></el-table-column>
+                  <el-table-column label="已下单数量 (份)" prop="OD_Num"></el-table-column>
+                  <el-table-column label="已退款数量 (份)">
+                    <template slot-scope="OD_Item">
+                      <span v-if="OD_Item.row.OD_Num - OD_Item.row.OD_RealNum == 0">0</span>
+                      <el-tag v-else type="danger">{{OD_Item.row.OD_Num - OD_Item.row.OD_RealNum}}</el-tag>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="本次仅退餐品数量" width="170">
+                    <template slot-scope="scope">
+                      <el-input-number size="small" v-model="scope.row.returnNum" :min="0" :max="scope.row.OD_RealNum"></el-input-number>
+                    </template>
+                  </el-table-column>
+                </el-table>
+              </template>
+            </el-table-column>
+          </el-table>
+
+          <span slot="footer" class="dialog-footer">
+            <el-button @click="returnGoodWithMoneyDialogVisible = false">取 消</el-button>
+            <el-button type="primary" @click="ensureReturnGood">确 定</el-button>
+          </span>
+        </el-dialog>
     </div>
 </template>
 
@@ -427,14 +476,10 @@ export default {
       OrderNotFiDisAble: true,
       OrderReturnDisAble: true,
       OrderReturnWithOutMoneyDisAble: true,
-      printObj: {
-        id: 'printMe',
-        popTitle: 'good print',
-        extraCss: '',
-        extraHead: '<meta http-equiv="Content-Language"content="zh-cn"/>'
-      },
       onlyReturnGoodDialogVisible: false,
-      onlyReturnGoodOrderDetailForm: []
+      onlyReturnGoodOrderDetailForm: [],
+      returnGoodWithMoneyDialogVisible: false,
+      returnGoodWithMoneyOrderDetailForm: []
     }
   },
   computed: {
@@ -448,6 +493,41 @@ export default {
     })
   },
   methods: {
+    // 真正的退款请求
+    async ensureReturnGood () {
+      console.log(this.returnGoodWithMoneyOrderDetailForm)
+      // 更新orderDetail,插入returnOrder,插入returnOrderDetail
+      // 从微信支付退款
+      var returnGoodWithMoneyTotleNum = 0
+      for (var index = 0; index < this.returnGoodWithMoneyOrderDetailForm.length; index++) {
+        for (var innerIndex = 0; innerIndex < this.returnGoodWithMoneyOrderDetailForm[index].orderDetails.length; innerIndex++) {
+          returnGoodWithMoneyTotleNum += this.returnGoodWithMoneyOrderDetailForm[index].orderDetails[innerIndex].returnNum
+        }
+      }
+      if (returnGoodWithMoneyTotleNum === 0) {
+        this.$message.info('未选择退款餐品')
+      } else {
+        // 发送请求，在失败中提示，退点餐品失败，在成功中刷新页面
+        const { data: res } = await this.$http.post('returnGoodsWithMoney', { returnGoodWithMoneyOrderDetailForm: this.returnGoodWithMoneyOrderDetailForm, O_ID: this.O_ID })
+        if (res.meta.status !== 200) {
+          this.$message.error('退点餐品失败')
+          return
+        }
+        this.$message.success('退点餐品成功')
+        this.initOrderDetailForm()
+      }
+      this.returnGoodWithMoneyDialogVisible = false
+    },
+    // 退款
+    returnGoodWithMoney () {
+      this.returnGoodWithMoneyOrderDetailForm = JSON.parse(JSON.stringify(this.orderAddFormList))
+      for (var index = 0; index < this.returnGoodWithMoneyOrderDetailForm.length; index++) {
+        for (var innerIndex = 0; innerIndex < this.returnGoodWithMoneyOrderDetailForm[index].orderDetails.length; innerIndex++) {
+          this.$set(this.returnGoodWithMoneyOrderDetailForm[index].orderDetails[innerIndex], 'returnNum', 0)
+        }
+      }
+      this.returnGoodWithMoneyDialogVisible = true
+    },
     // 订单未完成，主动操作按钮
     async orderNotFiUnderLine () {
       const { data: res } = await this.$http.post('orderNotFiUnderLine', this.orderForm)
@@ -571,6 +651,23 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.returnGoodWithMoneyDialogTab {
+  // /deep/ .el-table__header-wrapper {
+  //   display: none;
+  // }
+  .returnGoodWithMoneyDialogTabTitle {
+    color:#333;
+    padding:0 5px 0 5px;
+    height:45px;
+    line-height:45px;
+    border:1px solid #eee;display:flex;
+    justify-content: space-between;
+    background:rgb(233, 225, 225);
+    padding-left: 30px;
+    font-weight: 600;
+    font-size: 16px;
+  }
+}
 @page{
   size:  auto;   /* auto is the initial value */
   margin: 0;  /* this affects the margin in the printer settings */
