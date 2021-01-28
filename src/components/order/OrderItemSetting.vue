@@ -496,7 +496,7 @@ export default {
     // 真正的退款请求
     async ensureReturnGood () {
       console.log(this.returnGoodWithMoneyOrderDetailForm)
-      // 更新orderDetail,插入returnOrder,插入returnOrderDetail
+      // 更新orderDetail,更新order-总价,更新加菜orderadd,插入returnOrder,插入returnOrderDetail
       // 从微信支付退款
       var returnGoodWithMoneyTotleNum = 0
       for (var index = 0; index < this.returnGoodWithMoneyOrderDetailForm.length; index++) {
