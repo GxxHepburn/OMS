@@ -153,11 +153,6 @@
         </el-card>
 
         <el-card class="bottomElCard">
-          <el-divider content-position="left">退菜列表</el-divider>
-          <div></div>
-        </el-card>
-
-        <el-card class="bottomElCard">
           <el-divider content-position="left">支付信息</el-divider>
           <div v-if="JSON.stringify(orderPayForm) != '{}'">
             <span style="margin-left:20px;font-size:15px;color:#909399;font-weight:bold;"><label>支付时间: </label><label style="font-size:20px;color:#F56C6C;">{{orderPayForm.p_Time_End}}</label></span>
@@ -178,6 +173,41 @@
             </el-table>
           </div>
           <div></div>
+        </el-card>
+
+        <el-card class="bottomElCard">
+          <el-divider content-position="left">退菜列表</el-divider>
+          <div v-for="item in orderReturnFormList" :key="item.OR_ID" style="margin-bottom:50px;min-width:1200px;">
+            <h4 style="display:inline;">第 {{item.OR_Sort}} 次退款</h4>
+            <span style="margin-left:20px;font-size:15px;color:#909399;font-weight:bold;"><label>退款时间: </label><label style="font-size:20px;color:#F56C6C;">{{item.OR_ReturnTime}}</label></span>
+            <span style="margin-left:20px;font-size:15px;color:#909399;font-weight:bold;"><label>金额: </label><label style="font-size:20px;color:#F56C6C;">{{item.OR_TotlePrice}}</label> 元</span>
+            <el-button style="margin-left:30px;" type="primary" v-print="'#'+ 'printRT' + item.OR_Sort">打印退菜小票</el-button>
+            <el-table :data="item.orderReturnDetails" :border="false" :stripe="false">
+              <el-table-column type="index"></el-table-column>
+              <el-table-column label="菜品名称" prop="ORD_FName"></el-table-column>
+              <el-table-column label="价格（元）" prop="ORD_RealPrice"></el-table-column>
+              <el-table-column label="规格">
+                <template slot-scope="specs">
+                  <el-tag type="warning" size="mini" v-if="specs.row.ORD_Spec">{{specs.row.ORD_Spec}}</el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column label="属性">
+                <template slot-scope="property"  v-if="property.row.ORD_PropOne != ''">
+                  <span class="propertySpan" v-if="property.row.ORD_PropOne != ''">
+                    <el-tag type="success" size="mini">{{property.row.ORD_PropOne}}</el-tag>
+                  </span>
+                  <span class="propertySpan" v-if="property.row.ORD_PropTwo != ''">
+                    <el-tag type="success" size="mini">{{property.row.ORD_PropTwo}}</el-tag>
+                  </span>
+                </template>
+              </el-table-column>
+              <el-table-column label="退款数量 (份)">
+                <template slot-scope="scope">
+                  <el-tag type="danger">{{scope.row.ORD_Num}}</el-tag>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
         </el-card>
 
         <el-card class="bottomElCard">
@@ -367,6 +397,8 @@
               </div>
             </div>
 
+            <!-- 退菜票据 RT -->
+
           </div>
         </el-card>
 
@@ -479,7 +511,8 @@ export default {
       onlyReturnGoodDialogVisible: false,
       onlyReturnGoodOrderDetailForm: [],
       returnGoodWithMoneyDialogVisible: false,
-      returnGoodWithMoneyOrderDetailForm: []
+      returnGoodWithMoneyOrderDetailForm: [],
+      orderReturnFormList: []
     }
   },
   computed: {
@@ -644,6 +677,14 @@ export default {
         return
       }
       this.orderPayForm = res4.data.orderPayForm
+
+      const { data: res5 } = await this.$http.post('getOrderReturnFormList', { O_ID: this.O_ID })
+      if (res5.meta.status !== 200) {
+        this.$message.error('获取退款信息失败')
+        return
+      }
+      this.orderReturnFormList = res5.data.orderReturnFormList
+      console.log(this.orderReturnFormList)
     }
   }
 }
