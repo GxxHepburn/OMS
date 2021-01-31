@@ -196,13 +196,14 @@ export default {
     // 下线休息
     closeWs () {
       if (window.wbss === undefined) {
-        this.$message.error('websocket不能存在')
+        this.$message.error('websocket不存在')
         return
       }
-      if (window.wbss.readyState !== 1) {
-        this.$message.error('websocket未连接,请不要重复关闭')
-        return
-      }
+      // if (window.wbss.readyState !== 1) {
+      //   this.$message.error('websocket未连接,请不要重复关闭')
+      //   return
+      // }
+
       window.sessionStorage.setItem('isNeedToConnectWebSocket', 0)
       window.wbss.close()
     }

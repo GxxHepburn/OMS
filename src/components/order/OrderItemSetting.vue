@@ -212,7 +212,11 @@
 
         <el-card class="bottomElCard">
           <el-divider content-position="left">退款信息</el-divider>
-          <div></div>
+          <div>
+            <el-table :data="refundFormList" :border="false" :stripe="false">
+              <el-table-column type="index"></el-table-column>
+            </el-table>
+          </div>
         </el-card>
 
         <el-card class="bottomElCard">
@@ -512,7 +516,8 @@ export default {
       onlyReturnGoodOrderDetailForm: [],
       returnGoodWithMoneyDialogVisible: false,
       returnGoodWithMoneyOrderDetailForm: [],
-      orderReturnFormList: []
+      orderReturnFormList: [],
+      refundFormList: []
     }
   },
   computed: {
@@ -522,6 +527,9 @@ export default {
   },
   mounted () {
     window.$bus.$on('updateOrderItemSetting', (val) => {
+      this.initOrderDetailForm()
+    })
+    window.$bus.$on('returnSuccess', (val) => {
       this.initOrderDetailForm()
     })
   },
@@ -541,24 +549,47 @@ export default {
       } else {
         // 发送请求，在失败中提示，退点餐品失败，在成功中刷新页面
         const { data: res } = await this.$http.post('returnGoodsWithMoney', { returnGoodWithMoneyOrderDetailForm: this.returnGoodWithMoneyOrderDetailForm, O_ID: this.O_ID })
-        if (res.meta.status !== 200) {
-          this.$message.error('退点餐品失败')
+        if (res.meta.status !== 201 && res.meta.status !== 200) {
+          this.$message.error('退菜失败!退款失败！请联系管理员!')
           return
         }
-        this.$message.success('退点餐品成功')
+        this.$confirm(res.meta.msg, 'Tips', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'info'
+        }).then(() => {
+        }).catch(() => {
+        })
         this.initOrderDetailForm()
       }
       this.returnGoodWithMoneyDialogVisible = false
     },
     // 退款
     returnGoodWithMoney () {
-      this.returnGoodWithMoneyOrderDetailForm = JSON.parse(JSON.stringify(this.orderAddFormList))
-      for (var index = 0; index < this.returnGoodWithMoneyOrderDetailForm.length; index++) {
-        for (var innerIndex = 0; innerIndex < this.returnGoodWithMoneyOrderDetailForm[index].orderDetails.length; innerIndex++) {
-          this.$set(this.returnGoodWithMoneyOrderDetailForm[index].orderDetails[innerIndex], 'returnNum', 0)
+      if (this.orderPayForm.p_Trade_Type === '线下支付') {
+        this.$confirm('客人订单付款方式为: 线下支付。系统未收到客人支付款项，请退菜后人工退款', 'Tips', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'info'
+        }).then(() => {
+          this.returnGoodWithMoneyOrderDetailForm = JSON.parse(JSON.stringify(this.orderAddFormList))
+          for (var index = 0; index < this.returnGoodWithMoneyOrderDetailForm.length; index++) {
+            for (var innerIndex = 0; innerIndex < this.returnGoodWithMoneyOrderDetailForm[index].orderDetails.length; innerIndex++) {
+              this.$set(this.returnGoodWithMoneyOrderDetailForm[index].orderDetails[innerIndex], 'returnNum', 0)
+            }
+          }
+          this.returnGoodWithMoneyDialogVisible = true
+        }).catch(() => {
+        })
+      } else {
+        this.returnGoodWithMoneyOrderDetailForm = JSON.parse(JSON.stringify(this.orderAddFormList))
+        for (var index = 0; index < this.returnGoodWithMoneyOrderDetailForm.length; index++) {
+          for (var innerIndex = 0; innerIndex < this.returnGoodWithMoneyOrderDetailForm[index].orderDetails.length; innerIndex++) {
+            this.$set(this.returnGoodWithMoneyOrderDetailForm[index].orderDetails[innerIndex], 'returnNum', 0)
+          }
         }
+        this.returnGoodWithMoneyDialogVisible = true
       }
-      this.returnGoodWithMoneyDialogVisible = true
     },
     // 订单未完成，主动操作按钮
     async orderNotFiUnderLine () {
@@ -684,7 +715,6 @@ export default {
         return
       }
       this.orderReturnFormList = res5.data.orderReturnFormList
-      console.log(this.orderReturnFormList)
     }
   }
 }

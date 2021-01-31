@@ -64,6 +64,12 @@ function openWebSocket () {
         })
       }
     }
+    if (data.type === '4') {
+      // 判断是不是在对应订单详情界面，如果是，就刷新数据
+      if (window.VueThat.$route.path === '/static/orderItemSetting' && window.VueThat.$route.query.O_ID === '' + data.O_ID) {
+        window.$bus.$emit('returnSuccess', 'returnSuccess')
+      }
+    }
   })
 
   window.wbss.addEventListener('close', function (e) {
@@ -76,7 +82,6 @@ function openWebSocket () {
     } else {
       window.VueThat.$message.success('websocket关闭成功')
       heartCheck.reset()
-      console.log('websocket关闭成功')
     }
   })
 
