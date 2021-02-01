@@ -535,7 +535,35 @@ export default {
   },
   methods: {
     // 真正的退款请求
-    async ensureReturnGood () {
+    async realEnsureReturnGood (value) {
+      // 将下面得内容转到输入完交易密码后
+      var mmngctUserName = window.sessionStorage.getItem('mmngctUserName')
+      const { data: res1 } = await this.$http.post('checkTradePassword', { tradePas: value, mmngctUserName: mmngctUserName })
+      if (res1.meta.status === undefined) {
+        this.$message.error('验证交易密码失败!请联系管理员!')
+        return
+      }
+      if (res1.meta.msg !== 'OK') {
+        this.$message.error('交易密码错误!')
+        return
+      }
+      // 发送请求，在失败中提示，退点餐品失败，在成功中刷新页面
+      const { data: res } = await this.$http.post('returnGoodsWithMoney', { returnGoodWithMoneyOrderDetailForm: this.returnGoodWithMoneyOrderDetailForm, O_ID: this.O_ID })
+      if (res.meta.status !== 201 && res.meta.status !== 200) {
+        this.$message.error('退菜失败!退款失败！请联系管理员!')
+        return
+      }
+      this.$confirm(res.meta.msg, 'Tips', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'info'
+      }).then(() => {
+      }).catch(() => {
+      })
+      this.initOrderDetailForm()
+      this.returnGoodWithMoneyDialogVisible = false
+    },
+    ensureReturnGood () {
       // 更新orderDetail,更新order-总价，订单状态,更新加菜orderadd,插入returnOrder,插入returnOrderDetail
       // 从微信支付退款
       var returnGoodWithMoneyTotleNum = 0
@@ -547,22 +575,23 @@ export default {
       if (returnGoodWithMoneyTotleNum === 0) {
         this.$message.info('未选择退款餐品')
       } else {
-        // 发送请求，在失败中提示，退点餐品失败，在成功中刷新页面
-        const { data: res } = await this.$http.post('returnGoodsWithMoney', { returnGoodWithMoneyOrderDetailForm: this.returnGoodWithMoneyOrderDetailForm, O_ID: this.O_ID })
-        if (res.meta.status !== 201 && res.meta.status !== 200) {
-          this.$message.error('退菜失败!退款失败！请联系管理员!')
-          return
-        }
-        this.$confirm(res.meta.msg, 'Tips', {
+        // 先验证交易密码，成功了才可以退款，失败了，不可以操作
+        this.$prompt('请输入交易密码', '', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
-          type: 'info'
-        }).then(() => {
+          // 密码是6-16位字母加数字的正则表达式
+          inputPattern: /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,16}$/,
+          inputErrorMessage: '密码格式不正确',
+          inputType: 'password',
+          closeOnClickModal: false
+        }).then(({ value }) => {
+          // 这里验证交易密码
+          this.realEnsureReturnGood(value)
         }).catch(() => {
+          // 取消时，让退款dialog一并消失
+          this.returnGoodWithMoneyDialogVisible = false
         })
-        this.initOrderDetailForm()
       }
-      this.returnGoodWithMoneyDialogVisible = false
     },
     // 退款
     returnGoodWithMoney () {

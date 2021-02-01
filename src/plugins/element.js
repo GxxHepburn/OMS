@@ -78,6 +78,7 @@ Vue.use(Timeline)
 Vue.use(TimelineItem)
 Vue.prototype.$message = Message
 Vue.prototype.$confirm = MessageBox.confirm
+Vue.prototype.$prompt = MessageBox.prompt
 Vue.use(Image)
 Vue.use(Dropdown)
 Vue.use(DropdownMenu)
