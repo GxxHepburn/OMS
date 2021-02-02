@@ -23,8 +23,8 @@
               <template slot-scope="scope">
                 <el-tag v-if="scope.row.o_PayStatue == 0" type="danger">未支付</el-tag>
                 <el-tag v-if="scope.row.o_PayStatue == 1" type="primary">已完成</el-tag>
-                <el-tag v-if="scope.row.o_PayStatue == 2 && scope.row.O_TotlePrice == 0" type="warning">全额退款</el-tag>
-                <el-tag v-if="scope.row.o_PayStatue == 2 && scope.row.O_TotlePrice != 0" type="warning">部分退款</el-tag>
+                <el-tag v-if="scope.row.o_PayStatue == 2 && scope.row.o_TotlePrice == 0" type="warning">全额退款</el-tag>
+                <el-tag v-if="scope.row.o_PayStatue == 2 && scope.row.o_TotlePrice != 0" type="warning">部分退款</el-tag>
                 <el-tag v-if="scope.row.o_PayStatue == 3" type="info">未完成</el-tag>
               </template>
             </el-table-column>
@@ -719,7 +719,7 @@ export default {
       } else if (this.O_PayStatue === 1) {
         // 退款
         this.OrderReturnDisAble = false
-      } else if (this.O_PayStatue === 2) {
+      } else if (this.O_PayStatue === 2 && this.orderForm.o_TotlePrice !== 0) {
         // 退款
         this.OrderReturnDisAble = false
       }

@@ -126,7 +126,7 @@
               <el-table-column label="餐桌分类" prop="TT_Name"></el-table-column>
               <el-table-column label="用餐人数" prop="O_NumberOfDiners"></el-table-column>
               <el-table-column label="金额 (元)" prop="O_TotlePrice"></el-table-column>
-              <el-table-column label="支付状态">
+              <el-table-column label="支付状态"  width="100">
                 <!-- 修改成tag -->
                 <template slot-scope="scope">
                   <el-tag v-if="scope.row.O_PayStatue == 0" type="danger">未支付</el-tag>
