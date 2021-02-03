@@ -160,7 +160,12 @@
             <el-button style="margin-left:30px;" type="primary" v-print="'#printPT'">打印支付票据</el-button>
             <el-table :data="[orderPayForm]" :border="false" :stripe="false">
               <el-table-column type="index"></el-table-column>
-              <el-table-column label="支付单号" prop="p_Transaction_Id"></el-table-column>
+              <el-table-column label="支付单号" prop="p_Transaction_Id" width="220"></el-table-column>
+              <el-table-column label="商户单号" width="280">
+                <template>
+                  {{orderForm.o_OutTradeNo}}
+                </template>
+              </el-table-column>
               <el-table-column label="支付金额(元)">
                 <template slot-scope="scope">
                   {{scope.row.p_Totle_Fee/100}}
@@ -212,9 +217,41 @@
 
         <el-card class="bottomElCard">
           <el-divider content-position="left">退款信息</el-divider>
-          <div>
-            <el-table :data="refundFormList" :border="false" :stripe="false">
+          <div v-for="(item, index) in refundFormList" :key="item.R_ID" style="margin-bottom:50px;min-width:1200px;">
+            <h4 style="display:inline;">第 {{index+1}} 次退款</h4>
+            <el-button style="margin-left:30px;" type="primary" v-print="'#'+ 'printRefundT' + item.OR_Sort">打印退款票据</el-button>
+            <el-table :data="[item]" :border="false" :stripe="false">
               <el-table-column type="index"></el-table-column>
+              <el-table-column label="退款方式">
+                <template slot-scope="scope">
+                  <span v-if="scope.row.R_Is_OfLine === 1">系统退款</span>
+                  <span v-if="scope.row.R_Is_OfLine === 0">人工退款</span>
+                </template>
+              </el-table-column>
+              <el-table-column label="退款单号" prop="R_Refund_Id" width="249"></el-table-column>
+              <el-table-column label="商户退款单号" prop="R_Out_Refund_No" width="260"></el-table-column>
+              <el-table-column label="退款金额(元)">
+                <template slot-scope="scope">
+                  <span v-if="scope.row.R_Refund_Fee === undefined">{{scope.row.R_Refund_Fee}}</span>
+                  <span v-else>{{parseInt(scope.row.R_Refund_Fee)/100}}</span>
+                </template>
+              </el-table-column>
+              <el-table-column label="提交时间" prop="R_Submit_Time" width="150"></el-table-column>
+              <el-table-column label="提交退款业务结果" width="150">
+                <template slot-scope="scope">
+                  <span v-if="scope.row.R_Result_Code === 'SUCCESS'">退款申请接收成功</span>
+                  <span v-if="scope.row.R_Result_Code === 'FAIL'">提交退款失败</span>
+                </template>
+              </el-table-column>
+              <el-table-column label="退款到账时间" prop="R_Success_Time" width="150"></el-table-column>
+              <el-table-column label="退款结果" width="150">
+                <template slot-scope="scope">
+                  <span v-if="scope.row.R_Refund_Status === 'SUCCESS'">退款成功(到账)</span>
+                  <span v-if="scope.row.R_Refund_Status === 'CHANGE'">退款异常</span>
+                  <span v-if="scope.row.R_Refund_Status === 'REFUNDCLOSE'">退款关闭</span>
+                </template>
+              </el-table-column>
+              <el-table-column label="退款账户" prop="R_Refund_Recv_Account" width="150"></el-table-column>
             </el-table>
           </div>
         </el-card>
@@ -740,10 +777,17 @@ export default {
 
       const { data: res5 } = await this.$http.post('getOrderReturnFormList', { O_ID: this.O_ID })
       if (res5.meta.status !== 200) {
-        this.$message.error('获取退款信息失败')
+        this.$message.error('获取退菜信息失败')
         return
       }
       this.orderReturnFormList = res5.data.orderReturnFormList
+
+      const { data: res6 } = await this.$http.post('getRefundFormList', { O_ID: this.O_ID })
+      if (res6.meta.status !== 200) {
+        this.$message.error('获取退款信息失败')
+        return
+      }
+      this.refundFormList = res6.data.refundFormList
     }
   }
 }
