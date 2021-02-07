@@ -582,7 +582,16 @@ export default {
         return
       }
       // 修改为，只更新退款部分数据
-      this.initOrderDetailForm()
+      this.getRefundFormList()
+    },
+    // 获取退款信息列表
+    async getRefundFormList () {
+      const { data: res } = await this.$http.post('getRefundFormList', { O_ID: this.O_ID })
+      if (res.meta.status !== 200) {
+        this.$message.error('获取退款信息失败')
+        return
+      }
+      this.refundFormList = res.data.refundFormList
     },
     // 真正的退款请求
     async realEnsureReturnGood (value) {
