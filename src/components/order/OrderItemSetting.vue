@@ -220,6 +220,9 @@
           <div v-for="(item, index) in refundFormList" :key="item.R_ID" style="margin-bottom:50px;min-width:1200px;">
             <h4 style="display:inline;">第 {{index+1}} 次退款</h4>
             <el-button style="margin-left:30px;" type="primary" v-print="'#'+ 'printRefundT' + item.OR_Sort">打印退款票据</el-button>
+            <el-button style="margin-left:30px;" type="primary"
+              :disabled="(item.R_Is_OfLine === 1 && item.R_Refund_Status) ? true : false"
+              @click="refundQuery(item.R_ID)">查询退款到账</el-button>
             <el-table :data="[item]" :border="false" :stripe="false">
               <el-table-column type="index"></el-table-column>
               <el-table-column label="退款方式">
@@ -571,6 +574,16 @@ export default {
     })
   },
   methods: {
+    // 查询退款到账
+    async refundQuery (R_ID) {
+      const { data: res } = await this.$http.post('refundQuery', { R_ID: R_ID })
+      if (res.meta.status !== 200) {
+        this.$message.error('查询退款到账失败!')
+        return
+      }
+      // 修改为，只更新退款部分数据
+      this.initOrderDetailForm()
+    },
     // 真正的退款请求
     async realEnsureReturnGood (value) {
       // 将下面得内容转到输入完交易密码后
