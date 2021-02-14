@@ -562,10 +562,57 @@
                 <div style="border-bottom:#000 dashed 1px;"></div>
                 <p><label style="margin-left:10px;font-size:15px;">支付单号:</label></p>
                 <p><label style="font-size:12px;margin-left:20px;">{{orderPayForm.p_Transaction_Id}}</label></p>
+                <p><label style="margin-left:10px;font-size:15px;">商户单号:</label></p>
+                <p><label style="font-size:12px;margin-left:20px;">{{orderForm.o_OutTradeNo}}</label></p>
                 <p><label style="margin-left:10px;font-size:17px;">支付金额:</label><label style="font-size:15px;margin-left:10px;">{{orderPayForm.p_Totle_Fee == undefined? '':orderPayForm.p_Totle_Fee/100}} 元</label></p>
                 <p><label style="margin-left:10px;font-size:17px;">支付类型:</label><label style="font-size:15px;margin-left:10px;">{{orderPayForm.p_Trade_Type}}</label></p>
                 <p><label style="margin-left:10px;font-size:17px;">支付时间:</label><label style="font-size:15px;margin-left:10px;">{{orderPayForm.p_Time_End}}</label></p>
                 <p><label style="margin-left:10px;font-size:17px;">银行类型:</label><label style="font-size:15px;margin-left:10px;">{{orderPayForm.p_Bank_Type}}</label></p>
+                <div style="border-bottom:#000 dashed 1px;"></div>
+                <div v-for="(item, index) in orderReturnFormList" :key="index">
+                  <p style="text-align:center;font-size:15px">第 {{item.OR_Sort}} 次退款</p>
+                  <p>*************退菜商品***************</p>
+                  <div v-for="itemIn in item.orderReturnDetails"><!-- eslint-disable-line -->
+                    <p style="width:230px;word-wrap:break-word;">
+                      <label style="font-size:20px;">{{itemIn.ORD_FName}}</label>
+                      <label style="font-size:17px;margin-left:10px;">
+                        <em> {{itemIn.ORD_Spec}}</em>
+                        <em v-if="itemIn.ORD_PropOne"> {{itemIn.ORD_PropOne}}</em>
+                        <em v-if="itemIn.ORD_PropTwo"> {{itemIn.ORD_PropTwo}}</em>
+                      </label>
+                    </p>
+                    <p>
+                      <label  style="margin-right:20px;margin-left:100px"><span style="font-size:22px;">【<span style="font-size:20px;">x</span></span><span style="font-size:22px;">{{itemIn.ORD_Num}}</span><span style="font-size:22px;">】</span></label>￥<label style="font-size:20px">{{itemIn.ORD_RealPrice}}</label>
+                    </p>
+                  </div>
+                  <p>*************************************</p>
+                  <div><!-- eslint-disable-line -->
+                    <p><label style="margin-left:10px;font-size:17px;">退款方式:</label><label style="font-size:15px;margin-left:10px;">{{refundFormList[index].R_Is_OfLine === 1 ? '系统退款' : '人工退款'}}</label></p>
+                    <p><label style="margin-left:10px;font-size:15px;">退款单号:</label></p>
+                    <p><label style="font-size:12px;margin-left:20px;">{{refundFormList[index].R_Refund_Id}}</label></p>
+                    <p><label style="margin-left:10px;font-size:15px;">商户退款单号:</label></p>
+                    <p><label style="font-size:12px;margin-left:20px;">{{refundFormList[index].R_Out_Refund_No}}</label></p>
+                    <p><label style="margin-left:10px;font-size:17px;">退款金额:</label><label style="font-size:15px;margin-left:10px;">{{refundFormList[index].R_Refund_Fee == undefined? '':refundFormList[index].R_Refund_Fee/100}} 元</label></p>
+                    <p><label style="margin-left:10px;font-size:17px;">提交时间:</label><label style="font-size:15px;margin-left:10px;">{{refundFormList[index].R_Submit_Time}}</label></p>
+                    <p><label style="margin-left:10px;font-size:17px;">提交退款业务结果:</label></p>
+                    <p>
+                      <label style="font-size:15px;margin-left:20px;">
+                        <span v-if="refundFormList[index].R_Result_Code === 'SUCCESS'">退款申请接收成功</span>
+                        <span v-if="refundFormList[index].R_Result_Code === 'FAIL'">提交退款失败</span>
+                      </label>
+                    </p>
+                    <p><label style="margin-left:10px;font-size:17px;">到账时间:</label><label style="font-size:15px;margin-left:10px;">{{refundFormList[index].R_Success_Time}}</label></p>
+                    <p><label style="margin-left:10px;font-size:17px;">退款结果:</label></p>
+                    <p>
+                      <label style="font-size:15px;margin-left:20px;">
+                        <span v-if="refundFormList[index].R_Refund_Status === 'SUCCESS'">退款成功(到账)</span>
+                        <span v-if="refundFormList[index].R_Refund_Status === 'CHANGE'">退款异常</span>
+                        <span v-if="refundFormList[index].R_Refund_Status === 'REFUNDCLOSE'">退款关闭</span>
+                      </label>
+                    </p>
+                    <p><label style="margin-left:10px;font-size:17px;">退款账户:</label><label style="font-size:15px;margin-left:10px;">{{refundFormList[index].R_Refund_Recv_Account}}</label></p>
+                  </div>
+                </div>
                 <div style="border-bottom:#000 dashed 1px;"></div>
                 <p><label>打印时间:</label><label style="font-size:13px;margin-left:10px;">{{new Date().toLocaleString()}}</label></p>
                 <p><label>餐厅联系电话:</label><label style="font-size:13px;margin-left:10px;">{{merForm.m_Phone}}</label></p>
