@@ -108,7 +108,6 @@
             <span style="margin-left:20px;font-size:15px;color:#909399;font-weight:bold;"><label>金额: </label><label style="font-size:20px;color:#F56C6C;">{{item.OA_TotlePrice}}</label> 元</span>
             <el-button style="margin-left:30px;" type="primary" v-print="'#'+ 'printST' + item.OA_Sort">打印本次客人小票</el-button>
             <el-button style="margin-left:30px;" type="primary" v-print="'#'+ 'printKT' + item.OA_Sort">打印本次厨房餐票</el-button>
-            <el-button style="margin-left:30px;" type="primary" v-print="'#'+ 'printMT' + item.OA_Sort">打印本次餐厅底票</el-button>
             <span style="margin-left:20px;font-size:15px;color:#909399;font-weight:bold;">
               <label style="margin-right:20px;">接单状态</label>
               <el-switch
@@ -219,7 +218,7 @@
           <el-divider content-position="left">退款信息</el-divider>
           <div v-for="(item, index) in refundFormList" :key="item.R_ID" style="margin-bottom:50px;min-width:1200px;">
             <h4 style="display:inline;">第 {{index+1}} 次退款</h4>
-            <el-button style="margin-left:30px;" type="primary" v-print="'#'+ 'printRefundT' + item.OR_Sort">打印退款票据</el-button>
+            <el-button style="margin-left:30px;" type="primary" v-print="'#'+ 'printRefundT' + index">打印退款票据</el-button>
             <el-button style="margin-left:30px;" type="primary"
               :disabled="(item.R_Is_OfLine === 1 && item.R_Refund_Status) ? true : false"
               @click="refundQuery(item.R_ID)">查询退款到账</el-button>
@@ -306,7 +305,6 @@
                 <div style="border-bottom:#000 dashed 1px;"></div>
                 <p><label>单号:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_UniqSearchID}}</label></p>
                 <p><label>下单时间:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_OrderingTime}}</label></p>
-                <p><label>支付时间:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_PayTime}}</label></p>
                 <p><label>餐桌区域:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.TT_Name}}</label></p>
                 <p><label>餐桌:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.t_Name}}</label></p>
                 <p><label>用餐人数:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_NumberOfDiners}}人</label></p>
@@ -322,28 +320,13 @@
                   </p>
                 </div>
                 <p>*************************************</p>
-              </div>
-            </div>
-
-            <div class="bill-preview">
-              <h3>餐厅底票预览</h3>
-              <div id="printMT" class="detail">
-                <p style="text-align:center;font-size:25px">餐厅底票</p>
-                <h1 class="ST_merName">{{merForm.m_Name}}</h1>
-                <br/>
-                <hr/><!-- 分割线 -->
-                <p><label>单号:</label><label>100006032</label></p>
-                <p><label>交易时间:</label><label>2021-01-09 13:29:23</label></p>
-                <hr/><!-- 分割线 -->
-                <div v-for="item in orderDetailForm"><!-- eslint-disable-line -->
-                  <p>
-                    <label>{{item.name}}</label><em> {{item.specs}}</em><em v-for="proItem in item.property"> {{proItem}}</em><!-- eslint-disable-line -->
-                  </p>
-                  <p>
-                    <label  style="margin-right:30px;margin-left:120px">x{{item.OD_RealNum}}</label><label>￥{{item.price}}</label>
-                  </p>
-                </div>
-                <hr/>
+                <div style="border-bottom:#000 dashed 1px;"></div>
+                <p><label>打印时间:</label><label style="font-size:13px;margin-left:10px;">{{new Date().toLocaleString()}}</label></p>
+                <p><label>餐厅联系电话:</label><label style="font-size:13px;margin-left:10px;">{{merForm.m_Phone}}</label></p>
+                <p><label>餐厅地址:</label><label style="font-size:13px;margin-left:10px;">{{merForm.m_Address}}</label></p>
+                <p><label style="font-size:13px;">技术供应商:</label><label style="font-size:13px;margin-left:10px;">上海俣珩科技(东华之星™)</label></p>
+                <p><label style="font-size:13px;">供应商联系方式:</label><label style="font-size:10px;margin-left:10px;">18860976772</label></p>
+                <p><label style="font-size:13px;">供应商联系方式:</label><label style="font-size:10px;margin-left:10px;">1152862327@qq.com</label></p>
               </div>
             </div>
 
@@ -378,71 +361,195 @@
             <div class="bill-preview" v-for="item in orderAddFormList" :key="item.OA_ID">
               <h3>第 {{item.OA_Sort}} 次点菜 客人小票预览</h3>
               <div :id="'printST' + item.OA_Sort" class="detail">
+                <p style="text-align:center;font-size:15px">第 {{item.OA_Sort}} 次点菜</p>
                 <p style="text-align:center;font-size:25px">客人小票</p>
                 <h1 class="ST_merName">{{merForm.m_Name}}</h1>
-                <br/>
-                <hr/><!-- 分割线 -->
-                <p><label>单号:</label><label>100006032</label></p>
-                <p><label>交易时间:</label><label>2021-01-09 13:29:23</label></p>
-                <hr/><!-- 分割线 -->
-                <div v-for="item2 in item.orderDetails"><!-- eslint-disable-line -->
-                  <p>
-                    <label>{{item2.OD_FName}}</label><em> {{item2.OD_Spec}}</em><em v-if="item2.OD_PropOne != ''"> {{item2.OD_PropOne}}</em><em v-if="item2.OD_PropTwo != ''"> {{item2.OD_PropTwo}}</em>
+                <div style="border-bottom:#000 dashed 1px;"></div>
+                <p><label>单号:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_UniqSearchID}}</label></p>
+                <p><label>下单时间:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_OrderingTime}}</label></p>
+                <p><label>支付时间:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_PayTime}}</label></p>
+                <p><label>餐桌区域:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.TT_Name}}</label></p>
+                <p><label>餐桌:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.t_Name}}</label></p>
+                <p><label>用餐人数:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_NumberOfDiners}}人</label></p>
+                <div style="border-bottom:#000 dashed 1px;"></div>
+                <p style="width:230px;word-wrap:break-word;"><label>客人备注:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_Remarks}}</label></p>
+                <p>*****************商品***************</p>
+                <div v-for="itemIn in item.orderDetails"><!-- eslint-disable-line -->
+                  <p style="width:230px;word-wrap:break-word;">
+                    <label style="font-size:20px;">{{itemIn.OD_FName}}</label>
+                    <label style="font-size:17px;margin-left:10px;">
+                      <em> {{itemIn.OD_Spec}}</em>
+                      <em v-if="itemIn.OD_PropOne"> {{itemIn.OD_PropOne}}</em>
+                      <em v-if="itemIn.OD_PropTwo"> {{itemIn.OD_PropTwo}}</em>
+                    </label>
                   </p>
                   <p>
-                    <label  style="margin-right:30px;margin-left:120px">x{{item2.OD_RealNum}}</label><label>￥{{item2.OD_RealPrice}}</label>
+                    <label  style="margin-right:20px;margin-left:100px"><span style="font-size:22px;">【<span style="font-size:20px;">x</span></span><span style="font-size:22px;">{{itemIn.OD_RealNum}}</span><span style="font-size:22px;">】</span></label>￥<label style="font-size:20px">{{itemIn.OD_RealPrice}}</label>
                   </p>
                 </div>
-                <hr/>
+                <div style="border-bottom:#000 dashed 1px;"></div>
+                <p><label style="margin-left:100px;font-size:25px;">合计:</label><label style="font-size:25px;margin-left:20px;">￥{{item.OA_TotlePrice}}</label></p>
+                <p>*************************************</p>
+                <div style="border-bottom:#000 dashed 1px;"></div>
+                <p><label>打印时间:</label><label style="font-size:13px;margin-left:10px;">{{new Date().toLocaleString()}}</label></p>
+                <p><label>餐厅联系电话:</label><label style="font-size:13px;margin-left:10px;">{{merForm.m_Phone}}</label></p>
+                <p><label>餐厅地址:</label><label style="font-size:13px;margin-left:10px;">{{merForm.m_Address}}</label></p>
+                <p><label style="font-size:13px;">技术供应商:</label><label style="font-size:13px;margin-left:10px;">上海俣珩科技(东华之星™)</label></p>
+                <p><label style="font-size:13px;">供应商联系方式:</label><label style="font-size:10px;margin-left:10px;">18860976772</label></p>
+                <p><label style="font-size:13px;">供应商联系方式:</label><label style="font-size:10px;margin-left:10px;">1152862327@qq.com</label></p>
               </div>
             </div>
 
             <div class="bill-preview" v-for="item in orderAddFormList" :key="item.OA_ID + '1'">
               <h3>第 {{item.OA_Sort}} 次点菜 厨房餐票预览</h3>
               <div :id="'printKT' + item.OA_Sort" class="detail">
+                <p style="text-align:center;font-size:15px">第 {{item.OA_Sort}} 次点菜</p>
                 <p style="text-align:center;font-size:25px">厨房餐票</p>
                 <h1 class="ST_merName">{{merForm.m_Name}}</h1>
-                <br/>
-                <hr/><!-- 分割线 -->
-                <p><label>单号:</label><label>100006032</label></p>
-                <p><label>交易时间:</label><label>2021-01-09 13:29:23</label></p>
-                <hr/><!-- 分割线 -->
-                <div v-for="item2 in item.orderDetails"><!-- eslint-disable-line -->
-                  <p>
-                    <label>{{item2.OD_FName}}</label><em> {{item2.OD_Spec}}</em><em v-if="item2.OD_PropOne != ''"> {{item2.OD_PropOne}}</em><em v-if="item2.OD_PropTwo != ''"> {{item2.OD_PropTwo}}</em>
+                <div style="border-bottom:#000 dashed 1px;"></div>
+                <p><label>单号:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_UniqSearchID}}</label></p>
+                <p><label>下单时间:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_OrderingTime}}</label></p>
+                <p><label>餐桌区域:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.TT_Name}}</label></p>
+                <p><label>餐桌:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.t_Name}}</label></p>
+                <p><label>用餐人数:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_NumberOfDiners}}人</label></p>
+                <div style="border-bottom:#000 dashed 1px;"></div>
+                <p style="width:230px;word-wrap:break-word;"><label>客人备注:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_Remarks}}</label></p>
+                <p>*****************商品***************</p>
+                <div v-for="itemIn in item.orderDetails"><!-- eslint-disable-line -->
+                  <p style="width:230px;word-wrap:break-word;">
+                    <label style="font-size:20px;">{{itemIn.OD_FName}}</label>
+                    <label style="font-size:17px;margin-left:10px;">
+                      <em> {{itemIn.OD_Spec}}</em>
+                      <em v-if="itemIn.OD_PropOne"> {{itemIn.OD_PropOne}}</em>
+                      <em v-if="itemIn.OD_PropTwo"> {{itemIn.OD_PropTwo}}</em>
+                    </label>
                   </p>
                   <p>
-                    <label  style="margin-right:30px;margin-left:120px">x{{item2.OD_RealNum}}</label><label>￥{{item2.OD_RealPrice}}</label>
-                  </p>
-                </div>
-                <hr/>
-              </div>
-            </div>
-
-            <div class="bill-preview" v-for="item in orderAddFormList" :key="item.OA_ID + '2'">
-              <h3>第 {{item.OA_Sort}} 次点菜 餐厅底票预览</h3>
-              <div :id="'printMT' + item.OA_Sort" class="detail">
-                <p style="text-align:center;font-size:25px">餐厅底票</p>
-                <h1 class="ST_merName">{{merForm.m_Name}}</h1>
-                <br/>
-                <hr/><!-- 分割线 -->
-                <p><label>单号:</label><label>100006032</label></p>
-                <p><label>交易时间:</label><label>2021-01-09 13:29:23</label></p>
-                <hr/><!-- 分割线 -->
-                <div v-for="item2 in item.orderDetails"><!-- eslint-disable-line -->
-                  <p>
-                    <label>{{item2.OD_FName}}</label><em> {{item2.OD_Spec}}</em><em v-if="item2.OD_PropOne != ''"> {{item2.OD_PropOne}}</em><em v-if="item2.OD_PropTwo != ''"> {{item2.OD_PropTwo}}</em>
-                  </p>
-                  <p>
-                    <label  style="margin-right:30px;margin-left:120px">x{{item2.OD_RealNum}}</label><label>￥{{item2.OD_RealPrice}}</label>
+                    <label  style="margin-right:20px;margin-left:100px"><span style="font-size:22px;">【<span style="font-size:20px;">x</span></span><span style="font-size:22px;">{{itemIn.OD_RealNum}}</span><span style="font-size:22px;">】</span></label>
                   </p>
                 </div>
-                <hr/>
+                <p>*************************************</p>
+                <div style="border-bottom:#000 dashed 1px;"></div>
+                <p><label>打印时间:</label><label style="font-size:13px;margin-left:10px;">{{new Date().toLocaleString()}}</label></p>
+                <p><label>餐厅联系电话:</label><label style="font-size:13px;margin-left:10px;">{{merForm.m_Phone}}</label></p>
+                <p><label>餐厅地址:</label><label style="font-size:13px;margin-left:10px;">{{merForm.m_Address}}</label></p>
+                <p><label style="font-size:13px;">技术供应商:</label><label style="font-size:13px;margin-left:10px;">上海俣珩科技(东华之星™)</label></p>
+                <p><label style="font-size:13px;">供应商联系方式:</label><label style="font-size:10px;margin-left:10px;">18860976772</label></p>
+                <p><label style="font-size:13px;">供应商联系方式:</label><label style="font-size:10px;margin-left:10px;">1152862327@qq.com</label></p>
               </div>
             </div>
 
             <!-- 退菜票据 RT -->
+            <div class="bill-preview" v-for="item in orderReturnFormList" :key="item.OR_ID + '1'">
+              <h3>第 {{item.OR_Sort}} 次退款 退菜票据预览</h3>
+              <div :id="'printRT' + item.OR_Sort" class="detail">
+                <p style="text-align:center;font-size:15px">第 {{item.OR_Sort}} 次退款</p>
+                <p style="text-align:center;font-size:25px">退菜票据</p>
+                <h1 class="ST_merName">{{merForm.m_Name}}</h1>
+                <div style="border-bottom:#000 dashed 1px;"></div>
+                <p><label>单号:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_UniqSearchID}}</label></p>
+                <p><label>下单时间:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_OrderingTime}}</label></p>
+                <p><label>支付时间:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_PayTime}}</label></p>
+                <p><label>餐桌区域:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.TT_Name}}</label></p>
+                <p><label>餐桌:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.t_Name}}</label></p>
+                <p><label>用餐人数:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_NumberOfDiners}}人</label></p>
+                <p><label>退菜时间:</label><label style="font-size:13px;margin-left:10px;">{{item.OR_ReturnTime}}</label></p>
+                <div style="border-bottom:#000 dashed 1px;"></div>
+                <p>*****************商品***************</p>
+                <div v-for="itemIn in item.orderReturnDetails"><!-- eslint-disable-line -->
+                  <p style="width:230px;word-wrap:break-word;">
+                    <label style="font-size:20px;">{{itemIn.ORD_FName}}</label>
+                    <label style="font-size:17px;margin-left:10px;">
+                      <em> {{itemIn.ORD_Spec}}</em>
+                      <em v-if="itemIn.ORD_PropOne"> {{itemIn.ORD_PropOne}}</em>
+                      <em v-if="itemIn.ORD_PropTwo"> {{itemIn.ORD_PropTwo}}</em>
+                    </label>
+                  </p>
+                  <p>
+                    <label  style="margin-right:20px;margin-left:100px"><span style="font-size:22px;">【<span style="font-size:20px;">x</span></span><span style="font-size:22px;">{{itemIn.ORD_Num}}</span><span style="font-size:22px;">】</span></label>
+                  </p>
+                </div>
+                <p>*************************************</p>
+                <div style="border-bottom:#000 dashed 1px;"></div>
+                <p><label>打印时间:</label><label style="font-size:13px;margin-left:10px;">{{new Date().toLocaleString()}}</label></p>
+                <p><label>餐厅联系电话:</label><label style="font-size:13px;margin-left:10px;">{{merForm.m_Phone}}</label></p>
+                <p><label>餐厅地址:</label><label style="font-size:13px;margin-left:10px;">{{merForm.m_Address}}</label></p>
+                <p><label style="font-size:13px;">技术供应商:</label><label style="font-size:13px;margin-left:10px;">上海俣珩科技(东华之星™)</label></p>
+                <p><label style="font-size:13px;">供应商联系方式:</label><label style="font-size:10px;margin-left:10px;">18860976772</label></p>
+                <p><label style="font-size:13px;">供应商联系方式:</label><label style="font-size:10px;margin-left:10px;">1152862327@qq.com</label></p>
+              </div>
+            </div>
 
+            <!-- 退菜票据 RefundT -->
+            <div class="bill-preview" v-for="(item, index) in refundFormList" :key="index">
+              <h3>第 {{index + 1}} 次退款 退款票据预览</h3>
+              <div :id="'printRefundT' + index" class="detail">
+                <p style="text-align:center;font-size:15px">第 {{index + 1}} 次退款</p>
+                <p style="text-align:center;font-size:25px">退款票据</p>
+                <h1 class="ST_merName">{{merForm.m_Name}}</h1>
+                <div style="border-bottom:#000 dashed 1px;"></div>
+                <p><label>单号:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_UniqSearchID}}</label></p>
+                <p><label>下单时间:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_OrderingTime}}</label></p>
+                <p><label>支付时间:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_PayTime}}</label></p>
+                <p><label>餐桌区域:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.TT_Name}}</label></p>
+                <p><label>餐桌:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.t_Name}}</label></p>
+                <p><label>用餐人数:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_NumberOfDiners}}人</label></p>
+                <div style="border-bottom:#000 dashed 1px;"></div>
+                <div v-for="itemIn in item.orderReturnDetails"><!-- eslint-disable-line -->
+
+                </div>
+                <div style="border-bottom:#000 dashed 1px;"></div>
+                <p><label>打印时间:</label><label style="font-size:13px;margin-left:10px;">{{new Date().toLocaleString()}}</label></p>
+                <p><label>餐厅联系电话:</label><label style="font-size:13px;margin-left:10px;">{{merForm.m_Phone}}</label></p>
+                <p><label>餐厅地址:</label><label style="font-size:13px;margin-left:10px;">{{merForm.m_Address}}</label></p>
+                <p><label style="font-size:13px;">技术供应商:</label><label style="font-size:13px;margin-left:10px;">上海俣珩科技(东华之星™)</label></p>
+                <p><label style="font-size:13px;">供应商联系方式:</label><label style="font-size:10px;margin-left:10px;">18860976772</label></p>
+                <p><label style="font-size:13px;">供应商联系方式:</label><label style="font-size:10px;margin-left:10px;">1152862327@qq.com</label></p>
+              </div>
+            </div>
+
+            <div class="bill-preview">
+              <h3>餐厅底票预览</h3>
+              <div id="printMT" class="detail">
+                <p style="text-align:center;font-size:25px">餐厅底票</p>
+                <h1 class="ST_merName">{{merForm.m_Name}}</h1>
+                <div style="border-bottom:#000 dashed 1px;"></div>
+                <p><label>单号:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_UniqSearchID}}</label></p>
+                <p><label>下单时间:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_OrderingTime}}</label></p>
+                <p><label>支付时间:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_PayTime}}</label></p>
+                <p><label>餐桌区域:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.TT_Name}}</label></p>
+                <p><label>餐桌:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.t_Name}}</label></p>
+                <p><label>用餐人数:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_NumberOfDiners}}人</label></p>
+                <div style="border-bottom:#000 dashed 1px;"></div>
+                <p style="width:230px;word-wrap:break-word;"><label>客人备注:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_Remarks}}</label></p>
+                <p>*****************商品***************</p>
+                <div v-for="item in orderDetailForm"><!-- eslint-disable-line -->
+                  <p style="width:230px;word-wrap:break-word;">
+                    <label style="font-size:20px;">{{item.name}}</label><label style="font-size:17px;margin-left:10px;"><em> {{item.specs}}</em><em v-for="proItem in item.property"> {{proItem}}</em></label><!-- eslint-disable-line -->
+                  </p>
+                  <p>
+                    <label  style="margin-right:20px;margin-left:100px"><span style="font-size:22px;">【<span style="font-size:20px;">x</span></span><span style="font-size:22px;">{{item.OD_RealNum}}</span><span style="font-size:22px;">】</span></label>￥<label style="font-size:20px">{{item.price}}</label>
+                  </p>
+                </div>
+                <div style="border-bottom:#000 dashed 1px;"></div>
+                <p><label style="margin-left:100px;font-size:25px;">合计:</label><label style="font-size:25px;margin-left:20px;">￥{{orderForm.o_TotlePrice}}</label></p>
+                <p>*************************************</p>
+                <div style="border-bottom:#000 dashed 1px;"></div>
+                <p><label style="margin-left:10px;font-size:15px;">支付单号:</label></p>
+                <p><label style="font-size:12px;margin-left:20px;">{{orderPayForm.p_Transaction_Id}}</label></p>
+                <p><label style="margin-left:10px;font-size:17px;">支付金额:</label><label style="font-size:15px;margin-left:10px;">{{orderPayForm.p_Totle_Fee == undefined? '':orderPayForm.p_Totle_Fee/100}} 元</label></p>
+                <p><label style="margin-left:10px;font-size:17px;">支付类型:</label><label style="font-size:15px;margin-left:10px;">{{orderPayForm.p_Trade_Type}}</label></p>
+                <p><label style="margin-left:10px;font-size:17px;">支付时间:</label><label style="font-size:15px;margin-left:10px;">{{orderPayForm.p_Time_End}}</label></p>
+                <p><label style="margin-left:10px;font-size:17px;">银行类型:</label><label style="font-size:15px;margin-left:10px;">{{orderPayForm.p_Bank_Type}}</label></p>
+                <div style="border-bottom:#000 dashed 1px;"></div>
+                <p><label>打印时间:</label><label style="font-size:13px;margin-left:10px;">{{new Date().toLocaleString()}}</label></p>
+                <p><label>餐厅联系电话:</label><label style="font-size:13px;margin-left:10px;">{{merForm.m_Phone}}</label></p>
+                <p><label>餐厅地址:</label><label style="font-size:13px;margin-left:10px;">{{merForm.m_Address}}</label></p>
+                <p><label style="font-size:13px;">技术供应商:</label><label style="font-size:13px;margin-left:10px;">上海俣珩科技(东华之星™)</label></p>
+                <p><label style="font-size:13px;">供应商联系方式:</label><label style="font-size:10px;margin-left:10px;">18860976772</label></p>
+                <p><label style="font-size:13px;">供应商联系方式:</label><label style="font-size:10px;margin-left:10px;">1152862327@qq.com</label></p>
+              </div>
+            </div>
           </div>
         </el-card>
 
