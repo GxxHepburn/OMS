@@ -220,7 +220,7 @@
             <h4 style="display:inline;">第 {{index+1}} 次退款</h4>
             <el-button style="margin-left:30px;" type="primary" v-print="'#'+ 'printRefundT' + index">打印退款票据</el-button>
             <el-button style="margin-left:30px;" type="primary"
-              :disabled="(item.R_Is_OfLine === 1 && item.R_Refund_Status) ? true : false"
+              :disabled="((item.R_Is_OfLine === 1 && item.R_Refund_Status)||item.R_Is_OfLine === 0) ? true : false"
               @click="refundQuery(item.R_ID)">查询退款到账</el-button>
             <el-table :data="[item]" :border="false" :stripe="false">
               <el-table-column type="index"></el-table-column>
@@ -568,8 +568,8 @@
                 <p><label style="margin-left:10px;font-size:17px;">支付类型:</label><label style="font-size:15px;margin-left:10px;">{{orderPayForm.p_Trade_Type}}</label></p>
                 <p><label style="margin-left:10px;font-size:17px;">支付时间:</label><label style="font-size:15px;margin-left:10px;">{{orderPayForm.p_Time_End}}</label></p>
                 <p><label style="margin-left:10px;font-size:17px;">银行类型:</label><label style="font-size:15px;margin-left:10px;">{{orderPayForm.p_Bank_Type}}</label></p>
-                <div style="border-bottom:#000 dashed 1px;"></div>
                 <div v-for="(item, index) in orderReturnFormList" :key="index">
+                  <div style="border-bottom:#000 dashed 1px;"></div>
                   <p style="text-align:center;font-size:15px">第 {{item.OR_Sort}} 次退款</p>
                   <p>*************退菜商品***************</p>
                   <div v-for="itemIn in item.orderReturnDetails"><!-- eslint-disable-line -->
