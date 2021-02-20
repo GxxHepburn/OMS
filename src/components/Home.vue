@@ -3,7 +3,7 @@
     <!-- 头部区域 -->
     <el-header>
       <div>
-        <img src="../assets/logo.png" alt="">
+        <img src="../assets/home_top.png" alt="">
         <span>点菜宝智慧云餐厅 |</span>
         <label style="margin-left:10px;font-size:15px;">餐厅在线状态-</label>
         <label v-if="isWebSocket === '在线'" style="font-size:20px;margin-left:10px;color:#409EFF;font-weight:bold;">{{isWebSocket}}</label>
