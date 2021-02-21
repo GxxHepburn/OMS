@@ -221,10 +221,10 @@
             <el-button style="margin-left:30px;" type="primary" v-print="'#'+ 'printRefundT' + index">打印退款票据</el-button>
             <el-button style="margin-left:30px;" type="primary"
               :disabled="((item.R_Is_OfLine === 1 && item.R_Refund_Status)||item.R_Is_OfLine === 0) ? true : false"
-              @click="refundQuery(item.R_ID)">查询退款到账</el-button>
+              @click="refundQuery(item.R_ID)" v-if="item">查询退款到账</el-button>
             <el-table :data="[item]" :border="false" :stripe="false">
               <el-table-column type="index"></el-table-column>
-              <el-table-column label="退款方式">
+              <el-table-column label="退款方式"  v-if="item">
                 <template slot-scope="scope">
                   <span v-if="scope.row.R_Is_OfLine === 1">系统退款</span>
                   <span v-if="scope.row.R_Is_OfLine === 0">人工退款</span>
@@ -497,7 +497,7 @@
                 <p><label>餐桌:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.t_Name}}</label></p>
                 <p><label>用餐人数:</label><label style="font-size:13px;margin-left:10px;">{{orderForm.o_NumberOfDiners}}人</label></p>
                 <div style="border-bottom:#000 dashed 1px;"></div>
-                <div><!-- eslint-disable-line -->
+                <div  v-if="item"><!-- eslint-disable-line -->
                   <p><label style="margin-left:10px;font-size:17px;">退款方式:</label><label style="font-size:15px;margin-left:10px;">{{item.R_Is_OfLine === 1 ? '系统退款' : '人工退款'}}</label></p>
                   <p><label style="margin-left:10px;font-size:15px;">退款单号:</label></p>
                   <p><label style="font-size:12px;margin-left:20px;">{{item.R_Refund_Id}}</label></p>
@@ -586,7 +586,7 @@
                     </p>
                   </div>
                   <p>*************************************</p>
-                  <div><!-- eslint-disable-line -->
+                  <div  v-if="refundFormList[index]"><!-- eslint-disable-line -->
                     <p><label style="margin-left:10px;font-size:17px;">退款方式:</label><label style="font-size:15px;margin-left:10px;">{{refundFormList[index].R_Is_OfLine === 1 ? '系统退款' : '人工退款'}}</label></p>
                     <p><label style="margin-left:10px;font-size:15px;">退款单号:</label></p>
                     <p><label style="font-size:12px;margin-left:20px;">{{refundFormList[index].R_Refund_Id}}</label></p>
