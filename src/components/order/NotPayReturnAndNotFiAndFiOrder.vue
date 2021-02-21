@@ -183,6 +183,10 @@ export default {
         this.breadcrumbText = '交易成功'
         this.queryInfo.payStatus = 1
       }
+      if (this.$route.path === '/static/notPayOrders') {
+        this.breadcrumbText = '等待支付'
+        this.queryInfo.payStatus = 0
+      }
     },
     // 订单操作按钮
     orderSettingButtonClick (row) {
@@ -232,7 +236,7 @@ export default {
       this.$set(this.orderFormList[index], 'orderDetail', res.data)
     },
     async getOrderFormList () {
-      const { data: res } = await this.$http.post('getReturnAndNotFiAndFiOrderFormList', this.queryInfo)
+      const { data: res } = await this.$http.post('getNotPayReturnAndNotFiAndFiOrderFormList', this.queryInfo)
       if (res.meta.status !== 200) {
         this.$message.error('获取订单数据数据失败!')
         return

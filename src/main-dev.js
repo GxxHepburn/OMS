@@ -37,7 +37,7 @@ import axios from 'axios'
 let loadingInstance
 const options = {
   text: '加载中...',
-  background: 'rgba(0,0,0,0.1)',
+  background: 'rgba(0,0,0,0.3)',
   spinner: 'el-icon-loading',
   fullscreen: true
 }
@@ -66,6 +66,11 @@ axios.interceptors.response.use(config => {
   return config
 }, err => {
   NProgress.done()
+  if (loadingInstance) {
+    window.VueThat.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
+      loadingInstance.close()
+    })
+  }
   if (err.response.status === 400) {
     window.VueThat.$message.error('登陆过期，请重新登陆')
   } else if (err.response.status === 401) {
