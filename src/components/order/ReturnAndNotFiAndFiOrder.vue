@@ -4,7 +4,7 @@
         <el-breadcrumb separator-class="el-icon-arrow-right">
           <el-breadcrumb-item :to="{ path: '/static/home' }">首页</el-breadcrumb-item>
           <el-breadcrumb-item>订单管理</el-breadcrumb-item>
-          <el-breadcrumb-item>退款订单</el-breadcrumb-item>
+          <el-breadcrumb-item>{{breadcrumbText}}</el-breadcrumb-item>
         </el-breadcrumb>
 
          <!-- 卡片视图 -->
@@ -128,7 +128,8 @@ export default {
         pagesize: 10,
         mmngctUserName: window.sessionStorage.mmngctUserName,
         // 0:全部 1:今日 2:2天 3:3天 4:一周 5:一个月
-        timeStatus: 1
+        timeStatus: 1,
+        payStatus: 0
       },
       // options初始化时，对value值进行tab，tabtype区分，发送搜索请求前先判断是tabid还是tabtypeid
       tabAndTabTypeOptions: [],
@@ -145,7 +146,8 @@ export default {
       expands: [],
       orderDetailParams: {
         O_ID: 0
-      }
+      },
+      breadcrumbText: ''
     }
   },
   computed: {
@@ -161,13 +163,27 @@ export default {
     }
   },
   created () {
-    this.getParamsFromUsers()
-    this.getTabAndTabTypeOptions()
+    this.initBreadcrumb()
     this.getOrderFormList()
   },
   mounted () {
   },
   methods: {
+    // 获取当前路由path，并根据path，显示面包屑
+    initBreadcrumb () {
+      if (this.$route.path === '/static/returnOrders') {
+        this.breadcrumbText = '退款订单'
+        this.queryInfo.payStatus = 2
+      }
+      if (this.$route.path === '/static/notFiOrders') {
+        this.breadcrumbText = '交易失败'
+        this.queryInfo.payStatus = 3
+      }
+      if (this.$route.path === '/static/fiOrders') {
+        this.breadcrumbText = '交易成功'
+        this.queryInfo.payStatus = 1
+      }
+    },
     // 订单操作按钮
     orderSettingButtonClick (row) {
       this.$router.push({
@@ -176,31 +192,6 @@ export default {
           O_ID: row.O_ID
         }
       })
-    },
-    // 从用户列表页面跳转，获取用户检索id参数
-    getParamsFromUsers () {
-      // 取到路由带过来的参数
-      const routerParams = this.$route.params
-      this.queryInfo.U_OpenId = routerParams.U_OpenId
-      // 避免刷新后由于params消失，导致U_OpenId undefined
-      if (this.queryInfo.U_OpenId === undefined) {
-        this.queryInfo.U_OpenId = ''
-      }
-    },
-    // 餐桌选择框变化函数
-    tabAndTabtypeCascaderChange () {
-      if (this.cascaderModel.length === 0) {
-        this.queryInfo.TabTypeId = ''
-        this.queryInfo.TabId = ''
-      }
-      if (this.cascaderModel.length === 1) {
-        this.queryInfo.TabTypeId = this.cascaderModel[0]
-        this.queryInfo.TabId = ''
-      }
-      if (this.cascaderModel.length === 2) {
-        this.queryInfo.TabId = this.cascaderModel[1]
-        this.queryInfo.TabTypeId = ''
-      }
     },
     // 监听pagesize 改变的事件
     handleSizeChange (newSize) {
@@ -240,16 +231,8 @@ export default {
       }
       this.$set(this.orderFormList[index], 'orderDetail', res.data)
     },
-    async getTabAndTabTypeOptions () {
-      const { data: res } = await this.$http.post('ordersTabAndTabTypeOptions', this.queryInfo)
-      if (res.meta.status !== 200) {
-        this.$message.error('获取餐桌数据失败!')
-        return
-      }
-      this.tabAndTabTypeOptions = res.data.ordersTabAndTabTypeOptions
-    },
     async getOrderFormList () {
-      const { data: res } = await this.$http.post('getReturnOrderFormList', this.queryInfo)
+      const { data: res } = await this.$http.post('getReturnAndNotFiAndFiOrderFormList', this.queryInfo)
       if (res.meta.status !== 200) {
         this.$message.error('获取订单数据数据失败!')
         return
@@ -260,9 +243,6 @@ export default {
     getNewOrderFormList () {
       this.queryInfo.pagenum = 1
       this.getOrderFormList()
-    },
-    searchOrderForm () {
-      this.getNewOrderFormList()
     }
   }
 }

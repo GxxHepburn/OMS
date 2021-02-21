@@ -149,8 +149,6 @@ export default {
     }
   },
   created () {
-    this.getParamsFromUsers()
-    this.getTabAndTabTypeOptions()
     this.getOrderFormList()
   },
   mounted () {
@@ -164,31 +162,6 @@ export default {
           O_ID: row.O_ID
         }
       })
-    },
-    // 从用户列表页面跳转，获取用户检索id参数
-    getParamsFromUsers () {
-      // 取到路由带过来的参数
-      const routerParams = this.$route.params
-      this.queryInfo.U_OpenId = routerParams.U_OpenId
-      // 避免刷新后由于params消失，导致U_OpenId undefined
-      if (this.queryInfo.U_OpenId === undefined) {
-        this.queryInfo.U_OpenId = ''
-      }
-    },
-    // 餐桌选择框变化函数
-    tabAndTabtypeCascaderChange () {
-      if (this.cascaderModel.length === 0) {
-        this.queryInfo.TabTypeId = ''
-        this.queryInfo.TabId = ''
-      }
-      if (this.cascaderModel.length === 1) {
-        this.queryInfo.TabTypeId = this.cascaderModel[0]
-        this.queryInfo.TabId = ''
-      }
-      if (this.cascaderModel.length === 2) {
-        this.queryInfo.TabId = this.cascaderModel[1]
-        this.queryInfo.TabTypeId = ''
-      }
     },
     // 监听pagesize 改变的事件
     handleSizeChange (newSize) {
@@ -228,14 +201,6 @@ export default {
       }
       this.$set(this.orderFormList[index], 'orderDetail', res.data)
     },
-    async getTabAndTabTypeOptions () {
-      const { data: res } = await this.$http.post('ordersTabAndTabTypeOptions', this.queryInfo)
-      if (res.meta.status !== 200) {
-        this.$message.error('获取餐桌数据失败!')
-        return
-      }
-      this.tabAndTabTypeOptions = res.data.ordersTabAndTabTypeOptions
-    },
     async getOrderFormList () {
       const { data: res } = await this.$http.post('getLastOrderFormList', this.queryInfo)
       if (res.meta.status !== 200) {
@@ -248,9 +213,6 @@ export default {
     getNewOrderFormList () {
       this.queryInfo.pagenum = 1
       this.getOrderFormList()
-    },
-    searchOrderForm () {
-      this.getNewOrderFormList()
     }
   }
 }

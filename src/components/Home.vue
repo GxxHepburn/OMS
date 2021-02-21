@@ -43,7 +43,7 @@
       <!-- 右侧内容 -->
       <el-main>
         <!-- 路由占位符 -->
-        <router-view></router-view>
+        <router-view :key="$route.path"></router-view>
       </el-main>
     </el-container>
     <el-backtop :bottom="100">

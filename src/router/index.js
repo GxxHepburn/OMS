@@ -34,11 +34,11 @@ const LastOrder = () => import('../components/order/LastOrder.vue')
 
 const NotPayOrder = () => import('../components/order/NotPayOrder.vue')
 
-const ReturnOrder = () => import('../components/order/ReturnOrder.vue')
+const ReturnOrder = () => import('../components/order/ReturnAndNotFiAndFiOrder.vue')
 
-const NotFiOrder = () => import('../components/order/NotFiOrder.vue')
+const NotFiOrder = () => import('../components/order/ReturnAndNotFiAndFiOrder.vue')
 
-const FiOrder = () => import('../components/order/FiOrder.vue')
+const FiOrder = () => import('../components/order/ReturnAndNotFiAndFiOrder.vue')
 
 const AddTab = () => import(/* webpackChunkName: "order_report" */ '../components/tabs/addTab.vue')
 
