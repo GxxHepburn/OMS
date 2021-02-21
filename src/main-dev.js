@@ -10,6 +10,7 @@ import './assets/css/global.css'
 // 导入 NProgress 包对应JS和CSS
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
+import { Loading } from 'element-ui'
 
 // 引入bus总线
 import bus from './assets/js/bus'
@@ -32,11 +33,21 @@ import QRCode from 'qrcodejs2'
 import Print from 'vue-print-nb'
 
 import axios from 'axios'
+
+let loadingInstance
+const options = {
+  text: '加载中...',
+  background: 'rgba(0,0,0,0.1)',
+  spinner: 'el-icon-loading',
+  fullscreen: true
+}
+
 // 配置请求的根路径
 axios.defaults.baseURL = 'https://www.donghuastar.com/OSM'
 // 在 request 拦截器中，展示进度条 NProgress.start ()
 axios.interceptors.request.use(config => {
   NProgress.start()
+  loadingInstance = Loading.service(options)
   if (config.headers.Authorization !== undefined && config.headers.Authorization !== '') {
     return config
   }
@@ -47,6 +58,11 @@ axios.interceptors.request.use(config => {
 // 在 response 拦截器中，隐藏进度条 NProgress.done()
 axios.interceptors.response.use(config => {
   NProgress.done()
+  if (loadingInstance) {
+    window.VueThat.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
+      loadingInstance.close()
+    })
+  }
   return config
 }, err => {
   NProgress.done()
