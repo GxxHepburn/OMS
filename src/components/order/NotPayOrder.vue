@@ -237,7 +237,7 @@ export default {
       this.tabAndTabTypeOptions = res.data.ordersTabAndTabTypeOptions
     },
     async getOrderFormList () {
-      const { data: res } = await this.$http.post('getLastOrderFormList', this.queryInfo)
+      const { data: res } = await this.$http.post('getNotPayOrderFormList', this.queryInfo)
       if (res.meta.status !== 200) {
         this.$message.error('获取订单数据数据失败!')
         return
