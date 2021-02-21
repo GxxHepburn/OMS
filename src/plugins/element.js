@@ -31,9 +31,12 @@ import {
   DatePicker,
   PageHeader,
   Divider,
-  InputNumber
+  InputNumber,
+  RadioGroup, RadioButton
 } from 'element-ui'
 
+Vue.use(RadioButton)
+Vue.use(RadioGroup)
 Vue.use(InputNumber)
 Vue.use(Divider)
 Vue.use(PageHeader)
