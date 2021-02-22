@@ -50,8 +50,6 @@ const TabList = () => import(/* webpackChunkName: "order_report" */ '../componen
 
 const TabType = () => import(/* webpackChunkName: "order_report" */ '../components/tabs/tabType.vue')
 
-const FlowRecord = () => import('../components/finance/FlowRecord.vue')
-
 const PayRecord = () => import('../components/finance/PayRecord.vue')
 
 const RefundRecord = () => import('../components/finance/RefundRecord.vue')
@@ -166,10 +164,6 @@ const routes = [
       {
         path: '/static/reports',
         component: Report
-      },
-      {
-        path: '/static/flowRecord',
-        component: FlowRecord
       },
       {
         path: '/static/payRecord',
