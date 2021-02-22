@@ -9,6 +9,10 @@
 
          <!-- 卡片视图 -->
         <el-card class="topElCard">
+          <div class="titleDiv">
+            <span>1、非自动检索 -- 2、条件组合检索</span>
+          </div>
+          <div class="dividerDiv"></div>
 
           <el-row :gutter="20" type="flex" class="PayRecordElRow">
               <el-col :span="7">
