@@ -271,7 +271,7 @@
               <el-table-column label="退款结果" width="150">
                 <template slot-scope="scope">
                   <span v-if="scope.row.R_Refund_Status === 'SUCCESS'">退款成功(到账)</span>
-                  <span v-if="scope.row.R_Refund_Status === 'CHANGE'">退款异常</span>
+                  <span v-if="scope.row.R_Refund_Status === 'CHANGE'">退款异常,转人工退款</span>
                   <span v-if="scope.row.R_Refund_Status === 'REFUNDCLOSE'">退款关闭</span>
                 </template>
               </el-table-column>
@@ -542,7 +542,7 @@
                   <p>
                     <label style="font-size:15px;margin-left:20px;">
                       <span v-if="item.R_Refund_Status === 'SUCCESS'">退款成功(到账)</span>
-                      <span v-if="item.R_Refund_Status === 'CHANGE'">退款异常</span>
+                      <span v-if="item.R_Refund_Status === 'CHANGE'">退款异常,转人工退款</span>
                       <span v-if="item.R_Refund_Status === 'REFUNDCLOSE'">退款关闭</span>
                     </label>
                   </p>
