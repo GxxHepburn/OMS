@@ -9,11 +9,20 @@
 
         <!-- 卡片视图区域 -->
         <el-card>
+          <div class="titleDiv">
+            <span>真实检索由搜索按钮所在输入框内容触发，另一个输入框内容不参与检索！</span>
+          </div>
+          <div class="dividerDiv"></div>
           <!-- 搜索与添加区域 -->
           <el-row :gutter="20">
             <el-col :span="8">
-              <el-input placeholder="请输入检索ID(完整字符串)" v-model="queryInfo.query" :clearable="true" @clear="getNewUserList" @keyup.enter.native="getNewUserList">
-                <el-button slot="append" icon="el-icon-search" @click="getNewUserList"></el-button>
+              <el-input placeholder="请输入检索ID(完整字符串)" v-model="queryInfo.query" :clearable="true" @clear="search(1)" @keyup.enter.native="search(1)">
+                <el-button slot="append" icon="el-icon-search" @click="search(1)"></el-button>
+              </el-input>
+            </el-col>
+            <el-col :span="8">
+              <el-input placeholder="请输入订单号" v-model="queryInfo.O_UniqSearchId" :clearable="true" @clear="search(2)" @keyup.enter.native="search(2)">
+                <el-button slot="append" icon="el-icon-search" @click="search(2)"></el-button>
               </el-input>
             </el-col>
           </el-row>
@@ -62,7 +71,9 @@ export default {
     return {
       // 获取用户列表的参数对象
       queryInfo: {
+        touchButton: 1,
         query: '',
+        O_UniqSearchId: '',
         // 当前页数
         pagenum: 1,
         pagesize: 2,
@@ -76,6 +87,11 @@ export default {
     this.getUserList()
   },
   methods: {
+    // 搜索框按钮
+    search (touchIndex) {
+      this.queryInfo.touchButton = touchIndex
+      this.getNewUserList()
+    },
     // 用户禁用
     async changeWechatUserStatus (event, row) {
       const { data: res } = await this.$http.post('changeWechatUserStatus', row)
@@ -87,7 +103,7 @@ export default {
       this.getUserList()
     },
     async getUserList () {
-      const { data: res } = await this.$http.get('users', { params: this.queryInfo })
+      const { data: res } = await this.$http.post('users', this.queryInfo)
       if (res.meta.status !== 200) {
         this.$message.error('获取用户列表失败')
         return
