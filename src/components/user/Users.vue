@@ -13,7 +13,7 @@
             <span>真实检索由搜索按钮所在输入框内容触发，另一个输入框内容不参与检索！</span>
           </div>
           <div class="dividerDiv"></div>
-          <!-- 搜索与添加区域 -->
+          <!-- 搜索区域 -->
           <el-row :gutter="20">
             <el-col :span="8">
               <el-input placeholder="请输入检索ID(完整字符串)" v-model="queryInfo.query" :clearable="true" @clear="search(1)" @keyup.enter.native="search(1)">

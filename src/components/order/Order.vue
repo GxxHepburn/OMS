@@ -9,6 +9,11 @@
 
         <!-- 卡片视图 -->
         <el-card>
+          <div class="titleDiv">
+            <span>1、非自动检索，需点击搜索按钮检索！-- 2、当订单号不为空时，其他条件无效！ (Tips：其他条件可以组合,订单号不能参与组合,若订单号参与组合，则订单号成为唯一条件.)</span>
+          </div>
+          <div class="dividerDiv"></div>
+
           <el-row :gutter="20" type="flex">
               <el-col :span="5">
                 <el-input placeholder="订单号" v-model="queryInfo.O_UniqSearchID" :clearable="true">
@@ -64,7 +69,37 @@
               </el-select>
             </el-col>
             <el-col :span="3.5">
-              <el-button type="primary" @click="searchOrderForm">搜索</el-button>
+              <el-button type="primary" @click="search(1)">搜索</el-button>
+            </el-col>
+          </el-row>
+
+          <div class="dividerDiv"></div>
+          <div class="titleDiv">
+            <span>1、根据支付信息查询订单 -- 2、自动检索 -- 3、商户单号、支付单号、退款单号、商户退款单号各自独立检索！ (Tips：既各自独立检索，也与上方检索条件无关.)</span>
+          </div>
+          <div class="dividerDiv"></div>
+
+          <!-- 搜索区域 -->
+          <el-row :gutter="20">
+            <el-col :span="6">
+              <el-input placeholder="请输入商户单号" v-model="queryInfo.OutTradeNo" :clearable="true" @clear="search(2)" @keyup.enter.native="search(2)">
+                <el-button slot="append" icon="el-icon-search" @click="search(2)"></el-button>
+              </el-input>
+            </el-col>
+            <el-col :span="6">
+              <el-input placeholder="请输入支付单号" v-model="queryInfo.TransactionId" :clearable="true" @clear="search(3)" @keyup.enter.native="search(3)">
+                <el-button slot="append" icon="el-icon-search" @click="search(3)"></el-button>
+              </el-input>
+            </el-col>
+            <el-col :span="6">
+              <el-input placeholder="请输入商户退款单号" v-model="queryInfo.RefundOutTradeNo" :clearable="true" @clear="search(4)" @keyup.enter.native="search(4)">
+                <el-button slot="append" icon="el-icon-search" @click="search(4)"></el-button>
+              </el-input>
+            </el-col>
+            <el-col :span="6">
+              <el-input placeholder="请输入退款单号" v-model="queryInfo.RefundId" :clearable="true" @clear="search(5)" @keyup.enter.native="search(5)">
+                <el-button slot="append" icon="el-icon-search" @click="search(5)"></el-button>
+              </el-input>
             </el-col>
           </el-row>
 
@@ -178,6 +213,7 @@ export default {
   data () {
     return {
       queryInfo: {
+        touchButton: 1,
         O_UniqSearchID: '',
         U_OpenId: '',
         TabId: '',
@@ -187,6 +223,11 @@ export default {
         OrderEndTime: '',
         PayStartTime: '',
         PayEndTime: '',
+
+        OutTradeNo: '',
+        TransactionId: '',
+        RefundId: '',
+        RefundOutTradeNo: '',
 
         pagenum: 1,
         pagesize: 10,
@@ -332,7 +373,8 @@ export default {
       this.queryInfo.pagenum = 1
       this.getOrderFormList()
     },
-    searchOrderForm () {
+    search (touchIndex) {
+      this.queryInfo.touchButton = touchIndex
       this.getNewOrderFormList()
     }
   }
