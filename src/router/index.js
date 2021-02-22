@@ -82,6 +82,7 @@ const routes = [
       },
       {
         path: '/static/users',
+        name: 'Users',
         component: Users
       },
       {

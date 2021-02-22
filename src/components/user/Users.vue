@@ -84,9 +84,20 @@ export default {
     }
   },
   created () {
+    this.getParamsFromUsers()
     this.getUserList()
   },
   methods: {
+    // 从订单列表页面跳转，获取用户检索订单参数
+    getParamsFromUsers () {
+      // 取到路由带过来的参数
+      const routerParams = this.$route.params
+      this.queryInfo.O_UniqSearchId = routerParams.O_UniqSearchID
+      // 避免刷新后由于params消失，导致U_OpenId undefined
+      if (this.queryInfo.O_UniqSearchId === undefined) {
+        this.queryInfo.O_UniqSearchId = ''
+      }
+    },
     // 搜索框按钮
     search (touchIndex) {
       this.queryInfo.touchButton = touchIndex

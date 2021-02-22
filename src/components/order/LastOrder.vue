@@ -96,7 +96,12 @@
               </el-table-column>
               <el-table-column label="操作" width="140">
                 <template slot-scope="scope">
-                  <el-button type="primary" icon="el-icon-setting" size="mini" @click="orderSettingButtonClick(scope.row)"></el-button>
+                  <el-tooltip effect="dark" content="订单详情" placement="top" :enterable="false">
+                    <el-button type="primary" icon="el-icon-setting" size="mini" @click="orderSettingButtonClick(scope.row)"></el-button>
+                  </el-tooltip>
+                  <el-tooltip effect="dark" content="用户信息" placement="top" :enterable="false">
+                    <el-button type="primary" icon="el-icon-user-solid" size="mini" @click="userInfoButtonClick(scope.row)"></el-button>
+                  </el-tooltip>
                 </template>
               </el-table-column>
           </el-table>
@@ -157,6 +162,17 @@ export default {
   mounted () {
   },
   methods: {
+    // 用户信息按钮
+    userInfoButtonClick (row) {
+      // 带参数跳转到订单列表页面
+      this.$router.push({
+        path: '/static/users',
+        name: 'Users',
+        params: {
+          O_UniqSearchID: row.O_UniqSearchID
+        }
+      })
+    },
     // 订单操作按钮
     orderSettingButtonClick (row) {
       this.$router.push({
