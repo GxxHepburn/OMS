@@ -306,7 +306,7 @@ export default {
     async getOrderFormList () {
       const { data: res } = await this.$http.post('getOrderFormList', this.queryInfo)
       if (res.meta.status !== 200) {
-        this.$message.error('获取订单数据数据失败!')
+        this.$message.error('获取订单数据失败!')
         return
       }
       this.orderFormList = res.data.orderFormList
