@@ -10,7 +10,9 @@
 
         <!-- 卡片视图 -->
         <el-card>
-          <el-divider content-position="left">订单综合信息</el-divider>
+          <div class="titleDiv">
+            <span>订单综合信息</span>
+          </div>
 
           <el-table :data='[orderForm]'>
             <el-table-column label="检索 ID" prop="o_UniqSearchID" width="210"></el-table-column>
@@ -44,7 +46,11 @@
               </el-table-column>
           </el-table>
 
-          <el-divider content-position="left">订单操作区域</el-divider>
+          <div class="dividerDiv"></div>
+          <div class="titleDiv">
+            <span>订单操作区域</span>
+          </div>
+          <div class="dividerDiv"></div>
 
           <el-row :gutter="20" type="flex">
             <el-col :span="2" :lg="3" :md="3" :sm="3" :xs="3">
@@ -70,7 +76,11 @@
             </el-col>
           </el-row>
 
-          <el-divider content-position="left">订单综合详情</el-divider>
+          <div class="dividerDiv"></div>
+          <div class="titleDiv">
+            <span>订单综合详情</span>
+          </div>
+          <div class="dividerDiv"></div>
 
           <el-table :data="orderDetailForm" :border="false" :stripe="false">
             <el-table-column type="index"></el-table-column>
@@ -101,7 +111,10 @@
         </el-card>
 
         <el-card class="bottomElCard">
-          <el-divider content-position="left">点菜列表</el-divider>
+          <div class="titleDiv">
+            <span>点菜列表</span>
+          </div>
+          <div class="dividerDiv"></div>
           <div v-for="item in orderAddFormList" :key="item.OA_ID" style="margin-bottom:50px;min-width:1200px;">
             <h4 style="display:inline;">第 {{item.OA_Sort}} 次点菜</h4>
             <span style="margin-left:20px;font-size:15px;color:#909399;font-weight:bold;"><label>下单时间: </label><label style="font-size:20px;color:#F56C6C;">{{item.OA_OrderingTime}}</label></span>
@@ -152,7 +165,10 @@
         </el-card>
 
         <el-card class="bottomElCard">
-          <el-divider content-position="left">支付信息</el-divider>
+          <div class="titleDiv">
+            <span>支付信息</span>
+          </div>
+          <div class="dividerDiv"></div>
           <div v-if="JSON.stringify(orderPayForm) != '{}'">
             <span style="margin-left:20px;font-size:15px;color:#909399;font-weight:bold;"><label>支付时间: </label><label style="font-size:20px;color:#F56C6C;">{{orderPayForm.p_Time_End}}</label></span>
             <span style="margin-left:20px;font-size:15px;color:#909399;font-weight:bold;"><label>支付金额: </label><label style="font-size:20px;color:#F56C6C;">{{orderPayForm.p_Totle_Fee/100}}</label> 元</span>
@@ -180,7 +196,10 @@
         </el-card>
 
         <el-card class="bottomElCard">
-          <el-divider content-position="left">退菜列表</el-divider>
+          <div class="titleDiv">
+            <span>退菜列表</span>
+          </div>
+          <div class="dividerDiv"></div>
           <div v-for="item in orderReturnFormList" :key="item.OR_ID" style="margin-bottom:50px;min-width:1200px;">
             <h4 style="display:inline;">第 {{item.OR_Sort}} 次退款</h4>
             <span style="margin-left:20px;font-size:15px;color:#909399;font-weight:bold;"><label>退款时间: </label><label style="font-size:20px;color:#F56C6C;">{{item.OR_ReturnTime}}</label></span>
@@ -215,7 +234,10 @@
         </el-card>
 
         <el-card class="bottomElCard">
-          <el-divider content-position="left">退款信息</el-divider>
+          <div class="titleDiv">
+            <span>退款信息</span>
+          </div>
+          <div class="dividerDiv"></div>
           <div v-for="(item, index) in refundFormList" :key="item.R_ID" style="margin-bottom:50px;min-width:1200px;">
             <h4 style="display:inline;">第 {{index+1}} 次退款</h4>
             <el-button style="margin-left:30px;" type="primary" v-print="'#'+ 'printRefundT' + index">打印退款票据</el-button>
@@ -259,7 +281,10 @@
         </el-card>
 
         <el-card class="bottomElCard">
-          <el-divider content-position="left">票据预览</el-divider>
+          <div class="titleDiv">
+            <span>票据预览</span>
+          </div>
+          <div class="dividerDiv"></div>
           <div class="BillTicketWrapper">
             <div class="bill-preview">
               <h3>客人小票预览</h3>

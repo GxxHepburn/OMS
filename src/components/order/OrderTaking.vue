@@ -9,8 +9,10 @@
 
          <!-- 卡片视图 -->
         <el-card class="topElCard">
-          <el-divider content-position="left">店铺操作</el-divider>
-          <el-row :gutter="0" type="flex">
+          <div class="titleDiv">
+            <span>店铺操作</span>
+          </div>
+          <el-row :gutter="0" type="flex" style="margin-top:30px;">
             <el-col :xl="2" :lg="3" :md="3" :sm="3" :xs="3">
               <el-button type="danger" @click="openWs">上线接单</el-button>
             </el-col>

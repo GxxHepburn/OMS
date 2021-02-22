@@ -15,4 +15,17 @@ export default {
 #nprogress .bar {
   background: red !important;
 }
+.titleDiv {
+  background-color: #D9EDF7;
+  border-radius: 2px;
+  height: 50px;
+  line-height: 50px;
+  color: #32718F;
+  font-size: 14px;
+  font-weight: bold;
+  padding-left: 20px;
+}
+.dividerDiv {
+  margin-top: 30px;
+}
 </style>

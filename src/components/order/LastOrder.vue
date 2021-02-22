@@ -9,6 +9,9 @@
 
          <!-- 卡片视图 -->
         <el-card>
+          <div class="titleDiv">
+            <span>24小时内订单</span>
+          </div>
           <el-table :data='orderFormList'
              :border="true"
              :stripe="true"
