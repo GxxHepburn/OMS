@@ -86,9 +86,6 @@
                   <el-tooltip effect="dark" content="订单信息" placement="top" :enterable="false">
                     <el-button type="primary" icon="el-icon-s-order" size="mini" @click="ordersInfoButtonClick(scope.row)"></el-button>
                   </el-tooltip>
-                  <el-tooltip effect="dark" content="用户信息" placement="top" :enterable="false">
-                    <el-button type="primary" icon="el-icon-user-solid" size="mini" @click="userInfoButtonClick(scope.row)"></el-button>
-                  </el-tooltip>
                 </template>
               </el-table-column>
           </el-table>
@@ -116,7 +113,7 @@ export default {
         TransactionId: '',
         OutTradeNo: '',
         PayStartTime: '',
-        PatEndTime: '',
+        PayEndTime: '',
 
         pagenum: 1,
         pagesize: 10,
