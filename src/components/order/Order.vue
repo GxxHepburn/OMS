@@ -264,6 +264,7 @@ export default {
     }
   },
   created () {
+    this.getParamsFromRefund()
     this.getParamsFromPay()
     this.getParamsFromUsers()
     this.getTabAndTabTypeOptions()
@@ -289,6 +290,18 @@ export default {
           O_ID: row.O_ID
         }
       })
+    },
+    // 从退款列表页面跳转
+    getParamsFromRefund () {
+      // 取到路由带过来的参数
+      const routerParams = this.$route.params
+      this.queryInfo.RefundId = routerParams.R_Refund_Id
+      // 避免刷新后由于params消失，导致U_OpenId undefined
+      if (this.queryInfo.RefundId === undefined) {
+        this.queryInfo.RefundId = ''
+      } else {
+        this.queryInfo.touchButton = 5
+      }
     },
     // 从支付列表页面跳转
     getParamsFromPay () {

@@ -75,7 +75,45 @@
              :border="true"
              :stripe="true">
               <el-table-column type="index"></el-table-column>
-
+              <el-table-column label="退款方式" width="70px">
+                <template slot-scope="scope">
+                  <span v-if="scope.row.r_Is_OfLine === 1">系统退款</span>
+                  <span v-if="scope.row.r_Is_OfLine === 0">人工退款</span>
+                </template>
+              </el-table-column>
+              <el-table-column label="退款单号" prop="r_Refund_Id" width="230px"></el-table-column>
+              <el-table-column label="商户退款单号" prop="r_Out_Refund_No" width="245px"></el-table-column>
+              <el-table-column label="退款金额">
+                <template slot-scope="scope">
+                  {{scope.row.r_Refund_Fee/100}}
+                </template>
+              </el-table-column>
+              <el-table-column label="提交时间" prop="r_Submit_Time" width="140px"></el-table-column>
+              <el-table-column label="提交退款业务结果" width="120px">
+                <template slot-scope="scope">
+                  <span v-if="scope.row.r_Result_Code === 'SUCCESS'">退款申请接收成功</span>
+                  <span v-if="scope.row.r_Result_Code === 'FAIL'">提交退款失败</span>
+                </template>
+              </el-table-column>
+              <el-table-column label="退款到账时间" prop="r_Success_Time" width="140px"></el-table-column>
+              <el-table-column label="退款结果" width="130px">
+                <template slot-scope="scope">
+                  <span v-if="scope.row.r_Refund_Status === 'SUCCESS'">退款成功(到账)</span>
+                  <span v-if="scope.row.r_Refund_Status === 'CHANGE'">退款异常,转人工退款</span>
+                  <span v-if="scope.row.r_Refund_Status === 'REFUNDCLOSE'">退款关闭</span>
+                </template>
+              </el-table-column>
+              <el-table-column label="退款账户" prop="r_Refund_Recv_Account" width="110px"></el-table-column>
+              <el-table-column label="餐桌" prop="t_Name"></el-table-column>
+              <el-table-column label="餐桌分类" prop="TT_Name"></el-table-column>
+              <el-table-column label="用餐人数" prop="o_NumberOfDiners" width="70px"></el-table-column>
+              <el-table-column label="操作" width="70px">
+                <template slot-scope="scope">
+                  <el-tooltip effect="dark" content="订单信息" placement="top" :enterable="false">
+                    <el-button type="primary" icon="el-icon-s-order" size="mini" @click="ordersInfoButtonClick(scope.row)"></el-button>
+                  </el-tooltip>
+                </template>
+              </el-table-column>
           </el-table>
 
           <!-- 分页区域 -->
@@ -131,7 +169,7 @@ export default {
         path: '/static/orders',
         name: 'Order',
         params: {
-          P_Transaction_Id: row.p_Transaction_Id
+          R_Refund_Id: row.r_Refund_Id
         }
       })
     },
