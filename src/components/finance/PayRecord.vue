@@ -81,6 +81,16 @@
               <el-table-column label="餐桌" prop="t_Name"></el-table-column>
               <el-table-column label="餐桌分类" prop="TT_Name"></el-table-column>
               <el-table-column label="用餐人数" prop="o_NumberOfDiners" width="70"></el-table-column>
+              <el-table-column label="操作" width="140">
+                <template slot-scope="scope">
+                  <el-tooltip effect="dark" content="订单信息" placement="top" :enterable="false">
+                    <el-button type="primary" icon="el-icon-s-order" size="mini" @click="ordersInfoButtonClick(scope.row)"></el-button>
+                  </el-tooltip>
+                  <el-tooltip effect="dark" content="用户信息" placement="top" :enterable="false">
+                    <el-button type="primary" icon="el-icon-user-solid" size="mini" @click="userInfoButtonClick(scope.row)"></el-button>
+                  </el-tooltip>
+                </template>
+              </el-table-column>
           </el-table>
 
           <!-- 分页区域 -->
@@ -127,6 +137,17 @@ export default {
   mounted () {
   },
   methods: {
+    // 跳转订单
+    ordersInfoButtonClick (row) {
+      // 带参数跳转到订单列表页面
+      this.$router.push({
+        path: '/static/orders',
+        name: 'Order',
+        params: {
+          P_Transaction_Id: row.p_Transaction_Id
+        }
+      })
+    },
     // 监听pagesize 改变的事件
     handleSizeChange (newSize) {
       this.queryInfo.pagesize = newSize

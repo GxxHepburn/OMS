@@ -264,6 +264,7 @@ export default {
     }
   },
   created () {
+    this.getParamsFromPay()
     this.getParamsFromUsers()
     this.getTabAndTabTypeOptions()
     this.getOrderFormList()
@@ -271,7 +272,7 @@ export default {
   methods: {
     // 用户信息按钮
     userInfoButtonClick (row) {
-      // 带参数跳转到订单列表页面
+      // 带参数跳转到用户列表页面
       this.$router.push({
         path: '/static/users',
         name: 'Users',
@@ -288,6 +289,18 @@ export default {
           O_ID: row.O_ID
         }
       })
+    },
+    // 从支付列表页面跳转
+    getParamsFromPay () {
+      // 取到路由带过来的参数
+      const routerParams = this.$route.params
+      this.queryInfo.TransactionId = routerParams.P_Transaction_Id
+      // 避免刷新后由于params消失，导致U_OpenId undefined
+      if (this.queryInfo.TransactionId === undefined) {
+        this.queryInfo.TransactionId = ''
+      } else {
+        this.queryInfo.touchButton = 3
+      }
     },
     // 从用户列表页面跳转，获取用户检索id参数
     getParamsFromUsers () {
