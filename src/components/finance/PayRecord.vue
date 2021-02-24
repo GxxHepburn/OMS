@@ -205,11 +205,5 @@ export default {
     margin-bottom: 0;
   }
 }
-.PayRecordElRow {
-  /deep/ .el-input__inner {
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-  }
-}
+
 </style>

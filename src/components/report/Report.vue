@@ -3,8 +3,8 @@
         <!-- 面包屑导航区域 -->
         <el-breadcrumb separator-class="el-icon-arrow-right">
           <el-breadcrumb-item :to="{ path: '/static/home' }" @click.native="returnhome">首页</el-breadcrumb-item>
-          <el-breadcrumb-item>数据统计</el-breadcrumb-item>
-          <el-breadcrumb-item>数据报表</el-breadcrumb-item>
+          <el-breadcrumb-item>统计分析</el-breadcrumb-item>
+          <el-breadcrumb-item>订单分析</el-breadcrumb-item>
         </el-breadcrumb>
 
         <!-- 卡片视图 -->

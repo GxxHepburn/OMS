@@ -28,4 +28,9 @@ export default {
 .dividerDiv {
   margin-top: 30px;
 }
+.el-input__inner {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
 </style>
