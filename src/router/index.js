@@ -58,7 +58,7 @@ const RefundRecord = () => import('../components/finance/RefundRecord.vue')
 const MerInfoList = () => import('../components/mer/MerInfo.vue')
 
 // import Report from '../components/report/Report.vue'
-const Report = () => import(/* webpackChunkName: "order_report" */ '../components/report/Report.vue')
+const OrderReports = () => import(/* webpackChunkName: "order_report" */ '../components/report/OrderReport.vue')
 
 Vue.use(VueRouter)
 
@@ -163,8 +163,8 @@ const routes = [
         component: MerInfoList
       },
       {
-        path: '/static/reports',
-        component: Report
+        path: '/static/orderReports',
+        component: OrderReports
       },
       {
         path: '/static/payRecord',
