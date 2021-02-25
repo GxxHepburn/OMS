@@ -15,21 +15,6 @@
               <span class="statistics_time">{{today}} 00:00:00 ~ {{today}} 23:59:59</span>
             </div>
             <div class="dividerDiv"></div>
-            <!-- <el-row :gutter="20" class="ordersPHourElRow">
-              <el-col :span="5">
-                <el-date-picker
-                  v-model="todayPicker"
-                  type="date"
-                  :editable="false"
-                  :clearable="false"
-                  placeholder="选择日期"
-                  @change="initToday(todayPicker)">
-                </el-date-picker>
-              </el-col>
-              <el-col :span="4">
-                <el-button type="primary">搜索</el-button>
-              </el-col>
-            </el-row> -->
             <div>
               <el-date-picker
                   v-model="todayPicker"
