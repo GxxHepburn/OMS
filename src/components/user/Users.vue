@@ -29,7 +29,6 @@
           <!-- 用户列表区 -->
           <el-table :data='userlist' :border="true" :stripe="true">
             <el-table-column type="index"></el-table-column>
-            <el-table-column label="Code" prop="U_ID"></el-table-column>
             <el-table-column label="检索ID" prop="U_OpenId" width="400px"></el-table-column>
             <el-table-column label="注册时间" prop="U_RegisterTime"></el-table-column>
             <el-table-column label="最后登陆时间" prop="U_LoginTime"></el-table-column>
