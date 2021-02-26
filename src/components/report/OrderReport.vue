@@ -96,6 +96,47 @@
             </el-table>
           </el-tab-pane>
           <el-tab-pane label="订单数(月)" name="ordersPMonth">
+            <div class="titleDiv">
+              <span>统计周期 </span>
+              <span class="statistics_time">{{year}}-01-01 00:00:00 ~ {{year}}-12-31 23:59:59</span>
+            </div>
+            <div class="dividerDiv"></div>
+            <div>
+              <el-date-picker
+                v-model="yearPicker"
+                type="year"
+                :editable="false"
+                :clearable="false"
+                placeholder="选择年份">
+              </el-date-picker>
+              <el-button style="margin-left:30px;" type="primary" @click="searchOrdersPMonth">搜索</el-button>
+            </div>
+             <el-table :data='monthFormList'
+              :border="true"
+              :stripe="true" v-if="monthFormList.length > 0">
+              <el-table-column label="时段">
+                <template slot-scope="scope">
+                  {{scope.row.times}}
+                </template>
+              </el-table-column>
+              <el-table-column label="消费总额">
+                <template slot-scope="scope">
+                  {{scope.row.totalPrice.toFixed(2)}}
+                </template>
+              </el-table-column>
+              <el-table-column label="订单数" prop="totalOrdersNumbers"></el-table-column>
+              <el-table-column label="客人数" prop="numberOfDinners"></el-table-column>
+              <el-table-column label="单均">
+                <template slot-scope="scope">
+                  {{scope.row.pricePOrder.toFixed(2)}}
+                </template>
+              </el-table-column>
+              <el-table-column label="人均">
+                <template slot-scope="scope">
+                  {{scope.row.pricePPeople.toFixed(2)}}
+                </template>
+              </el-table-column>
+            </el-table>
           </el-tab-pane>
           <el-tab-pane label="退款订单" name="refundOrders">
           </el-tab-pane>
@@ -108,6 +149,7 @@ export default {
   data () {
     return {
       tabsValue: 'ordersPHour',
+
       today: '',
       todayPicker: '',
       hourFormList: [],
@@ -115,13 +157,29 @@ export default {
       monthStart: '',
       monthEnd: '',
       monthPicker: '',
-      dayFormList: []
+      dayFormList: [],
+
+      year: '',
+      yearPicker: '',
+      monthFormList: []
     }
   },
   created () {
     this.initToday(new Date())
   },
   methods: {
+    // 搜索订单数(y)
+    async searchOrdersPMonth () {
+      if (this.yearPicker !== '') {
+        this.initYear(this.yearPicker)
+      }
+      const { data: res } = await this.$http.post('searchOrdersPMonth', { year: this.year, mmngctUserName: window.sessionStorage.getItem('mmngctUserName') })
+      if (res.meta.status !== 200) {
+        this.$message.error('获取订单数(月)统计数据失败!')
+        return
+      }
+      this.monthFormList = res.data.monthFormList
+    },
     // 搜索订单数(d)
     async searchOrdersPDay () {
       if (this.monthPicker !== '') {
@@ -156,9 +214,14 @@ export default {
         this.monthPicker = ''
         this.dayFormList = []
       }
+      if (oldActiveName === 'ordersPMonth') {
+        this.yearPicker = ''
+        this.monthFormList = []
+      }
       // 初始化所有TabItem
       this.initToday(new Date())
       this.initMonth(new Date())
+      this.initYear(new Date())
     },
     initToday (todayDate) {
       var day = todayDate.getDate() <= 9 ? '0' + todayDate.getDate() : todayDate.getDate()
@@ -178,6 +241,10 @@ export default {
 
       this.monthStart = nowYear + '-' + month + '-' + dayStart
       this.monthEnd = nowYear + '-' + month + '-' + dayEnd
+    },
+    initYear (yearDate) {
+      var nowYear = yearDate.getFullYear()
+      this.year = nowYear
     }
   }
 }
