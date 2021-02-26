@@ -8,7 +8,7 @@
         </el-breadcrumb>
 
         <!-- 卡片视图 -->
-        <el-tabs type="border-card" v-model="tabsValue">
+        <el-tabs type="border-card" v-model="tabsValue" :before-leave="changeTabs">
           <el-tab-pane label="订单数(时)" name="ordersPHour">
             <div class="titleDiv">
               <span>统计周期 </span>
@@ -53,6 +53,19 @@
             </el-table>
           </el-tab-pane>
           <el-tab-pane label="订单数(日)" name="ordersPDay">
+            <div class="titleDiv">
+              <span>统计周期 </span>
+              <span class="statistics_time">{{monthStart}} 00:00:00 ~ {{monthEnd}} 23:59:59</span>
+            </div>
+            <div class="dividerDiv"></div>
+            <el-date-picker
+              v-model="monthPicker"
+              type="month"
+              :editable="false"
+              :clearable="false"
+              placeholder="选择月份">
+            </el-date-picker>
+            <el-button style="margin-left:30px;" type="primary" @click="searchOrdersPDay">搜索</el-button>
           </el-tab-pane>
           <el-tab-pane label="订单数(月)" name="ordersPMonth">
           </el-tab-pane>
@@ -69,13 +82,30 @@ export default {
       tabsValue: 'ordersPHour',
       today: '',
       todayPicker: '',
-      hourFormList: []
+      hourFormList: [],
+
+      monthStart: '',
+      monthEnd: '',
+      monthPicker: '',
+      dayFormList: []
     }
   },
   created () {
     this.initToday(new Date())
   },
   methods: {
+    // 搜索订单数(d)
+    async searchOrdersPDay () {
+      if (this.monthPicker !== '') {
+        this.initMonth(this.monthPicker)
+      }
+      const { data: res } = await this.$http.post('searchOrdersPDay', { monthStart: this.monthStart, monthEnd: this.monthEnd, mmngctUserName: window.sessionStorage.getItem('mmngctUserName') })
+      if (res.meta.status !== 200) {
+        this.$message.error('获取订单数(日)统计数据失败!')
+        return
+      }
+      this.dayFormList = res.data.dayFormList
+    },
     // 搜索订单数(h)
     async searchOrdersPHour () {
       if (this.todayPicker !== '') {
@@ -83,16 +113,43 @@ export default {
       }
       const { data: res } = await this.$http.post('searchOrdersPHour', { today: this.today, mmngctUserName: window.sessionStorage.getItem('mmngctUserName') })
       if (res.meta.status !== 200) {
-        this.$message.error('获取订单数(h)统计数据失败!')
+        this.$message.error('获取订单数(时)统计数据失败!')
         return
       }
       this.hourFormList = res.data.hourFormList
+    },
+    // 切换tabs
+    changeTabs (activeName, oldActiveName) {
+      if (oldActiveName === 'ordersPHour') {
+        this.todayPicker = ''
+        this.hourFormList = []
+      }
+      if (oldActiveName === 'ordersPDay') {
+        this.monthPicker = ''
+        this.dayFormList = []
+      }
+      // 初始化所有TabItem
+      this.initToday(new Date())
+      this.initMonth(new Date())
     },
     initToday (todayDate) {
       var day = todayDate.getDate() <= 9 ? '0' + todayDate.getDate() : todayDate.getDate()
       var month = todayDate.getMonth() <= 9 ? '0' + (todayDate.getMonth() + 1) : todayDate.getMonth() + 1
       var year = todayDate.getFullYear()
       this.today = year + '-' + month + '-' + day
+    },
+    initMonth (monthDate) {
+      var nowMonth = monthDate.getMonth()
+      var nowYear = monthDate.getFullYear()
+      var monthStartDate = new Date(nowYear, nowMonth, 1)
+      var monthEndDate = new Date(nowYear, nowMonth + 1, 0)
+
+      var dayStart = monthStartDate.getDate <= 9 ? '0' + monthStartDate.getDate() : monthStartDate.getDate()
+      var dayEnd = monthEndDate.getDate <= 9 ? '0' + monthEndDate.getDate() : monthEndDate.getDate()
+      var month = nowMonth <= 9 ? '0' + (nowMonth + 1) : nowMonth + 1
+
+      this.monthStart = nowYear + '-' + month + '-' + dayStart
+      this.monthEnd = nowYear + '-' + month + '-' + dayEnd
     }
   }
 }
