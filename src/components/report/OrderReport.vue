@@ -30,7 +30,7 @@
              :stripe="true" v-if="hourFormList.length > 0">
              <el-table-column label="时段">
                <template slot-scope="scope">
-                 {{scope.row.hours}}
+                 {{scope.row.times}}
                </template>
              </el-table-column>
              <el-table-column label="消费总额">
@@ -58,14 +58,42 @@
               <span class="statistics_time">{{monthStart}} 00:00:00 ~ {{monthEnd}} 23:59:59</span>
             </div>
             <div class="dividerDiv"></div>
-            <el-date-picker
-              v-model="monthPicker"
-              type="month"
-              :editable="false"
-              :clearable="false"
-              placeholder="选择月份">
-            </el-date-picker>
-            <el-button style="margin-left:30px;" type="primary" @click="searchOrdersPDay">搜索</el-button>
+            <div>
+              <el-date-picker
+                v-model="monthPicker"
+                type="month"
+                :editable="false"
+                :clearable="false"
+                placeholder="选择月份">
+              </el-date-picker>
+              <el-button style="margin-left:30px;" type="primary" @click="searchOrdersPDay">搜索</el-button>
+            </div>
+            <el-table :data='dayFormList'
+              :border="true"
+              :stripe="true" v-if="dayFormList.length > 0">
+              <el-table-column label="时段">
+                <template slot-scope="scope">
+                  {{scope.row.times}}
+                </template>
+              </el-table-column>
+              <el-table-column label="消费总额">
+                <template slot-scope="scope">
+                  {{scope.row.totalPrice.toFixed(2)}}
+                </template>
+              </el-table-column>
+              <el-table-column label="订单数" prop="totalOrdersNumbers"></el-table-column>
+              <el-table-column label="客人数" prop="numberOfDinners"></el-table-column>
+              <el-table-column label="单均">
+                <template slot-scope="scope">
+                  {{scope.row.pricePOrder.toFixed(2)}}
+                </template>
+              </el-table-column>
+              <el-table-column label="人均">
+                <template slot-scope="scope">
+                  {{scope.row.pricePPeople.toFixed(2)}}
+                </template>
+              </el-table-column>
+            </el-table>
           </el-tab-pane>
           <el-tab-pane label="订单数(月)" name="ordersPMonth">
           </el-tab-pane>
@@ -144,8 +172,8 @@ export default {
       var monthStartDate = new Date(nowYear, nowMonth, 1)
       var monthEndDate = new Date(nowYear, nowMonth + 1, 0)
 
-      var dayStart = monthStartDate.getDate <= 9 ? '0' + monthStartDate.getDate() : monthStartDate.getDate()
-      var dayEnd = monthEndDate.getDate <= 9 ? '0' + monthEndDate.getDate() : monthEndDate.getDate()
+      var dayStart = monthStartDate.getDate() <= 9 ? '0' + monthStartDate.getDate() : monthStartDate.getDate()
+      var dayEnd = monthEndDate.getDate() <= 9 ? '0' + monthEndDate.getDate() : monthEndDate.getDate()
       var month = nowMonth <= 9 ? '0' + (nowMonth + 1) : nowMonth + 1
 
       this.monthStart = nowYear + '-' + month + '-' + dayStart
