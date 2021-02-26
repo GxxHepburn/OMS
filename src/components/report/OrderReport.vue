@@ -28,11 +28,7 @@
             <el-table :data='hourFormList'
               :border="true"
              :stripe="true" v-if="hourFormList.length > 0">
-             <el-table-column label="时段">
-               <template slot-scope="scope">
-                 {{scope.row.times}}
-               </template>
-             </el-table-column>
+             <el-table-column label="时段" prop="times"></el-table-column>
              <el-table-column label="消费总额">
                <template slot-scope="scope">
                  {{scope.row.totalPrice.toFixed(2)}}
@@ -71,11 +67,7 @@
             <el-table :data='dayFormList'
               :border="true"
               :stripe="true" v-if="dayFormList.length > 0">
-              <el-table-column label="时段">
-                <template slot-scope="scope">
-                  {{scope.row.times}}
-                </template>
-              </el-table-column>
+              <el-table-column label="时段" prop="times"></el-table-column>
               <el-table-column label="消费总额">
                 <template slot-scope="scope">
                   {{scope.row.totalPrice.toFixed(2)}}
@@ -111,14 +103,10 @@
               </el-date-picker>
               <el-button style="margin-left:30px;" type="primary" @click="searchOrdersPMonth">搜索</el-button>
             </div>
-             <el-table :data='monthFormList'
+            <el-table :data='monthFormList'
               :border="true"
               :stripe="true" v-if="monthFormList.length > 0">
-              <el-table-column label="时段">
-                <template slot-scope="scope">
-                  {{scope.row.times}}
-                </template>
-              </el-table-column>
+              <el-table-column label="时段" prop="times"></el-table-column>
               <el-table-column label="消费总额">
                 <template slot-scope="scope">
                   {{scope.row.totalPrice.toFixed(2)}}
@@ -139,6 +127,26 @@
             </el-table>
           </el-tab-pane>
           <el-tab-pane label="退款订单" name="refundOrders">
+            <div class="titleDiv">
+              <span>统计周期 </span>
+              <span class="statistics_time">{{refundYear}}-01-01 00:00:00 ~ {{refundYear}}-12-31 23:59:59</span>
+            </div>
+            <div class="dividerDiv"></div>
+            <div>
+              <el-date-picker
+                v-model="refundYearPicker"
+                type="year"
+                :editable="false"
+                :clearable="false"
+                placeholder="选择年份">
+              </el-date-picker>
+              <el-button style="margin-left:30px;" type="primary" @click="searchRefundPMonth">搜索</el-button>
+            </div>
+            <el-table :data='refundMonthFormList'
+              :border="true"
+              :stripe="true" v-if="refundMonthFormList.length > 0">
+              <el-table-column label="时段" prop="times"></el-table-column>
+            </el-table>
           </el-tab-pane>
         </el-tabs>
     </div>
@@ -161,13 +169,29 @@ export default {
 
       year: '',
       yearPicker: '',
-      monthFormList: []
+      monthFormList: [],
+
+      refundYear: '',
+      refundYearPicker: '',
+      refundMonthFormList: []
     }
   },
   created () {
     this.initToday(new Date())
   },
   methods: {
+    // 退款订单(y)
+    async searchRefundPMonth () {
+      if (this.refundYearPicker !== '') {
+        this.initRefundYear(this.refundYearPicker)
+      }
+      const { data: res } = await this.$http.post('searchRefundPMonth', { year: this.year, mmngctUserName: window.sessionStorage.getItem('mmngctUserName') })
+      if (res.meta.status !== 200) {
+        this.$message.error('获取退款订单统计数据失败!')
+        return
+      }
+      this.refundMonthFormList = res.data.refundMonthFormList
+    },
     // 搜索订单数(y)
     async searchOrdersPMonth () {
       if (this.yearPicker !== '') {
@@ -218,10 +242,15 @@ export default {
         this.yearPicker = ''
         this.monthFormList = []
       }
+      if (oldActiveName === 'refundOrders') {
+        this.refundYearPicker = ''
+        this.refundMonthFormList = []
+      }
       // 初始化所有TabItem
       this.initToday(new Date())
       this.initMonth(new Date())
       this.initYear(new Date())
+      this.initRefundYear(new Date())
     },
     initToday (todayDate) {
       var day = todayDate.getDate() <= 9 ? '0' + todayDate.getDate() : todayDate.getDate()
@@ -245,6 +274,10 @@ export default {
     initYear (yearDate) {
       var nowYear = yearDate.getFullYear()
       this.year = nowYear
+    },
+    initRefundYear (refundYearDate) {
+      var nowYear = refundYearDate.getFullYear()
+      this.refundYear = nowYear
     }
   }
 }
