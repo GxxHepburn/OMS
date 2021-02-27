@@ -85,7 +85,7 @@
               <el-table-column label="商户退款单号" prop="r_Out_Refund_No" width="245px"></el-table-column>
               <el-table-column label="退款金额">
                 <template slot-scope="scope">
-                  {{scope.row.r_Refund_Fee/100}}
+                  <span v-if="scope.row.r_Refund_Fee">{{scope.row.r_Refund_Fee/100}}</span>
                 </template>
               </el-table-column>
               <el-table-column label="提交时间" prop="r_Submit_Time" width="140px"></el-table-column>
