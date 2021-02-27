@@ -185,7 +185,7 @@ export default {
       if (this.refundYearPicker !== '') {
         this.initRefundYear(this.refundYearPicker)
       }
-      const { data: res } = await this.$http.post('searchRefundPMonth', { year: this.year, mmngctUserName: window.sessionStorage.getItem('mmngctUserName') })
+      const { data: res } = await this.$http.post('searchRefundPMonth', { year: this.refundYear, mmngctUserName: window.sessionStorage.getItem('mmngctUserName') })
       if (res.meta.status !== 200) {
         this.$message.error('获取退款订单统计数据失败!')
         return
