@@ -146,6 +146,9 @@
               :border="true"
               :stripe="true" v-if="refundMonthFormList.length > 0">
               <el-table-column label="时段" prop="times"></el-table-column>
+              <el-table-column label="退单次数" prop="totalRefundNumbers"></el-table-column>
+              <el-table-column label="退菜数量" prop="totalReturnNum"></el-table-column>
+              <el-table-column label="退菜金额" prop="totalRefundPrice"></el-table-column>
             </el-table>
           </el-tab-pane>
         </el-tabs>
@@ -185,7 +188,7 @@ export default {
       if (this.refundYearPicker !== '') {
         this.initRefundYear(this.refundYearPicker)
       }
-      const { data: res } = await this.$http.post('searchRefundPMonth', { year: this.refundYear, mmngctUserName: window.sessionStorage.getItem('mmngctUserName') })
+      const { data: res } = await this.$http.post('searchRefundPMonth', { refundYear: this.refundYear, mmngctUserName: window.sessionStorage.getItem('mmngctUserName') })
       if (res.meta.status !== 200) {
         this.$message.error('获取退款订单统计数据失败!')
         return
