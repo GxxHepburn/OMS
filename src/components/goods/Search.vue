@@ -166,7 +166,7 @@
                   <el-input placeholder="请输入营销标签" v-model="editForm.F_Tag" @blur="editForm.F_Tag = editForm.F_Tag.trim()"></el-input>
               </el-form-item>
               <el-form-item label="规格">
-                  <el-tag class="FS_Tag" size="mini" v-if="editForm.F_Specs == undefined || editForm.F_Specs.length <= 0">原价 : {{editForm.F_Price.toFixed(2)}} 元</el-tag>
+                  <el-tag class="FS_Tag" size="mini" v-if="editForm.F_Specs == undefined || editForm.F_Specs.length <= 0">原价 : {{editForm.F_Price === undefined ? 0.00 : editForm.F_Price.toFixed(2)}} 元</el-tag>
                   <el-tag class="FS_Tag"
                   :disable-transitions="true"
                   :closable="true"
