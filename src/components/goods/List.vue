@@ -28,7 +28,11 @@
             <el-table :data="goodslist" :border="true" :stripe="true">
                 <el-table-column type="index"></el-table-column>
                 <el-table-column label="商品名称" prop="F_Name"></el-table-column>
-                <el-table-column label="商品价格 (元)" prop="F_Price" width="95px"></el-table-column>
+                <el-table-column label="商品价格 (元)" prop="F_Price" width="95px">
+                  <template slot-scope="scope">
+                    {{scope.row.F_Price.toFixed(2)}}
+                  </template>
+                </el-table-column>
                 <el-table-column label="图片 (点击预览)" width="110px">
                     <template slot-scope="scope">
                         <el-image style="width: 30px; height: 30px"
@@ -147,7 +151,7 @@
                   <el-input placeholder="请输入营销标签" v-model="editForm.F_Tag" @blur="editForm.F_Tag = editForm.F_Tag.trim()"></el-input>
                 </el-form-item>
                 <el-form-item label="规格">
-                  <el-tag class="FS_Tag" size="mini" v-if="editForm.F_Specs == undefined || editForm.F_Specs.length <= 0">原价 : {{editForm.F_Price}} 元</el-tag>
+                  <el-tag class="FS_Tag" size="mini" v-if="editForm.F_Specs == undefined || editForm.F_Specs.length <= 0">原价 : {{editForm.F_Price.toFixed(2)}} 元</el-tag>
                   <el-tag class="FS_Tag"
                     :disable-transitions="true"
                     :closable="true"
