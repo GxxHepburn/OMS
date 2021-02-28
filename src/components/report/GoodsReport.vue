@@ -33,6 +33,7 @@
               <el-cascader v-model="PSSCascaderModel" :options="PSSGoodsAndGoodstypeOptions"
                   :props="{ checkStrictly: true }" clearable placeholder="请选择菜品分类或菜品"
                   @change="PSSGoodsAndGoodstypeCascaderChange"></el-cascader>
+              <el-button style="margin-left:30px;" type="primary" @click="searchPSSFormList">搜索</el-button>
             </div>
           </el-tab-pane>
         </el-tabs>
@@ -62,6 +63,27 @@ export default {
     this.getPSSGoodsAndGoodstypeOptions()
   },
   methods: {
+    // 获取searchPSSFormList
+    async searchPSSFormList () {
+      if (this.PSSStartPicker !== '') {
+        this.initPSSStartTime(this.PSSStartPicker, 1)
+      }
+      if (this.PSSEndPicker !== '') {
+        this.initPSSEndTime(this.PSSEndPicker, 1)
+      }
+      const { data: res } = await this.$http.post('searchPSSFormList', {
+        mmngctUserName: window.sessionStorage.getItem('mmngctUserName'),
+        PSSStartString: this.PSSStartString,
+        PSSEndString: this.PSSEndString,
+        PSSGoodID: this.PSSGoodID,
+        PSSGoodtypeID: this.PSSGoodtypeID
+      })
+      if (res.meta.status !== 200) {
+        this.$message.error('获取产品销售统计数据失败!')
+        return
+      }
+      this.PSSFormList = res.data.PSSFormList
+    },
     // 获取PSS级联选择器中GoodsAndGoodstype
     async getPSSGoodsAndGoodstypeOptions () {
       const { data: res } = await this.$http.post('pSSGoodsAndGoodstypeOptions', {
@@ -74,27 +96,18 @@ export default {
       this.PSSGoodsAndGoodstypeOptions = res.data.PSSGoodsAndGoodstypeOptions
     },
     // PSS 级联选择器变化
-    PSSGoodsAndGoodstypeCascaderChange () {},
-    // 合计方法
-    getSummaries (param) {
-    },
-    // 切换tabs
-    changeTabs (activeName, oldActiveName) {
-      if (oldActiveName === 'ordersPHour') {
-        this.todayPicker = ''
-        this.hourFormList = []
+    PSSGoodsAndGoodstypeCascaderChange () {
+      if (this.PSSCascaderModel.length === 0) {
+        this.PSSGoodID = ''
+        this.PSSGoodtypeID = ''
       }
-      if (oldActiveName === 'ordersPDay') {
-        this.monthPicker = ''
-        this.dayFormList = []
+      if (this.PSSCascaderModel.length === 1) {
+        this.PSSGoodtypeID = this.PSSCascaderModel[0]
+        this.PSSGoodID = ''
       }
-      if (oldActiveName === 'ordersPMonth') {
-        this.yearPicker = ''
-        this.monthFormList = []
-      }
-      if (oldActiveName === 'refundOrders') {
-        this.refundYearPicker = ''
-        this.refundMonthFormList = []
+      if (this.PSSCascaderModel.length === 2) {
+        this.PSSGoodID = this.PSSCascaderModel[1]
+        this.PSSGoodtypeID = ''
       }
     },
     // 初始化PSS时间
@@ -123,7 +136,11 @@ export default {
       } else {
         this.PSSEndString = year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second
       }
-    }
+    },
+    // 合计方法
+    getSummaries (param) {},
+    // 切换tabs
+    changeTabs (activeName, oldActiveName) {}
   }
 }
 </script>
