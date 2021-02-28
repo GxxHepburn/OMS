@@ -27,25 +27,27 @@
             </div>
             <el-table :data='hourFormList'
               :border="true"
-             :stripe="true" v-if="hourFormList.length > 0">
-             <el-table-column label="时段" prop="times"></el-table-column>
-             <el-table-column label="消费总额">
-               <template slot-scope="scope">
-                 {{scope.row.totalPrice.toFixed(2)}}
-               </template>
-             </el-table-column>
-             <el-table-column label="订单数" prop="totalOrdersNumbers"></el-table-column>
-             <el-table-column label="客人数" prop="numberOfDinners"></el-table-column>
-             <el-table-column label="单均">
-               <template slot-scope="scope">
-                 {{scope.row.pricePOrder.toFixed(2)}}
-               </template>
-             </el-table-column>
-             <el-table-column label="人均">
-               <template slot-scope="scope">
-                 {{scope.row.pricePPeople.toFixed(2)}}
-               </template>
-             </el-table-column>
+              :show-summary="true"
+              :summary-method="getSummaries"
+              :stripe="true" v-if="hourFormList.length > 0">
+              <el-table-column label="时段" prop="times"></el-table-column>
+              <el-table-column label="消费总额" prop="totalPrice">
+                <template slot-scope="scope">
+                  {{scope.row.totalPrice.toFixed(2)}}
+                </template>
+              </el-table-column>
+              <el-table-column label="订单数" prop="totalOrdersNumbers"></el-table-column>
+              <el-table-column label="客人数" prop="numberOfDinners"></el-table-column>
+              <el-table-column label="单均"  prop="pricePOrder">
+                <template slot-scope="scope">
+                  {{scope.row.pricePOrder.toFixed(2)}}
+                </template>
+              </el-table-column>
+              <el-table-column label="人均" prop="pricePPeople">
+                <template slot-scope="scope">
+                  {{scope.row.pricePPeople.toFixed(2)}}
+                </template>
+              </el-table-column>
             </el-table>
           </el-tab-pane>
           <el-tab-pane label="订单数(日)" name="ordersPDay">
@@ -66,21 +68,23 @@
             </div>
             <el-table :data='dayFormList'
               :border="true"
+              :show-summary="true"
+              :summary-method="getSummaries"
               :stripe="true" v-if="dayFormList.length > 0">
               <el-table-column label="时段" prop="times"></el-table-column>
-              <el-table-column label="消费总额">
+              <el-table-column label="消费总额" prop="totalPrice">
                 <template slot-scope="scope">
                   {{scope.row.totalPrice.toFixed(2)}}
                 </template>
               </el-table-column>
               <el-table-column label="订单数" prop="totalOrdersNumbers"></el-table-column>
               <el-table-column label="客人数" prop="numberOfDinners"></el-table-column>
-              <el-table-column label="单均">
+              <el-table-column label="单均" prop="pricePOrder">
                 <template slot-scope="scope">
                   {{scope.row.pricePOrder.toFixed(2)}}
                 </template>
               </el-table-column>
-              <el-table-column label="人均">
+              <el-table-column label="人均" prop="pricePPeople">
                 <template slot-scope="scope">
                   {{scope.row.pricePPeople.toFixed(2)}}
                 </template>
@@ -105,21 +109,23 @@
             </div>
             <el-table :data='monthFormList'
               :border="true"
+              :show-summary="true"
+              :summary-method="getSummaries"
               :stripe="true" v-if="monthFormList.length > 0">
               <el-table-column label="时段" prop="times"></el-table-column>
-              <el-table-column label="消费总额">
+              <el-table-column label="消费总额" prop="totalPrice">
                 <template slot-scope="scope">
                   {{scope.row.totalPrice.toFixed(2)}}
                 </template>
               </el-table-column>
               <el-table-column label="订单数" prop="totalOrdersNumbers"></el-table-column>
               <el-table-column label="客人数" prop="numberOfDinners"></el-table-column>
-              <el-table-column label="单均">
+              <el-table-column label="单均" prop="pricePOrder">
                 <template slot-scope="scope">
                   {{scope.row.pricePOrder.toFixed(2)}}
                 </template>
               </el-table-column>
-              <el-table-column label="人均">
+              <el-table-column label="人均" prop="pricePPeople">
                 <template slot-scope="scope">
                   {{scope.row.pricePPeople.toFixed(2)}}
                 </template>
@@ -183,6 +189,39 @@ export default {
     this.initToday(new Date())
   },
   methods: {
+    // 合计方法
+    getSummaries (param) {
+      const { columns, data } = param
+      const sums = []
+      columns.forEach((column, index) => {
+        if (index === 0) {
+          sums[index] = '总价'
+          return
+        }
+        const values = data.map(item => Number(item[column.property]))
+        sums[index] = values.reduce((prev, curr) => {
+          const value = Number(curr)
+          if (!isNaN(value)) {
+            return prev + curr
+          } else {
+            return prev
+          }
+        }, 0)
+      })
+      for (var i = 1; i < sums.length; i++) {
+        if (i !== 2 && i !== 3) {
+          sums[i] = sums[i].toFixed(2)
+        }
+      }
+
+      if (sums[2] !== 0) {
+        sums[4] = (sums[1] / sums[2]).toFixed(2)
+      }
+      if (sums[3] !== 0) {
+        sums[5] = (sums[1] / sums[3]).toFixed(2)
+      }
+      return sums
+    },
     // 退款订单(y)
     async searchRefundPMonth () {
       if (this.refundYearPicker !== '') {
@@ -295,5 +334,11 @@ export default {
   text-align: center;
   background-color: #FFEEFF;
   border-color: #CCCCCC;
+}
+/deep/ .el-table__footer {
+  td {
+    background-color: #FCF8E3;
+    border-color: #CCCCCC;
+  }
 }
 </style>
