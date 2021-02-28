@@ -40,15 +40,15 @@ const NotFiOrder = () => import('../components/order/NotPayReturnAndNotFiAndFiOr
 
 const FiOrder = () => import('../components/order/NotPayReturnAndNotFiAndFiOrder.vue')
 
-const AddTab = () => import(/* webpackChunkName: "order_report" */ '../components/tabs/addTab.vue')
+const AddTab = () => import('../components/tabs/addTab.vue')
 
-const AddTabType = () => import(/* webpackChunkName: "order_report" */ '../components/tabs/addTabType.vue')
+const AddTabType = () => import('../components/tabs/addTabType.vue')
 
-const SearchTab = () => import(/* webpackChunkName: "order_report" */ '../components/tabs/searchTab.vue')
+const SearchTab = () => import('../components/tabs/searchTab.vue')
 
-const TabList = () => import(/* webpackChunkName: "order_report" */ '../components/tabs/tabList.vue')
+const TabList = () => import('../components/tabs/tabList.vue')
 
-const TabType = () => import(/* webpackChunkName: "order_report" */ '../components/tabs/tabType.vue')
+const TabType = () => import('../components/tabs/tabType.vue')
 
 const PayRecord = () => import('../components/finance/PayRecord.vue')
 
@@ -57,8 +57,19 @@ const RefundRecord = () => import('../components/finance/RefundRecord.vue')
 // import Mer
 const MerInfoList = () => import('../components/mer/MerInfo.vue')
 
-// import Report from '../components/report/Report.vue'
-const OrderReports = () => import(/* webpackChunkName: "order_report" */ '../components/report/OrderReport.vue')
+const OrderReports = () => import('../components/report/OrderReport.vue')
+
+const GoodsReport = () => import('../components/report/GoodsReport.vue')
+
+const TabsReport = () => import('../components/report/TabsReport.vue')
+
+const UsersReport = () => import('../components/report/UsersReport.vue')
+
+const BusinessReport = () => import('../components/report/BusinessReport.vue')
+
+const OtherReport = () => import('../components/report/OtherReport.vue')
+
+const FinanceReport = () => import('../components/report/FinanceReport.vue')
 
 Vue.use(VueRouter)
 
@@ -163,16 +174,40 @@ const routes = [
         component: MerInfoList
       },
       {
-        path: '/static/orderReports',
-        component: OrderReports
-      },
-      {
         path: '/static/payRecord',
         component: PayRecord
       },
       {
         path: '/static/refundRecord',
         component: RefundRecord
+      },
+      {
+        path: '/static/orderReports',
+        component: OrderReports
+      },
+      {
+        path: '/static/goodsReport',
+        component: GoodsReport
+      },
+      {
+        path: '/static/tabsReport',
+        component: TabsReport
+      },
+      {
+        path: '/static/usersReport',
+        component: UsersReport
+      },
+      {
+        path: '/static/businessReport',
+        component: BusinessReport
+      },
+      {
+        path: '/static/otherReport',
+        component: OtherReport
+      },
+      {
+        path: '/static/financeReport',
+        component: FinanceReport
       }
     ]
   }
