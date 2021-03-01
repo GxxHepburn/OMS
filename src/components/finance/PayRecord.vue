@@ -141,7 +141,7 @@ export default {
         path: '/static/orders',
         name: 'Order',
         params: {
-          P_Transaction_Id: row.p_Transaction_Id
+          O_UniqSearchID: row.o_UniqSearchID
         }
       })
     },

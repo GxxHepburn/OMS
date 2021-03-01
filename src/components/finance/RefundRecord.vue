@@ -164,13 +164,13 @@ export default {
   methods: {
     // 跳转订单
     ordersInfoButtonClick (row) {
-      console.log(row)
       // 带参数跳转到订单列表页面
       this.$router.push({
         path: '/static/orders',
         name: 'Order',
         params: {
-          R_Refund_Id: row.r_Refund_Id
+          R_Refund_Id: row.r_Refund_Id,
+          O_UniqSearchID: row.o_UniqSearchID
         }
       })
     },
