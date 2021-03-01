@@ -251,8 +251,8 @@ export default {
         sums[2] = '平均价格：' + (sums[4] / sums[3]).toFixed(2)
       }
 
-      sums[4] = sums[4].toFixed(2)
-      sums[6] = sums[6].toFixed(2)
+      sums[4] = parseFloat(sums[4]).toFixed(2)
+      sums[6] = parseFloat(sums[6]).toFixed(2)
       return sums
     },
     // 切换tabs
