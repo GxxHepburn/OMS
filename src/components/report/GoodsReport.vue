@@ -35,6 +35,31 @@
                   @change="PSSGoodsAndGoodstypeCascaderChange"></el-cascader>
               <el-button style="margin-left:30px;" type="primary" @click="searchPSSFormList">搜索</el-button>
             </div>
+            <el-table :data='PSSFormList'
+              :border='true'
+              :stripe="true"
+              :span-method="pssObjectSpanMethod"
+              v-if="PSSFormList.length > 0">
+              <el-table-column label="分类" prop="ftname"></el-table-column>
+              <el-table-column label="名称" prop="fname"></el-table-column>
+              <el-table-column label="单价" prop="odrealprice">
+                <template slot-scope="scope">
+                  {{scope.row.odrealprice.toFixed(2)}}
+                </template>
+              </el-table-column>
+              <el-table-column label="出售数量" prop="odnum"></el-table-column>
+              <el-table-column label="出售金额" prop="totalPrice">
+                <template slot-scope="scope">
+                  {{scope.row.totalPrice.toFixed(2)}}
+                </template>
+              </el-table-column>
+              <el-table-column label="真实数量" prop="odrealnum"></el-table-column>
+              <el-table-column label="真实金额" prop="realTotalPrice">
+                <template slot-scope="scope">
+                  {{scope.row.realTotalPrice.toFixed(2)}}
+                </template>
+              </el-table-column>
+            </el-table>
           </el-tab-pane>
         </el-tabs>
     </div>
@@ -54,7 +79,9 @@ export default {
       PSSCascaderModel: [],
       PSSGoodsAndGoodstypeOptions: [],
       PSSGoodID: '',
-      PSSGoodtypeID: ''
+      PSSGoodtypeID: '',
+      PSSSpanOneArr: [],
+      PSSSpanTwoArr: []
     }
   },
   created () {
@@ -63,8 +90,63 @@ export default {
     this.getPSSGoodsAndGoodstypeOptions()
   },
   methods: {
+    // 获取第一列跨行数据
+    getPSSSpanOneArr (data) {
+      for (var i = 0; i < data.length; i++) {
+        if (i === 0) {
+          this.PSSSpanOneArr.push(1)
+          this.pos = 0
+        } else {
+          if (data[i].ftname === data[i - 1].ftname) {
+            this.PSSSpanOneArr[this.pos] += 1
+            this.PSSSpanOneArr.push(0)
+          } else {
+            this.PSSSpanOneArr.push(1)
+            this.pos = i
+          }
+        }
+      }
+    },
+    // 获取第二列跨行数据
+    getPSSSpanTwoArr (data) {
+      for (var i = 0; i < data.length; i++) {
+        if (i === 0) {
+          this.PSSSpanTwoArr.push(1)
+          this.pos = 0
+        } else {
+          if (data[i].fname === data[i - 1].fname) {
+            this.PSSSpanTwoArr[this.pos] += 1
+            this.PSSSpanTwoArr.push(0)
+          } else {
+            this.PSSSpanTwoArr.push(1)
+            this.pos = i
+          }
+        }
+      }
+    },
+    // 合并行
+    pssObjectSpanMethod ({ row, column, rowIndex, columnIndex }) {
+      if (columnIndex === 0) {
+        const _row = this.PSSSpanOneArr[rowIndex]
+        const _col = _row > 0 ? 1 : 0
+        return {
+          rowspan: _row,
+          colspan: _col
+        }
+      }
+      if (columnIndex === 1) {
+        const _row = this.PSSSpanTwoArr[rowIndex]
+        const _col = _row > 0 ? 1 : 0
+        return {
+          rowspan: _row,
+          colspan: _col
+        }
+      }
+    },
     // 获取searchPSSFormList
     async searchPSSFormList () {
+      this.PSSSpanOneArr = []
+      this.PSSSpanTwoArr = []
       if (this.PSSStartPicker !== '') {
         this.initPSSStartTime(this.PSSStartPicker, 1)
       }
@@ -83,6 +165,8 @@ export default {
         return
       }
       this.PSSFormList = res.data.PSSFormList
+      this.getPSSSpanOneArr(this.PSSFormList)
+      this.getPSSSpanTwoArr(this.PSSFormList)
     },
     // 获取PSS级联选择器中GoodsAndGoodstype
     async getPSSGoodsAndGoodstypeOptions () {
