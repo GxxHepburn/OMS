@@ -427,7 +427,7 @@
               </div>
             </div>
 
-            <div class="bill-preview" v-for="item in orderAddFormList" :key="item.OA_ID + '1'">
+            <div class="bill-preview" v-for="(item, index) in orderAddFormList" :key="'KT' + item.OA_ID + '-' + index">
               <h3>第 {{item.OA_Sort}} 次点菜 厨房餐票预览</h3>
               <div :id="'printKT' + item.OA_Sort" class="detail">
                 <p style="text-align:center;font-size:15px">第 {{item.OA_Sort}} 次点菜</p>
@@ -467,7 +467,7 @@
             </div>
 
             <!-- 退菜票据 RT -->
-            <div class="bill-preview" v-for="item in orderReturnFormList" :key="item.OR_ID + '1'">
+            <div class="bill-preview" v-for="(item, index) in orderReturnFormList" :key="'RT' + item.OR_ID + '-' + index">
               <h3>第 {{item.OR_Sort}} 次退款 退菜票据预览</h3>
               <div :id="'printRT' + item.OR_Sort" class="detail">
                 <p style="text-align:center;font-size:15px">第 {{item.OR_Sort}} 次退款</p>
