@@ -38,6 +38,8 @@
             <el-table :data='PSSFormList'
               :border='true'
               :stripe="true"
+              :show-summary="true"
+              :summary-method="getSummaries"
               :span-method="pssObjectSpanMethod"
               v-if="PSSFormList.length > 0">
               <el-table-column label="分类" prop="ftname"></el-table-column>
@@ -222,7 +224,37 @@ export default {
       }
     },
     // 合计方法
-    getSummaries (param) {},
+    getSummaries (param) {
+      const { columns, data } = param
+      const sums = []
+      columns.forEach((column, index) => {
+        if (index === 0) {
+          sums[index] = '合计'
+          return
+        }
+        if (index === 1 || index === 2) {
+          sums[index] = ''
+          return
+        }
+        const values = data.map(item => Number(item[column.property]))
+        sums[index] = values.reduce((prev, curr) => {
+          const value = Number(curr)
+          if (!isNaN(value)) {
+            return prev + curr
+          } else {
+            return prev
+          }
+        }, 0)
+      })
+
+      if (sums[3] !== 0) {
+        sums[2] = '平均价格：' + (sums[4] / sums[3]).toFixed(2)
+      }
+
+      sums[4] = sums[4].toFixed(2)
+      sums[6] = sums[6].toFixed(2)
+      return sums
+    },
     // 切换tabs
     changeTabs (activeName, oldActiveName) {}
   }
