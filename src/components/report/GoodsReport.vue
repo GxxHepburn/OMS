@@ -40,8 +40,7 @@
               :stripe="true"
               :show-summary="true"
               :summary-method="getSummaries"
-              :span-method="pssObjectSpanMethod"
-              v-if="PSSFormList.length > 0">
+              :span-method="pssObjectSpanMethod">
               <el-table-column label="分类" prop="ftname"></el-table-column>
               <el-table-column label="名称" prop="fname"></el-table-column>
               <el-table-column label="单价" prop="odrealprice">
