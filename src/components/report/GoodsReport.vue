@@ -117,6 +117,64 @@
               </el-table-column>
             </el-table>
           </el-tab-pane>
+          <el-tab-pane label="菜品销售对比表" name="productSalesComparison">
+            <div class="titleDiv">
+              <span>统计周期 </span>
+              <span class="statistics_time">{{PSCStartString}} ~ {{PSCEndString}}</span>
+            </div>
+            <div class="dividerDiv"></div>
+            <div>
+              <el-date-picker
+                v-model="PSCStartPicker"
+                type="datetime"
+                :editable="false"
+                :clearable="false"
+                placeholder="开始时间">
+              </el-date-picker>
+              <el-date-picker style="margin-left:20px;margin-right:20px;"
+                v-model="PSCEndPicker"
+                type="datetime"
+                :editable="false"
+                :clearable="false"
+                placeholder="结束时间">
+              </el-date-picker>
+              <el-cascader v-model="PSCCascaderModel" :options="PSCGoodsAndGoodstypeOptions"
+                  :props="{ checkStrictly: true }" clearable placeholder="请选择菜品分类或菜品"
+                  @change="PSCGoodsAndGoodstypeCascaderChange"></el-cascader>
+              <el-button style="margin-left:30px;" type="primary" @click="searchPSCFormList">搜索</el-button>
+            </div>
+            <el-table :data='PSCFormList'
+              :border='true'
+              :stripe="true"
+              :show-summary="true"
+              :summary-method="getPSCSummaries"
+              :span-method="pssObjectSpanMethod">
+              <el-table-column label="分类" prop="ftname"></el-table-column>
+              <el-table-column label="名称" prop="fname"></el-table-column>
+              <el-table-column label="SKU">
+                <template slot-scope="scope">
+                  {{scope.row.spec + ' ' + scope.row.propOne + ' ' + scope.row.propTwo}}
+                </template>
+              </el-table-column>
+              <el-table-column label="单价" prop="odrealprice">
+                <template slot-scope="scope">
+                  {{scope.row.odrealprice.toFixed(2)}}
+                </template>
+              </el-table-column>
+              <el-table-column label="出售数量" prop="odnum"></el-table-column>
+              <el-table-column label="出售金额" prop="totalPrice">
+                <template slot-scope="scope">
+                  {{scope.row.totalPrice.toFixed(2)}}
+                </template>
+              </el-table-column>
+              <el-table-column label="真实数量" prop="odrealnum"></el-table-column>
+              <el-table-column label="真实金额" prop="realTotalPrice">
+                <template slot-scope="scope">
+                  {{scope.row.realTotalPrice.toFixed(2)}}
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-tab-pane>
         </el-tabs>
     </div>
 </template>
@@ -146,7 +204,17 @@ export default {
       CSSFormList: [],
       CSSCascaderModel: [],
       CSSGoodstypeOptions: [],
-      CSSGoodtypeID: ''
+      CSSGoodtypeID: '',
+
+      PSCStartString: '',
+      PSCEndString: '',
+      PSCStartPicker: '',
+      PSCEndPicker: '',
+      PSCFormList: [],
+      PSCCascaderModel: [],
+      PSCGoodsAndGoodstypeOptions: [],
+      PSCGoodID: '',
+      PSCGoodtypeID: ''
     }
   },
   created () {
@@ -157,6 +225,106 @@ export default {
     this.getCSSGoodstypeOptions()
   },
   methods: {
+    // PSC合计方法
+    getPSCSummaries (param) {
+      const { columns, data } = param
+      const sums = []
+      columns.forEach((column, index) => {
+        if (index === 0) {
+          sums[index] = '合计'
+          return
+        }
+        if (index === 1 || index === 2 || index === 3) {
+          sums[index] = ''
+          return
+        }
+        const values = data.map(item => Number(item[column.property]))
+        sums[index] = values.reduce((prev, curr) => {
+          const value = Number(curr)
+          if (!isNaN(value)) {
+            return prev + curr
+          } else {
+            return prev
+          }
+        }, 0)
+      })
+
+      if (sums[4] !== 0) {
+        sums[3] = '平均价格：' + (sums[5] / sums[4]).toFixed(2)
+      }
+
+      sums[5] = parseFloat(sums[5]).toFixed(2)
+      sums[7] = parseFloat(sums[7]).toFixed(2)
+      return sums
+    },
+    // 获取PSC数据
+    async searchPSCFormList () {
+      this.PSSSpanOneArr = []
+      this.PSSSpanTwoArr = []
+      if (this.PSCStartPicker !== '') {
+        this.initPSCStartTime(this.PSCStartPicker, 1)
+      }
+      if (this.PSCEndPicker !== '') {
+        this.initPSCEndTime(this.PSCEndPicker, 1)
+      }
+      const { data: res } = await this.$http.post('searchPSCFormList', {
+        mmngctUserName: window.sessionStorage.getItem('mmngctUserName'),
+        PSCStartString: this.PSCStartString,
+        PSCEndString: this.PSCEndString,
+        PSCGoodID: this.PSCGoodID,
+        PSCGoodtypeID: this.PSCGoodtypeID
+      })
+      if (res.meta.status !== 200) {
+        this.$message.error('获取菜品销售对比数据失败!')
+        return
+      }
+      this.PSCFormList = res.data.PSCFormList
+      this.getPSSSpanOneArr(this.PSCFormList)
+      this.getPSSSpanTwoArr(this.PSCFormList)
+    },
+    // PSC 级联选择器变化
+    PSCGoodsAndGoodstypeCascaderChange () {
+      if (this.PSCCascaderModel.length === 0) {
+        this.PSCGoodID = ''
+        this.PSCGoodtypeID = ''
+      }
+      if (this.PSCCascaderModel.length === 1) {
+        this.PSCGoodtypeID = this.PSCCascaderModel[0]
+        this.PSCGoodID = ''
+      }
+      if (this.PSCCascaderModel.length === 2) {
+        this.PSCGoodID = this.PSCCascaderModel[1]
+        this.PSCGoodtypeID = ''
+      }
+    },
+    // 初始化PSCStartTime
+    initPSCStartTime (date, index) {
+      var day = date.getDate() <= 9 ? '0' + date.getDate() : date.getDate()
+      var month = date.getMonth() <= 9 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1
+      var year = date.getFullYear()
+      var hour = date.getHours() <= 10 ? '0' + date.getHours() : date.getHours()
+      var minute = date.getMinutes() <= 10 ? '0' + date.getMinutes() : date.getMinutes()
+      var second = date.getSeconds() <= 10 ? '0' + date.getSeconds() : date.getSeconds()
+      if (index === 0) {
+        this.PSCStartString = year + '-' + month + '-' + day + ' 00:00:00'
+      } else {
+        this.PSCStartString = year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second
+      }
+    },
+    // 初始化PSCEndTime
+    initPSCEndTime (date, index) {
+      var day = date.getDate() <= 9 ? '0' + date.getDate() : date.getDate()
+      var month = date.getMonth() <= 9 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1
+      var year = date.getFullYear()
+      var hour = date.getHours() <= 10 ? '0' + date.getHours() : date.getHours()
+      var minute = date.getMinutes() <= 10 ? '0' + date.getMinutes() : date.getMinutes()
+      var second = date.getSeconds() <= 10 ? '0' + date.getSeconds() : date.getSeconds()
+      if (index === 0) {
+        this.PSCEndString = year + '-' + month + '-' + day + ' 23:59:59'
+      } else {
+        this.PSCEndString = year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second
+      }
+    },
     // CSS合计
     getCSSSummaries (param) {
       const { columns, data } = param
@@ -240,7 +408,7 @@ export default {
       }
       this.CSSGoodstypeOptions = res.data.cates
     },
-    // 获取第一列跨行数据
+    // 获取第一列跨行数据 PSS、PSC
     getPSSSpanOneArr (data) {
       for (var i = 0; i < data.length; i++) {
         if (i === 0) {
@@ -257,7 +425,7 @@ export default {
         }
       }
     },
-    // 获取第二列跨行数据
+    // 获取第二列跨行数据 PSS、PSC
     getPSSSpanTwoArr (data) {
       for (var i = 0; i < data.length; i++) {
         if (i === 0) {
@@ -274,7 +442,7 @@ export default {
         }
       }
     },
-    // 合并行
+    // 合并行 PSS、PSC
     pssObjectSpanMethod ({ row, column, rowIndex, columnIndex }) {
       if (columnIndex === 0) {
         const _row = this.PSSSpanOneArr[rowIndex]
@@ -319,6 +487,7 @@ export default {
       this.getPSSSpanTwoArr(this.PSSFormList)
     },
     // 获取PSS级联选择器中GoodsAndGoodstype
+    // 获取PSC级联选择器中GoodsAndGoodstype
     async getPSSGoodsAndGoodstypeOptions () {
       const { data: res } = await this.$http.post('pSSGoodsAndGoodstypeOptions', {
         mmngctUserName: window.sessionStorage.getItem('mmngctUserName')
@@ -328,6 +497,7 @@ export default {
         return
       }
       this.PSSGoodsAndGoodstypeOptions = res.data.PSSGoodsAndGoodstypeOptions
+      this.PSCGoodsAndGoodstypeOptions = res.data.PSSGoodsAndGoodstypeOptions
     },
     // PSS 级联选择器变化
     PSSGoodsAndGoodstypeCascaderChange () {
@@ -426,12 +596,25 @@ export default {
       this.CSSFormList = []
       this.CSSCascaderModel = ''
       this.CSSGoodtypeID = ''
+
+      // 清空PSC
+      this.PSCStartString = ''
+      this.PSCEndString = ''
+      this.PSCStartPicker = ''
+      this.PSCEndPicker = ''
+      this.PSCFormList = []
+      this.PSCCascaderModel = ''
+      this.PSCGoodID = ''
+      this.PSCGoodtypeID = ''
       // 初始化所有TabItem数据
       this.initPSSStartTime(new Date(), 0)
       this.initPSSEndTime(new Date(), 0)
 
       this.initCSSStartTime(new Date(), 0)
       this.initCSSEndTime(new Date(), 0)
+
+      this.initPSCStartTime(new Date(), 0)
+      this.initPSCEndTime(new Date(), 0)
     }
   }
 }
