@@ -39,7 +39,7 @@
               :border='true'
               :stripe="true"
               :show-summary="true"
-              :summary-method="getSummaries"
+              :summary-method="getPSSSummaries"
               :span-method="pssObjectSpanMethod">
               <el-table-column label="分类" prop="ftname"></el-table-column>
               <el-table-column label="名称" prop="fname"></el-table-column>
@@ -93,6 +93,29 @@
               </el-select>
               <el-button style="margin-left:30px;" type="primary" @click="searchCSSFormList">搜索</el-button>
             </div>
+            <el-table :data='CSSFormList'
+              :border='true'
+              :stripe="true"
+              :summary-method="getCSSSummaries"
+              :show-summary="true">
+              <el-table-column label="分类" prop="ftname"></el-table-column>
+              <el-table-column label="销售数量" prop="odnum"></el-table-column>
+              <el-table-column label="销售金额" prop="totalPrice">
+                <template slot-scope="scope">
+                  {{scope.row.totalPrice.toFixed(2)}}
+                </template>
+              </el-table-column>
+              <el-table-column label="数量占比" prop="numPercentage">
+                <template slot-scope="scope">
+                  {{(scope.row.numPercentage*100).toFixed(2)}}%
+                </template>
+              </el-table-column>
+              <el-table-column label="金额占比" prop="pricePercentage">
+                <template slot-scope="scope">
+                  {{(scope.row.pricePercentage*100).toFixed(2)}}%
+                </template>
+              </el-table-column>
+            </el-table>
           </el-tab-pane>
         </el-tabs>
     </div>
@@ -134,6 +157,30 @@ export default {
     this.getCSSGoodstypeOptions()
   },
   methods: {
+    // CSS合计
+    getCSSSummaries (param) {
+      const { columns, data } = param
+      const sums = []
+      columns.forEach((column, index) => {
+        if (index === 0) {
+          sums[index] = '合计'
+          return
+        }
+        const values = data.map(item => Number(item[column.property]))
+        sums[index] = values.reduce((prev, curr) => {
+          const value = Number(curr)
+          if (!isNaN(value)) {
+            return prev + curr
+          } else {
+            return prev
+          }
+        }, 0)
+      })
+
+      sums[3] = '100%'
+      sums[4] = '100%'
+      return sums
+    },
     // 获取CSS数据
     async searchCSSFormList () {
       if (this.CSSStartPicker !== '') {
@@ -325,7 +372,7 @@ export default {
       }
     },
     // 合计方法
-    getSummaries (param) {
+    getPSSSummaries (param) {
       const { columns, data } = param
       const sums = []
       columns.forEach((column, index) => {
@@ -376,7 +423,7 @@ export default {
       this.CSSEndString = ''
       this.CSSStartPicker = ''
       this.CSSEndPicker = ''
-      this.CSSFormList = ''
+      this.CSSFormList = []
       this.CSSCascaderModel = ''
       this.CSSGoodtypeID = ''
       // 初始化所有TabItem数据
