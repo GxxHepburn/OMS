@@ -272,22 +272,15 @@ export default {
     },
     // 切换tabs
     changeTabs (activeName, oldActiveName) {
-      if (oldActiveName === 'ordersPHour') {
-        this.todayPicker = ''
-        this.hourFormList = []
-      }
-      if (oldActiveName === 'ordersPDay') {
-        this.monthPicker = ''
-        this.dayFormList = []
-      }
-      if (oldActiveName === 'ordersPMonth') {
-        this.yearPicker = ''
-        this.monthFormList = []
-      }
-      if (oldActiveName === 'refundOrders') {
-        this.refundYearPicker = ''
-        this.refundMonthFormList = []
-      }
+      // 清空所有TabItem数据
+      this.todayPicker = ''
+      this.hourFormList = []
+      this.monthPicker = ''
+      this.dayFormList = []
+      this.yearPicker = ''
+      this.monthFormList = []
+      this.refundYearPicker = ''
+      this.refundMonthFormList = []
       // 初始化所有TabItem
       this.initToday(new Date())
       this.initMonth(new Date())

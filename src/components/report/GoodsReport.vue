@@ -62,6 +62,38 @@
               </el-table-column>
             </el-table>
           </el-tab-pane>
+          <el-tab-pane label="分类销售统计" name="classifiedSalesStatistics">
+            <div class="titleDiv">
+              <span>统计周期 </span>
+              <span class="statistics_time">{{CSSStartString}} ~ {{CSSEndString}}</span>
+            </div>
+            <div class="dividerDiv"></div>
+            <div>
+              <el-date-picker
+                v-model="CSSStartPicker"
+                type="datetime"
+                :editable="false"
+                :clearable="false"
+                placeholder="开始时间">
+              </el-date-picker>
+              <el-date-picker style="margin-left:20px;margin-right:20px;"
+                v-model="CSSEndPicker"
+                type="datetime"
+                :editable="false"
+                :clearable="false"
+                placeholder="结束时间">
+              </el-date-picker>
+              <el-select v-model="CSSGoodtypeID" placeholder="请选择菜品分类" :clearable="true">
+                <el-option
+                    v-for="item in CSSGoodstypeOptions"
+                    :key="item.FT_ID"
+                    :label="item.FT_Name"
+                    :value="item.FT_ID">
+                </el-option>
+              </el-select>
+              <el-button style="margin-left:30px;" type="primary" @click="searchCSSFormList">搜索</el-button>
+            </div>
+          </el-tab-pane>
         </el-tabs>
     </div>
 </template>
@@ -82,15 +114,85 @@ export default {
       PSSGoodID: '',
       PSSGoodtypeID: '',
       PSSSpanOneArr: [],
-      PSSSpanTwoArr: []
+      PSSSpanTwoArr: [],
+
+      CSSStartString: '',
+      CSSEndString: '',
+      CSSStartPicker: '',
+      CSSEndPicker: '',
+      CSSFormList: [],
+      CSSCascaderModel: [],
+      CSSGoodstypeOptions: [],
+      CSSGoodtypeID: ''
     }
   },
   created () {
     this.initPSSStartTime(new Date(), 0)
     this.initPSSEndTime(new Date(), 0)
+    // 页面只初始化一次
     this.getPSSGoodsAndGoodstypeOptions()
+    this.getCSSGoodstypeOptions()
   },
   methods: {
+    // 获取CSS数据
+    async searchCSSFormList () {
+      if (this.CSSStartPicker !== '') {
+        this.initCSSStartTime(this.CSSStartPicker, 1)
+      }
+      if (this.CSSEndPicker !== '') {
+        this.initCSSEndTime(this.CSSEndPicker, 1)
+      }
+      const { data: res } = await this.$http.post('searchCSSFormList', {
+        mmngctUserName: window.sessionStorage.getItem('mmngctUserName'),
+        CSSStartString: this.CSSStartString,
+        CSSEndString: this.CSSEndString,
+        CSSGoodtypeID: this.CSSGoodtypeID
+      })
+      if (res.meta.status !== 200) {
+        this.$message.error('获取分类销售统计数据失败!')
+        return
+      }
+      this.CSSFormList = res.data.CSSFormList
+    },
+    // 初始化CSSStartTime
+    initCSSStartTime (date, index) {
+      var day = date.getDate() <= 9 ? '0' + date.getDate() : date.getDate()
+      var month = date.getMonth() <= 9 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1
+      var year = date.getFullYear()
+      var hour = date.getHours() <= 10 ? '0' + date.getHours() : date.getHours()
+      var minute = date.getMinutes() <= 10 ? '0' + date.getMinutes() : date.getMinutes()
+      var second = date.getSeconds() <= 10 ? '0' + date.getSeconds() : date.getSeconds()
+      if (index === 0) {
+        this.CSSStartString = year + '-' + month + '-' + day + ' 00:00:00'
+      } else {
+        this.CSSStartString = year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second
+      }
+    },
+    // 初始化CSSEndTime
+    initCSSEndTime (date, index) {
+      var day = date.getDate() <= 9 ? '0' + date.getDate() : date.getDate()
+      var month = date.getMonth() <= 9 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1
+      var year = date.getFullYear()
+      var hour = date.getHours() <= 10 ? '0' + date.getHours() : date.getHours()
+      var minute = date.getMinutes() <= 10 ? '0' + date.getMinutes() : date.getMinutes()
+      var second = date.getSeconds() <= 10 ? '0' + date.getSeconds() : date.getSeconds()
+      if (index === 0) {
+        this.CSSEndString = year + '-' + month + '-' + day + ' 23:59:59'
+      } else {
+        this.CSSEndString = year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second
+      }
+    },
+    // 获取CSS选择器中的Goodstype
+    async getCSSGoodstypeOptions () {
+      const { data: res } = await this.$http.post('cates', {
+        mmngctUserName: window.sessionStorage.getItem('mmngctUserName')
+      })
+      if (res.meta.status !== 200) {
+        this.$message.error('获取Select菜品分类数据失败!')
+        return
+      }
+      this.CSSGoodstypeOptions = res.data.cates
+    },
     // 获取第一列跨行数据
     getPSSSpanOneArr (data) {
       for (var i = 0; i < data.length; i++) {
@@ -255,7 +357,35 @@ export default {
       return sums
     },
     // 切换tabs
-    changeTabs (activeName, oldActiveName) {}
+    changeTabs (activeName, oldActiveName) {
+      // 清空所有TabItem数据
+      // 清空PSS
+      this.PSSStartString = ''
+      this.PSSEndString = ''
+      this.PSSStartPicker = ''
+      this.PSSEndPicker = ''
+      this.PSSFormList = []
+      this.PSSCascaderModel = ''
+      this.PSSGoodID = ''
+      this.PSSGoodtypeID = ''
+      this.PSSSpanOneArr = []
+      this.PSSSpanTwoArr = []
+
+      // 清空CSS
+      this.CSSStartString = ''
+      this.CSSEndString = ''
+      this.CSSStartPicker = ''
+      this.CSSEndPicker = ''
+      this.CSSFormList = ''
+      this.CSSCascaderModel = ''
+      this.CSSGoodtypeID = ''
+      // 初始化所有TabItem数据
+      this.initPSSStartTime(new Date(), 0)
+      this.initPSSEndTime(new Date(), 0)
+
+      this.initCSSStartTime(new Date(), 0)
+      this.initCSSEndTime(new Date(), 0)
+    }
   }
 }
 </script>
