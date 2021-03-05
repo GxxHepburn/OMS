@@ -175,6 +175,67 @@
               </el-table-column>
             </el-table>
           </el-tab-pane>
+          <el-tab-pane label="退菜记录" name="returnRecord">
+            <div class="titleDiv">
+              <span>统计周期 </span>
+              <span class="statistics_time">{{RCStartString}} ~ {{RCEndString}}</span>
+            </div>
+            <div class="dividerDiv"></div>
+            <div>
+              <el-input
+                placeholder="请输入订单号"
+                v-model="RCO_UniqSearchID"
+                :clearable="true"
+                style="width:300px;"></el-input>
+              <el-date-picker style="margin-left:20px;margin-right:20px;"
+                v-model="RCStartPicker"
+                type="datetime"
+                :editable="false"
+                :clearable="false"
+                placeholder="开始时间">
+              </el-date-picker>
+              <el-date-picker style="margin-right:20px;"
+                v-model="RCEndPicker"
+                type="datetime"
+                :editable="false"
+                :clearable="false"
+                placeholder="结束时间">
+              </el-date-picker>
+              <el-button style="margin-left:30px;" type="primary" @click="searchRCFormList">搜索</el-button>
+            </div>
+            <el-table :data='RCFormList'
+              :border='true'
+              :stripe="true"
+              :show-summary="true"
+              :summary-method="getRCSummaries">
+              <el-table-column label="单号" prop="ousid" width="200"></el-table-column>
+              <el-table-column label="桌台">
+                <template slot-scope="scope">
+                  {{scope.row.ttname + '-' + scope.row.tname}}
+                </template>
+              </el-table-column>
+              <el-table-column label="产品编号 (sku)" width="200">
+                <template slot-scope="scope">
+                  {{scope.row.ftname + ' ' + scope.row.fname + ' ' + scope.row.spec + ' ' + scope.row.propOne + ' ' + scope.row.propTwo}}
+                </template>
+              </el-table-column>
+              <el-table-column label="分类" prop="ftname"></el-table-column>
+              <el-table-column label="名称" prop="fname"></el-table-column>
+              <el-table-column label="单价" prop="price">
+                <template slot-scope="scope">
+                  {{scope.row.price.toFixed(2)}}
+                </template>
+              </el-table-column>
+              <el-table-column label="退菜数量" prop="num"></el-table-column>
+              <el-table-column label="退菜金额" prop="totalPrice">
+                <template slot-scope="scope">
+                  {{scope.row.totalPrice.toFixed(2)}}
+                </template>
+              </el-table-column>
+              <el-table-column label="点菜时间" prop="orderTime"></el-table-column>
+              <el-table-column label="退菜时间" prop="returnTime"></el-table-column>
+            </el-table>
+          </el-tab-pane>
         </el-tabs>
     </div>
 </template>
@@ -214,7 +275,14 @@ export default {
       PSCCascaderModel: [],
       PSCGoodsAndGoodstypeOptions: [],
       PSCGoodID: '',
-      PSCGoodtypeID: ''
+      PSCGoodtypeID: '',
+
+      RCStartString: '',
+      RCEndString: '',
+      RCStartPicker: '',
+      RCEndPicker: '',
+      RCFormList: [],
+      RCO_UniqSearchID: ''
     }
   },
   created () {
@@ -225,6 +293,84 @@ export default {
     this.getCSSGoodstypeOptions()
   },
   methods: {
+    // RC合计
+    getRCSummaries (param) {
+      const { columns, data } = param
+      const sums = []
+      columns.forEach((column, index) => {
+        if (index === 0) {
+          sums[index] = '合计'
+          return
+        }
+        if (index === 1 || index === 2 || index === 3 || index === 4 || index === 8 || index === 9) {
+          sums[index] = ''
+          return
+        }
+        const values = data.map(item => Number(item[column.property]))
+        sums[index] = values.reduce((prev, curr) => {
+          const value = Number(curr)
+          if (!isNaN(value)) {
+            return prev + curr
+          } else {
+            return prev
+          }
+        }, 0)
+      })
+
+      if (sums[6] !== 0) {
+        sums[5] = '平均价格：' + (sums[7] / sums[6]).toFixed(2)
+      }
+      sums[7] = parseFloat(sums[7]).toFixed(2)
+      return sums
+    },
+    // 获取RC数据
+    async searchRCFormList () {
+      if (this.RCStartPicker !== '') {
+        this.initRCStartTime(this.RCStartPicker, 1)
+      }
+      if (this.RCEndPicker !== '') {
+        this.initRCEndTime(this.RCEndPicker, 1)
+      }
+      const { data: res } = await this.$http.post('searchRCFormList', {
+        mmngctUserName: window.sessionStorage.getItem('mmngctUserName'),
+        RCStartString: this.RCStartString,
+        RCEndString: this.RCEndString,
+        RCO_UniqSearchID: this.RCO_UniqSearchID
+      })
+      if (res.meta.status !== 200) {
+        this.$message.error('获取退菜记录数据失败!')
+        return
+      }
+      this.RCFormList = res.data.RCFormList
+    },
+    // 初始化RCStartTime
+    initRCStartTime (date, index) {
+      var day = date.getDate() <= 9 ? '0' + date.getDate() : date.getDate()
+      var month = date.getMonth() <= 9 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1
+      var year = date.getFullYear()
+      var hour = date.getHours() <= 10 ? '0' + date.getHours() : date.getHours()
+      var minute = date.getMinutes() <= 10 ? '0' + date.getMinutes() : date.getMinutes()
+      var second = date.getSeconds() <= 10 ? '0' + date.getSeconds() : date.getSeconds()
+      if (index === 0) {
+        this.RCStartString = year + '-' + month + '-' + day + ' 00:00:00'
+      } else {
+        this.RCStartString = year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second
+      }
+    },
+    // 初始化RCEndTime
+    initRCEndTime (date, index) {
+      var day = date.getDate() <= 9 ? '0' + date.getDate() : date.getDate()
+      var month = date.getMonth() <= 9 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1
+      var year = date.getFullYear()
+      var hour = date.getHours() <= 10 ? '0' + date.getHours() : date.getHours()
+      var minute = date.getMinutes() <= 10 ? '0' + date.getMinutes() : date.getMinutes()
+      var second = date.getSeconds() <= 10 ? '0' + date.getSeconds() : date.getSeconds()
+      if (index === 0) {
+        this.RCEndString = year + '-' + month + '-' + day + ' 23:59:59'
+      } else {
+        this.RCEndString = year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second
+      }
+    },
     // PSC合计方法
     getPSCSummaries (param) {
       const { columns, data } = param
@@ -606,6 +752,13 @@ export default {
       this.PSCCascaderModel = ''
       this.PSCGoodID = ''
       this.PSCGoodtypeID = ''
+      // 清空RC
+      this.RCStartString = ''
+      this.RCEndString = ''
+      this.RCStartPicker = ''
+      this.RCEndPicker = ''
+      this.RCFormList = []
+      this.RCO_UniqSearchID = ''
       // 初始化所有TabItem数据
       this.initPSSStartTime(new Date(), 0)
       this.initPSSEndTime(new Date(), 0)
@@ -615,6 +768,9 @@ export default {
 
       this.initPSCStartTime(new Date(), 0)
       this.initPSCEndTime(new Date(), 0)
+
+      this.initRCStartTime(new Date(), 0)
+      this.initRCEndTime(new Date(), 0)
     }
   }
 }
