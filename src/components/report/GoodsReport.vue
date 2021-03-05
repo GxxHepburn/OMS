@@ -221,6 +221,7 @@
               </el-table-column>
               <el-table-column label="分类" prop="ftname"></el-table-column>
               <el-table-column label="名称" prop="fname"></el-table-column>
+              <el-table-column label="单位" prop="unit"></el-table-column>
               <el-table-column label="单价" prop="price">
                 <template slot-scope="scope">
                   {{scope.row.price.toFixed(2)}}
@@ -234,6 +235,56 @@
               </el-table-column>
               <el-table-column label="点菜时间" prop="orderTime"></el-table-column>
               <el-table-column label="退菜时间" prop="returnTime"></el-table-column>
+            </el-table>
+          </el-tab-pane>
+          <el-tab-pane label="退菜统计" name="returnStatistics">
+            <div class="titleDiv">
+              <span>统计周期 </span>
+              <span class="statistics_time">{{RSStartString}} ~ {{RSEndString}}</span>
+            </div>
+            <div class="dividerDiv"></div>
+            <div>
+              <el-date-picker
+                v-model="RSStartPicker"
+                type="datetime"
+                :editable="false"
+                :clearable="false"
+                placeholder="开始时间">
+              </el-date-picker>
+              <el-date-picker style="margin-left:20px;margin-right:20px;"
+                v-model="RSEndPicker"
+                type="datetime"
+                :editable="false"
+                :clearable="false"
+                placeholder="结束时间">
+              </el-date-picker>
+              <el-button style="margin-left:30px;" type="primary" @click="searchRSFormList">搜索</el-button>
+            </div>
+            <el-table :data='RSFormList'
+              :border='true'
+              :stripe="true"
+              :show-summary="true"
+              :summary-method="getRSSummaries">
+              <el-table-column label="产品编号 (sku)" width="200">
+                <template slot-scope="scope">
+                  {{scope.row.ftname + ' ' + scope.row.fname + ' ' + scope.row.spec + ' ' + scope.row.propOne + ' ' + scope.row.propTwo}}
+                </template>
+              </el-table-column>
+              <el-table-column label="分类" prop="ftname"></el-table-column>
+              <el-table-column label="名称" prop="fname"></el-table-column>
+              <el-table-column label="单位" prop="unit"></el-table-column>
+              <el-table-column label="点单数量" prop="orderNum"></el-table-column>
+              <el-table-column label="退菜数量" prop="num"></el-table-column>
+              <el-table-column label="退菜率">
+                <template slot-scope="scope">
+                  {{($math.chain($math.bignumber(Number(scope.row.num))).divide($math.bignumber(Number(scope.row.orderNum))) * 100).toFixed(2) + '%'}}
+                </template>
+              </el-table-column>
+              <el-table-column label="单价" prop="price">
+                <template slot-scope="scope">
+                  {{scope.row.price.toFixed(2)}}
+                </template>
+              </el-table-column>
             </el-table>
           </el-tab-pane>
         </el-tabs>
@@ -282,7 +333,13 @@ export default {
       RCStartPicker: '',
       RCEndPicker: '',
       RCFormList: [],
-      RCO_UniqSearchID: ''
+      RCO_UniqSearchID: '',
+
+      RSStartString: '',
+      RSEndString: '',
+      RSStartPicker: '',
+      RSEndPicker: '',
+      RSFormList: []
     }
   },
   created () {
@@ -293,8 +350,8 @@ export default {
     this.getCSSGoodstypeOptions()
   },
   methods: {
-    // RC合计
-    getRCSummaries (param) {
+    // RS 合计
+    getRSSummaries (param) {
       const { columns, data } = param
       const sums = []
       columns.forEach((column, index) => {
@@ -302,7 +359,7 @@ export default {
           sums[index] = '合计'
           return
         }
-        if (index === 1 || index === 2 || index === 3 || index === 4 || index === 8 || index === 9) {
+        if (index === 1 || index === 2 || index === 3 || index === 7) {
           sums[index] = ''
           return
         }
@@ -317,10 +374,84 @@ export default {
         }, 0)
       })
 
-      if (sums[6] !== 0) {
-        sums[5] = '平均价格：' + (sums[7] / sums[6]).toFixed(2)
+      if (sums[4] !== 0) {
+        sums[6] = '平均退菜率：' + ((sums[5] / sums[4]) * 100).toFixed(2) + '%'
       }
-      sums[7] = parseFloat(sums[7]).toFixed(2)
+      return sums
+    },
+    async searchRSFormList () {
+      if (this.RSStartPicker !== '') {
+        this.initRSStartTime(this.RSStartPicker, 1)
+      }
+      if (this.RSEndPicker !== '') {
+        this.initRSEndTime(this.RSEndPicker, 1)
+      }
+      const { data: res } = await this.$http.post('searchRSFormList', {
+        mmngctUserName: window.sessionStorage.getItem('mmngctUserName'),
+        RSStartString: this.RSStartString,
+        RSEndString: this.RSEndString
+      })
+      if (res.meta.status !== 200) {
+        this.$message.error('获取退菜统计数据失败!')
+        return
+      }
+      this.RSFormList = res.data.RSFormList
+    },
+    // 初始化RSStartTime
+    initRSStartTime (date, index) {
+      var day = date.getDate() <= 9 ? '0' + date.getDate() : date.getDate()
+      var month = date.getMonth() <= 9 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1
+      var year = date.getFullYear()
+      var hour = date.getHours() <= 10 ? '0' + date.getHours() : date.getHours()
+      var minute = date.getMinutes() <= 10 ? '0' + date.getMinutes() : date.getMinutes()
+      var second = date.getSeconds() <= 10 ? '0' + date.getSeconds() : date.getSeconds()
+      if (index === 0) {
+        this.RSStartString = year + '-' + month + '-' + day + ' 00:00:00'
+      } else {
+        this.RSStartString = year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second
+      }
+    },
+    initRSEndTime (date, index) {
+      var day = date.getDate() <= 9 ? '0' + date.getDate() : date.getDate()
+      var month = date.getMonth() <= 9 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1
+      var year = date.getFullYear()
+      var hour = date.getHours() <= 10 ? '0' + date.getHours() : date.getHours()
+      var minute = date.getMinutes() <= 10 ? '0' + date.getMinutes() : date.getMinutes()
+      var second = date.getSeconds() <= 10 ? '0' + date.getSeconds() : date.getSeconds()
+      if (index === 0) {
+        this.RSEndString = year + '-' + month + '-' + day + ' 23:59:59'
+      } else {
+        this.RSEndString = year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second
+      }
+    },
+    // RC合计
+    getRCSummaries (param) {
+      const { columns, data } = param
+      const sums = []
+      columns.forEach((column, index) => {
+        if (index === 0) {
+          sums[index] = '合计'
+          return
+        }
+        if (index === 1 || index === 2 || index === 3 || index === 4 || index === 5 || index === 9 || index === 10) {
+          sums[index] = ''
+          return
+        }
+        const values = data.map(item => Number(item[column.property]))
+        sums[index] = values.reduce((prev, curr) => {
+          const value = Number(curr)
+          if (!isNaN(value)) {
+            return prev + curr
+          } else {
+            return prev
+          }
+        }, 0)
+      })
+
+      if (sums[7] !== 0) {
+        sums[6] = '平均价格：' + (sums[8] / sums[7]).toFixed(2)
+      }
+      sums[8] = parseFloat(sums[8]).toFixed(2)
       return sums
     },
     // 获取RC数据
@@ -759,6 +890,12 @@ export default {
       this.RCEndPicker = ''
       this.RCFormList = []
       this.RCO_UniqSearchID = ''
+      // 清空RS
+      this.RSStartString = ''
+      this.RSEndString = ''
+      this.RSStartPicker = ''
+      this.RSEndPicker = ''
+      this.RSFormList = []
       // 初始化所有TabItem数据
       this.initPSSStartTime(new Date(), 0)
       this.initPSSEndTime(new Date(), 0)
@@ -771,6 +908,9 @@ export default {
 
       this.initRCStartTime(new Date(), 0)
       this.initRCEndTime(new Date(), 0)
+
+      this.initRSStartTime(new Date(), 0)
+      this.initRSEndTime(new Date(), 0)
     }
   }
 }
