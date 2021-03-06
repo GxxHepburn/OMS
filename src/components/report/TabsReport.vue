@@ -58,6 +58,23 @@
               </el-table-column>
             </el-table>
           </el-tab-pane>
+          <el-tab-pane label="翻台率" name="turnoverRate">
+            <div class="titleDiv">
+              <span>统计周期 </span>
+              <span class="statistics_time">{{TRDayString}} 00:00:00 ~ {{TRDayString}} 23:59:59</span>
+            </div>
+            <div class="dividerDiv"></div>
+            <div>
+              <el-date-picker
+                v-model="TRDayPicker"
+                type="date"
+                :editable="false"
+                :clearable="false"
+                placeholder="选择年份">
+              </el-date-picker>
+              <el-button style="margin-left:30px;" type="primary" @click="searchTRFormList">搜索</el-button>
+            </div>
+          </el-tab-pane>
         </el-tabs>
     </div>
 </template>
@@ -72,7 +89,11 @@ export default {
       COSNEndString: '',
       COSNStartPicker: '',
       COSNEndPicker: '',
-      COSNFormList: []
+      COSNFormList: [],
+
+      TRDayString: '',
+      TRDayPicker: '',
+      TRFormList: []
     }
   },
   created () {
@@ -80,6 +101,28 @@ export default {
     this.initCOSNEndTime(new Date(), 0)
   },
   methods: {
+    // 搜索TRFormList
+    async searchTRFormList () {
+      if (this.TRDayPicker !== '') {
+        this.initTRDayTime(this.TRDayPicker)
+      }
+      const { data: res } = await this.$http.post('searchTRFormList', {
+        mmngctUserName: window.sessionStorage.getItem('mmngctUserName'),
+        TRDayString: this.TRDayString
+      })
+      if (res.meta.status !== 200) {
+        this.$message.error('获取翻台率数据失败!')
+        return
+      }
+      this.TRFormList = res.data.TRFormList
+    },
+    // 初始化TRDayString
+    initTRDayTime (date) {
+      var day = date.getDate() <= 9 ? '0' + date.getDate() : date.getDate()
+      var month = date.getMonth() <= 9 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1
+      var year = date.getFullYear()
+      this.TRDayString = year + '-' + month + '-' + day
+    },
     // COSN合计
     getCOSNSummaries (param) {
       const { columns, data } = param
@@ -159,7 +202,26 @@ export default {
       }
     },
     // 切换tab
-    changeTabs () {}
+    changeTabs () {
+      // 清空所有TabItem数据
+      // 清空COSN
+      this.COSNStartString = ''
+      this.COSNEndString = ''
+      this.COSNStartPicker = ''
+      this.COSNEndPicker = ''
+      this.COSNFormList = []
+
+      // 清空TR
+      this.TRDayString = ''
+      this.TRDayPicker = ''
+      this.TRFormList = []
+
+      // 初始化所有TabItem数据
+      this.initCOSNStartTime(new Date(), 0)
+      this.initCOSNEndTime(new Date(), 0)
+
+      this.initTRDayTime(new Date())
+    }
   }
 }
 </script>
