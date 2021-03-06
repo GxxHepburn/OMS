@@ -11,11 +11,11 @@
         <el-card>
           <!-- 内容主体区 -->
           <el-form :model="tabForm" :rules="tabFormRules" ref="tabFormRef" label-width="200px">
-            <el-form-item label="分类名称" prop='t_Name'>
+            <el-form-item label="餐桌名称" prop='t_Name'>
               <el-input placeholder="请输入餐桌名称" v-model="tabForm.t_Name" @blur="tabForm.t_Name = tabForm.t_Name.trim()"></el-input>
             </el-form-item>
             <el-form-item label="用餐人数" prop='t_PeopleOfDiners'>
-              <el-input placeholder="请输入餐桌分类名称" v-model="tabForm.t_PeopleOfDiners"></el-input>
+              <el-input placeholder="请输入用餐人数" v-model="tabForm.t_PeopleOfDiners"></el-input>
             </el-form-item>
             <el-form-item label="所属分类" prop="t_TTID">
               <el-select v-model="tabForm.t_TTID" placeholder="请选择">
