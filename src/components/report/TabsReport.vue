@@ -32,6 +32,31 @@
               </el-date-picker>
               <el-button style="margin-left:30px;" type="primary" @click="searchCOSNFormList">搜索</el-button>
             </div>
+            <el-table :data='COSNFormList'
+              :border='true'
+              :stripe="true"
+              :show-summary="true"
+              :summary-method="getCOSNSummaries">
+              <el-table-column label="桌台分类" prop="ttname"></el-table-column>
+              <el-table-column label="桌台名称" prop="tname"></el-table-column>
+              <el-table-column label="订单数" prop="orderNum"></el-table-column>
+              <el-table-column label="消费人数" prop="numberOfDiners"></el-table-column>
+              <el-table-column label="订单总价" prop="totalOrderPrice">
+                <template slot-scope="scope">
+                  {{scope.row.totalOrderPrice.toFixed(2)}}
+                </template>
+              </el-table-column>
+              <el-table-column label="单均消费" prop="totalPricePOrder">
+                <template slot-scope="scope">
+                  {{scope.row.totalPricePOrder.toFixed(2)}}
+                </template>
+              </el-table-column>
+              <el-table-column label="人均消费" prop="totalPricePPerson">
+                <template slot-scope="scope">
+                  {{scope.row.totalPricePPerson.toFixed(2)}}
+                </template>
+              </el-table-column>
+            </el-table>
           </el-tab-pane>
         </el-tabs>
     </div>
@@ -55,6 +80,38 @@ export default {
     this.initCOSNEndTime(new Date(), 0)
   },
   methods: {
+    // COSN合计
+    getCOSNSummaries (param) {
+      const { columns, data } = param
+      const sums = []
+      columns.forEach((column, index) => {
+        if (index === 0) {
+          sums[index] = '合计'
+          return
+        }
+        if (index === 1 || index === 5 || index === 6) {
+          sums[index] = ''
+          return
+        }
+        const values = data.map(item => Number(item[column.property]))
+        sums[index] = values.reduce((prev, curr) => {
+          const value = Number(curr)
+          if (!isNaN(value)) {
+            return prev + curr
+          } else {
+            return prev
+          }
+        }, 0)
+      })
+
+      if (sums[2] !== 0) {
+        sums[5] = (sums[4] / sums[2]).toFixed(2)
+      }
+      if (sums[3] !== 0) {
+        sums[6] = (sums[4] / sums[3]).toFixed(2)
+      }
+      return sums
+    },
     // 查询COSN数据
     async searchCOSNFormList () {
       if (this.COSNStartPicker !== '') {
