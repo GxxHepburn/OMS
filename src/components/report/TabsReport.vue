@@ -109,6 +109,8 @@
               <el-date-picker
                 v-model="TRWTimePicker"
                 type="week"
+                :editable="false"
+                :clearable="false"
                 format="yyyy 第 WW 周"
                 placeholder="选择周">
               </el-date-picker>
@@ -139,6 +141,23 @@
               </el-table-column>
             </el-table>
           </el-tab-pane>
+          <el-tab-pane label="翻台率(月平均)" name="turnoverRateMonth">
+            <div class="titleDiv">
+              <span>统计周期 </span>
+              <span class="statistics_time">{{TRMStartString}} ~ {{TRMEndString}}</span>
+            </div>
+            <div class="dividerDiv"></div>
+            <div>
+              <el-date-picker
+                v-model="TRMTimePicker"
+                type="month"
+                :editable="false"
+                :clearable="false"
+                placeholder="选择月">
+              </el-date-picker>
+              <el-button style="margin-left:30px;" type="primary" @click="searchTRMFormList">搜索</el-button>
+            </div>
+          </el-tab-pane>
         </el-tabs>
     </div>
 </template>
@@ -162,7 +181,12 @@ export default {
       TRWTimePicker: '',
       TRWStartString: '',
       TRWEndString: '',
-      TRWFormList: []
+      TRWFormList: [],
+
+      TRMTimePicker: '',
+      TRMStartString: '',
+      TRMEndString: '',
+      TRMFormList: []
     }
   },
   created () {
@@ -170,6 +194,41 @@ export default {
     this.initCOSNEndTime(new Date(), 0)
   },
   methods: {
+    // 获取TRMFormList数据
+    async searchTRMFormList () {
+      if (this.TRMTimePicker !== '') {
+        this.initTRMStartStringAndTRMEndString(this.TRMTimePicker)
+      }
+      const { data: res } = await this.$http.post('searchTRMFormList', {
+        mmngctUserName: window.sessionStorage.getItem('mmngctUserName'),
+        TRMStartString: this.TRMStartString,
+        TRMEndString: this.TRMEndString
+      })
+      if (res.meta.status !== 200) {
+        this.$message.error('获取翻台率(月平均)数据失败!')
+        return
+      }
+      this.TRMFormList = res.data.TRMFormList
+    },
+    // 初始化TRMStartString 和 TRMEndString
+    initTRMStartStringAndTRMEndString (date) {
+      var year = date.getFullYear()
+      var month = date.getMonth()
+
+      var firstDate = new Date(year, month, '1', '08', '00', '00')
+      var lastDate = new Date(year, month + 1, '0', '07', '59', '59')
+
+      var firstDay = firstDate.getDate() <= 9 ? '0' + firstDate.getDate() : firstDate.getDate()
+      var firstMonth = firstDate.getMonth() <= 9 ? '0' + (firstDate.getMonth() + 1) : firstDate.getMonth() + 1
+      var firstYear = firstDate.getFullYear()
+      this.TRMStartString = firstYear + '-' + firstMonth + '-' + firstDay + ' 00:00:00'
+
+      var lastDay = lastDate.getDate() <= 9 ? '0' + lastDate.getDate() : lastDate.getDate()
+      var lastMonth = lastDate.getMonth() <= 9 ? '0' + (lastDate.getMonth() + 1) : lastDate.getMonth() + 1
+      var lastYear = lastDate.getFullYear()
+
+      this.TRMEndString = lastYear + '-' + lastMonth + '-' + lastDay + ' 23:59:59'
+    },
     // 获取TRWFormList数据
     async searchTRWFormList () {
       if (this.TRWTimePicker !== '') {
@@ -323,6 +382,12 @@ export default {
       this.TRWEndString = ''
       this.TRWFormList = []
 
+      // 清空TRM
+      this.TRMTimePicker = ''
+      this.TRMStartString = ''
+      this.TRMEndString = ''
+      this.TRMFormList = []
+
       // 初始化所有TabItem数据
       this.initCOSNStartTime(new Date(), 0)
       this.initCOSNEndTime(new Date(), 0)
@@ -330,6 +395,8 @@ export default {
       this.initTRDayTime(new Date())
 
       this.initTRWStartStringAndTRWEndString(new Date())
+
+      this.initTRMStartStringAndTRMEndString(new Date())
     }
   }
 }
