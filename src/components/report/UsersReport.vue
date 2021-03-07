@@ -32,6 +32,19 @@
               </el-date-picker>
               <el-button style="margin-left:30px;" type="primary" @click="searchUDSFormList">搜索</el-button>
             </div>
+            <el-table :data='UDSFormList'
+              :border='true'
+              :stripe="true">
+              <el-table-column label="用户人数" prop="userNum"></el-table-column>
+              <el-table-column label="新用户人数" prop="newUserNum"></el-table-column>
+              <el-table-column label="消费人数" prop="consumeNum"></el-table-column>
+              <el-table-column label="消费次数" prop="consumeCount"></el-table-column>
+              <el-table-column label="平均消费" prop="averageConsumption">
+                <template slot-scope="scope">
+                  {{scope.row.averageConsumption.toFixed(2)}}
+                </template>
+              </el-table-column>
+            </el-table>
           </el-tab-pane>
         </el-tabs>
     </div>
