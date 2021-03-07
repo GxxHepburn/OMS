@@ -157,6 +157,30 @@
               </el-date-picker>
               <el-button style="margin-left:30px;" type="primary" @click="searchTRMFormList">搜索</el-button>
             </div>
+            <el-table :data='TRMFormList'
+              :border='true'
+              :stripe="true">
+              <el-table-column label="桌台数" prop="tabnum"></el-table-column>
+              <el-table-column label="餐位数" prop="tabPersonNum"></el-table-column>
+              <el-table-column label="交易数" prop="tradeNum"></el-table-column>
+              <el-table-column label="开台数" prop="openingNum"></el-table-column>
+              <el-table-column label="客人数" prop="numberOfDiners"></el-table-column>
+              <el-table-column label="上座率" prop="attendance">
+                <template slot-scope="scope">
+                  {{(scope.row.attendance*100).toFixed(2) + '%'}}
+                </template>
+              </el-table-column>
+              <el-table-column label="开台率" prop="openingRate">
+                <template slot-scope="scope">
+                  {{(scope.row.openingRate*100).toFixed(2) + '%'}}
+                </template>
+              </el-table-column>
+              <el-table-column label="翻台率" prop="turnoverRate">
+                <template slot-scope="scope">
+                  {{(scope.row.turnoverRate*100).toFixed(2) + '%'}}
+                </template>
+              </el-table-column>
+            </el-table>
           </el-tab-pane>
         </el-tabs>
     </div>
