@@ -99,6 +99,22 @@
               </el-table-column>
             </el-table>
           </el-tab-pane>
+          <el-tab-pane label="翻台率(周平均)" name="turnoverRateWeek">
+            <div class="titleDiv">
+              <span>统计周期 </span>
+              <span class="statistics_time">{{TRWStartString}} ~ {{TRWEndString}}</span>
+            </div>
+            <div class="dividerDiv"></div>
+            <div>
+              <el-date-picker
+                v-model="TRWTimePicker"
+                type="week"
+                format="yyyy 第 WW 周"
+                placeholder="选择周">
+              </el-date-picker>
+              <el-button style="margin-left:30px;" type="primary" @click="searchTRWFormList">搜索</el-button>
+            </div>
+          </el-tab-pane>
         </el-tabs>
     </div>
 </template>
@@ -117,7 +133,12 @@ export default {
 
       TRDayString: '',
       TRDayPicker: '',
-      TRFormList: []
+      TRFormList: [],
+
+      TRWTimePicker: '',
+      TRWStartString: '',
+      TRWEndString: '',
+      TRWFormList: []
     }
   },
   created () {
@@ -125,6 +146,28 @@ export default {
     this.initCOSNEndTime(new Date(), 0)
   },
   methods: {
+    // 获取TRWFormList数据
+    searchTRWFormList () {
+      if (this.TRWTimePicker !== '') {
+        this.initTRWStartStringAndTRWEndString(this.TRWTimePicker)
+      }
+    },
+    // 初始化TRWStartString 和 TRWEndString
+    initTRWStartStringAndTRWEndString (date) {
+      var firstDate = new Date(date.setDate(date.getDate() - date.getDay()))
+      var lastDate = new Date(date.setDate(date.getDate() - date.getDay() + 6))
+
+      var firstDay = firstDate.getDate() <= 9 ? '0' + firstDate.getDate() : firstDate.getDate()
+      var firstMonth = firstDate.getMonth() <= 9 ? '0' + (firstDate.getMonth() + 1) : firstDate.getMonth() + 1
+      var firstYear = firstDate.getFullYear()
+      this.TRWStartString = firstYear + '-' + firstMonth + '-' + firstDay + ' 00:00:00'
+
+      var lastDay = lastDate.getDate() <= 9 ? '0' + lastDate.getDate() : lastDate.getDate()
+      var lastMonth = lastDate.getMonth() <= 9 ? '0' + (lastDate.getMonth() + 1) : lastDate.getMonth() + 1
+      var lastYear = lastDate.getFullYear()
+
+      this.TRWEndString = lastYear + '-' + lastMonth + '-' + lastDay + ' 23:59:59'
+    },
     // 搜索TRFormList
     async searchTRFormList () {
       if (this.TRDayPicker !== '') {
@@ -240,11 +283,19 @@ export default {
       this.TRDayPicker = ''
       this.TRFormList = []
 
+      // 清空TRW
+      this.TRWTimePicker = ''
+      this.TRWStartString = ''
+      this.TRWEndString = ''
+      this.TRWFormList = []
+
       // 初始化所有TabItem数据
       this.initCOSNStartTime(new Date(), 0)
       this.initCOSNEndTime(new Date(), 0)
 
       this.initTRDayTime(new Date())
+
+      this.initTRWStartStringAndTRWEndString(new Date())
     }
   }
 }
