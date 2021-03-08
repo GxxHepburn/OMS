@@ -98,6 +98,23 @@
               </el-date-picker>
               <el-button style="margin-left:30px;" type="primary" @click="searchCDFormList">搜索</el-button>
             </div>
+            <el-table :data='CDFormList'
+              :border='true'
+              :stripe="true">
+              <el-table-column label="用户检索ID" prop="searchID" width="400px"></el-table-column>
+              <el-table-column label="消费金额" prop="totalPrice">
+                <template slot-scope="scope">
+                  {{scope.row.totalPrice.toFixed(2)}}
+                </template>
+              </el-table-column>
+              <el-table-column label="最近消费时间" prop="lastOrderingTime"></el-table-column>
+              <el-table-column label="消费次数" prop="orderingNum"></el-table-column>
+              <el-table-column label="平均消费" prop="averagePrice">
+                <template slot-scope="scope">
+                  {{scope.row.averagePrice.toFixed(2)}}
+                </template>
+              </el-table-column>
+            </el-table>
           </el-tab-pane>
         </el-tabs>
     </div>
