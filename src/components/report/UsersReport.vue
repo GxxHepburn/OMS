@@ -116,6 +116,30 @@
               </el-table-column>
             </el-table>
           </el-tab-pane>
+          <el-tab-pane label="消费统计" name="consumptionSummary">
+            <div class="titleDiv">
+              <span>统计周期 </span>
+              <span class="statistics_time">{{CSStartString}} ~ {{CSEndString}}</span>
+            </div>
+            <div class="dividerDiv"></div>
+            <div>
+              <el-date-picker
+                v-model="CSStartPicker"
+                type="datetime"
+                :editable="false"
+                :clearable="false"
+                placeholder="开始时间">
+              </el-date-picker>
+              <el-date-picker style="margin-left:20px;"
+                v-model="CSEndPicker"
+                type="datetime"
+                :editable="false"
+                :clearable="false"
+                placeholder="结束时间">
+              </el-date-picker>
+              <el-button style="margin-left:30px;" type="primary" @click="searchCSFormList">搜索</el-button>
+            </div>
+          </el-tab-pane>
         </el-tabs>
     </div>
 </template>
@@ -142,7 +166,13 @@ export default {
       CDEndString: '',
       CDStartPicker: '',
       CDEndPicker: '',
-      CDFormList: []
+      CDFormList: [],
+
+      CSStartString: '',
+      CSEndString: '',
+      CSStartPicker: '',
+      CSEndPicker: '',
+      CSFormList: []
     }
   },
   created () {
@@ -150,6 +180,53 @@ export default {
     this.initUDSEndTime(new Date(), 0)
   },
   methods: {
+    // 获取CSFormList数据
+    async searchCSFormList () {
+      if (this.CSStartPicker !== '') {
+        this.initCSStartTime(this.CSStartPicker, 1)
+      }
+      if (this.CSEndPicker !== '') {
+        this.initCSEndTime(this.CSEndPicker, 1)
+      }
+      const { data: res } = await this.$http.post('searchCSFormList', {
+        mmngctUserName: window.sessionStorage.getItem('mmngctUserName'),
+        CSStartString: this.CSStartString,
+        CSEndString: this.CSEndString
+      })
+      if (res.meta.status !== 200) {
+        this.$message.error('获取消费统计数据失败!')
+        return
+      }
+      this.CSFormList = res.data.CSFormList
+    },
+    // 初始化CSStartString
+    initCSStartTime (date, index) {
+      var day = date.getDate() <= 9 ? '0' + date.getDate() : date.getDate()
+      var month = date.getMonth() <= 9 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1
+      var year = date.getFullYear()
+      var hour = date.getHours() <= 10 ? '0' + date.getHours() : date.getHours()
+      var minute = date.getMinutes() <= 10 ? '0' + date.getMinutes() : date.getMinutes()
+      var second = date.getSeconds() <= 10 ? '0' + date.getSeconds() : date.getSeconds()
+      if (index === 0) {
+        this.CSStartString = year + '-' + month + '-' + day + ' 00:00:00'
+      } else {
+        this.CSStartString = year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second
+      }
+    },
+    // 初始化CSEndString
+    initCSEndTime (date, index) {
+      var day = date.getDate() <= 9 ? '0' + date.getDate() : date.getDate()
+      var month = date.getMonth() <= 9 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1
+      var year = date.getFullYear()
+      var hour = date.getHours() <= 10 ? '0' + date.getHours() : date.getHours()
+      var minute = date.getMinutes() <= 10 ? '0' + date.getMinutes() : date.getMinutes()
+      var second = date.getSeconds() <= 10 ? '0' + date.getSeconds() : date.getSeconds()
+      if (index === 0) {
+        this.CSEndString = year + '-' + month + '-' + day + ' 23:59:59'
+      } else {
+        this.CSEndString = year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second
+      }
+    },
     // 获取CDFormList数据
     async searchCDFormList () {
       if (this.CDStartPicker !== '') {
@@ -314,6 +391,13 @@ export default {
       this.CDEndPicker = ''
       this.CDFormList = []
 
+      // 清空CS
+      this.CSStartString = ''
+      this.CSEndString = ''
+      this.CSStartPicker = ''
+      this.CSEndPicker = ''
+      this.CSFormList = []
+
       // 初始化所有tabitem数据
       // 初始化UDS
       this.initUDSStartTime(new Date(), 0)
@@ -326,6 +410,10 @@ export default {
       // 初始化CD
       this.initCDStartTime(new Date(), 0)
       this.initCDEndTime(new Date(), 0)
+
+      // 初始化CS
+      this.initCSStartTime(new Date(), 0)
+      this.initCSEndTime(new Date(), 0)
     }
   }
 }
