@@ -139,6 +139,16 @@
               </el-date-picker>
               <el-button style="margin-left:30px;" type="primary" @click="searchCSFormList">搜索</el-button>
             </div>
+            <el-table :data='CSFormList'
+              :border='true'
+              :stripe="true">
+              <el-table-column label="消费次数" prop="orderingNum"></el-table-column>
+              <el-table-column label="消费金额" prop="orderingTotalPrice">
+                <template slot-scope="scope">
+                  {{scope.row.orderingTotalPrice.toFixed(2)}}
+                </template>
+              </el-table-column>
+            </el-table>
           </el-tab-pane>
         </el-tabs>
     </div>
