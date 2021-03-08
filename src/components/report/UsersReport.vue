@@ -46,6 +46,30 @@
               </el-table-column>
             </el-table>
           </el-tab-pane>
+          <el-tab-pane label="新增用户统计" name="newUserStatistics">
+            <div class="titleDiv">
+              <span>统计周期 </span>
+              <span class="statistics_time">{{NUSStartString}} ~ {{NUSEndString}}</span>
+            </div>
+            <div class="dividerDiv"></div>
+            <div>
+              <el-date-picker
+                v-model="NUSStartPicker"
+                type="datetime"
+                :editable="false"
+                :clearable="false"
+                placeholder="开始时间">
+              </el-date-picker>
+              <el-date-picker style="margin-left:20px;"
+                v-model="NUSEndPicker"
+                type="datetime"
+                :editable="false"
+                :clearable="false"
+                placeholder="结束时间">
+              </el-date-picker>
+              <el-button style="margin-left:30px;" type="primary" @click="searchNUSFormList">搜索</el-button>
+            </div>
+          </el-tab-pane>
         </el-tabs>
     </div>
 </template>
@@ -60,7 +84,13 @@ export default {
       UDSEndString: '',
       UDSStartPicker: '',
       UDSEndPicker: '',
-      UDSFormList: []
+      UDSFormList: [],
+
+      NUSStartString: '',
+      NUSEndString: '',
+      NUSStartPicker: '',
+      NUSEndPicker: '',
+      NUSFormList: []
     }
   },
   created () {
@@ -68,6 +98,53 @@ export default {
     this.initUDSEndTime(new Date(), 0)
   },
   methods: {
+    // 获取NUSFormList数据
+    async searchNUSFormList () {
+      if (this.NUSStartPicker !== '') {
+        this.initNUSStartTime(this.NUSStartPicker, 1)
+      }
+      if (this.NUSEndPicker !== '') {
+        this.initNUSEndTime(this.NUSEndPicker, 1)
+      }
+      const { data: res } = await this.$http.post('searchNUSFormList', {
+        mmngctUserName: window.sessionStorage.getItem('mmngctUserName'),
+        NUSStartString: this.NUSStartString,
+        NUSEndString: this.NUSEndString
+      })
+      if (res.meta.status !== 200) {
+        this.$message.error('获取新增用户统计数据失败!')
+        return
+      }
+      this.NUSFormList = res.data.NUSFormList
+    },
+    // 初始化NUSStartString
+    initNUSStartTime (date, index) {
+      var day = date.getDate() <= 9 ? '0' + date.getDate() : date.getDate()
+      var month = date.getMonth() <= 9 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1
+      var year = date.getFullYear()
+      var hour = date.getHours() <= 10 ? '0' + date.getHours() : date.getHours()
+      var minute = date.getMinutes() <= 10 ? '0' + date.getMinutes() : date.getMinutes()
+      var second = date.getSeconds() <= 10 ? '0' + date.getSeconds() : date.getSeconds()
+      if (index === 0) {
+        this.NUSStartString = year + '-' + month + '-' + day + ' 00:00:00'
+      } else {
+        this.NUSStartString = year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second
+      }
+    },
+    // 初始化NUSEndString
+    initNUSEndTime (date, index) {
+      var day = date.getDate() <= 9 ? '0' + date.getDate() : date.getDate()
+      var month = date.getMonth() <= 9 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1
+      var year = date.getFullYear()
+      var hour = date.getHours() <= 10 ? '0' + date.getHours() : date.getHours()
+      var minute = date.getMinutes() <= 10 ? '0' + date.getMinutes() : date.getMinutes()
+      var second = date.getSeconds() <= 10 ? '0' + date.getSeconds() : date.getSeconds()
+      if (index === 0) {
+        this.NUSEndString = year + '-' + month + '-' + day + ' 23:59:59'
+      } else {
+        this.NUSEndString = year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second
+      }
+    },
     // 获取UDSFormList数据
     async searchUDSFormList () {
       if (this.UDSStartPicker !== '') {
@@ -117,6 +194,28 @@ export default {
     // 切换tabs
     changeTabs (activeName, oldActiveName) {
       // 清空所有TabItem数据
+      // 清空UDS
+      this.UDSStartString = ''
+      this.UDSEndString = ''
+      this.UDSStartPicker = ''
+      this.UDSEndString = ''
+      this.UDSFormList = []
+
+      // 清空NUS
+      this.NUSStartString = ''
+      this.NUSEndString = ''
+      this.NUSStartPicker = ''
+      this.NUSEndPicker = ''
+      this.NUSFormList = []
+
+      // 初始化所有tabitem数据
+      // 初始化UDS
+      this.initUDSStartTime(new Date(), 0)
+      this.initUDSEndTime(new Date(), 0)
+
+      // 初始化NUS
+      this.initNUSStartTime(new Date(), 0)
+      this.initNUSEndTime(new Date(), 0)
     }
   }
 }
