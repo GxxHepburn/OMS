@@ -69,6 +69,11 @@
               </el-date-picker>
               <el-button style="margin-left:30px;" type="primary" @click="searchNUSFormList">搜索</el-button>
             </div>
+            <el-table :data='NUSFormList'
+              :border='true'
+              :stripe="true">
+              <el-table-column label="新用户数" prop="newUserNum"></el-table-column>
+            </el-table>
           </el-tab-pane>
         </el-tabs>
     </div>
