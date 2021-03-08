@@ -32,7 +32,7 @@
               <template slot-scope="scope">
                 <el-popover placement="left" width="220">
                   <div style="text-align: center">
-                      <div id="qrcode" ref="qr"></div>
+                      <div class='qrcode' :id="'qrcode' + scope.row.t_ID"></div>
                       <el-button type="primary" size="mini" @click="downloadQrcode(scope.row)">下 载</el-button>
                   </div>
                   <el-button slot="reference" type="primary" size="mini" @click="qrCode(scope.row)">查 看</el-button>
@@ -216,8 +216,8 @@ export default {
         if (this.code != null && this.code !== '') {
           this.code.clear()
         }
-        document.getElementById('qrcode').innerHTML = ''
-        var qrcode = new this.QRCode('qrcode', {
+        document.getElementById('qrcode' + item.t_ID).innerHTML = ''
+        var qrcode = new this.QRCode('qrcode' + item.t_ID, {
           width: 150,
           height: 150,
           colorDark: '#000000',
@@ -225,7 +225,7 @@ export default {
         })
         qrcode.makeCode('https://www.donghuastar.com/wechat/scan?res=' + this.m_ID + '&table=' + item.t_ID)
         this.code = qrcode
-        this.qrCodeImgSrc = document.getElementById('qrcode').getElementsByTagName('canvas')[0].toDataURL('image/png')
+        this.qrCodeImgSrc = document.getElementById('qrcode' + item.t_ID).getElementsByTagName('canvas')[0].toDataURL('image/png')
       })
     },
     // 获取餐桌列表
@@ -251,7 +251,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-#qrcode {
+.qrcode {
   /deep/ img {
     margin: 0 auto;
     margin-bottom: 10px;
