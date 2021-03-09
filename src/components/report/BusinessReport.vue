@@ -60,6 +60,30 @@
               </el-table-column>
             </el-table>
           </el-tab-pane>
+          <el-tab-pane label="营收统计" name="revenueStatistics">
+            <div class="titleDiv">
+              <span>统计周期 </span>
+              <span class="statistics_time">{{RSStartString}} ~ {{RSEndString}}</span>
+            </div>
+            <div class="dividerDiv"></div>
+            <div>
+              <el-date-picker
+                v-model="RSStartPicker"
+                type="datetime"
+                :editable="false"
+                :clearable="false"
+                placeholder="开始时间">
+              </el-date-picker>
+              <el-date-picker style="margin-left:20px;"
+                v-model="RSEndPicker"
+                type="datetime"
+                :editable="false"
+                :clearable="false"
+                placeholder="结束时间">
+              </el-date-picker>
+              <el-button style="margin-left:30px;" type="primary" @click="searchRSFormList">搜索</el-button>
+            </div>
+          </el-tab-pane>
         </el-tabs>
     </div>
 </template>
@@ -75,7 +99,13 @@ export default {
       SDStartPicker: '',
       SDEndPicker: '',
       SDFormList: [],
-      SDO_UniqSearchID: ''
+      SDO_UniqSearchID: '',
+
+      RSStartString: '',
+      RSEndString: '',
+      RSStartPicker: '',
+      RSEndPicker: '',
+      RSFormList: []
     }
   },
   created () {
@@ -83,6 +113,53 @@ export default {
     this.initSDEndTime(new Date(), 0)
   },
   methods: {
+    // 获取RSFormList数据
+    async searchRSFormList () {
+      if (this.RSStartPicker !== '') {
+        this.initRSStartTime(this.RSStartPicker, 1)
+      }
+      if (this.RSEndPicker !== '') {
+        this.initRSEndTime(this.RSEndPicker, 1)
+      }
+      const { data: res } = await this.$http.post('searchRSFormList', {
+        mmngctUserName: window.sessionStorage.getItem('mmngctUserName'),
+        RSStartString: this.RSStartString,
+        RSEndString: this.RSEndString
+      })
+      if (res.meta.status !== 200) {
+        this.$message.error('获取营收统计数据失败!')
+        return
+      }
+      this.RSFormList = res.data.RSFormList
+    },
+    // 初始化RSStartString
+    initRSStartTime (date, index) {
+      var day = date.getDate() <= 9 ? '0' + date.getDate() : date.getDate()
+      var month = date.getMonth() <= 9 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1
+      var year = date.getFullYear()
+      var hour = date.getHours() <= 10 ? '0' + date.getHours() : date.getHours()
+      var minute = date.getMinutes() <= 10 ? '0' + date.getMinutes() : date.getMinutes()
+      var second = date.getSeconds() <= 10 ? '0' + date.getSeconds() : date.getSeconds()
+      if (index === 0) {
+        this.RSStartString = year + '-' + month + '-' + day + ' 00:00:00'
+      } else {
+        this.RSStartString = year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second
+      }
+    },
+    // 初始化RSEndString
+    initRSEndTime (date, index) {
+      var day = date.getDate() <= 9 ? '0' + date.getDate() : date.getDate()
+      var month = date.getMonth() <= 9 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1
+      var year = date.getFullYear()
+      var hour = date.getHours() <= 10 ? '0' + date.getHours() : date.getHours()
+      var minute = date.getMinutes() <= 10 ? '0' + date.getMinutes() : date.getMinutes()
+      var second = date.getSeconds() <= 10 ? '0' + date.getSeconds() : date.getSeconds()
+      if (index === 0) {
+        this.RSEndString = year + '-' + month + '-' + day + ' 23:59:59'
+      } else {
+        this.RSEndString = year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second
+      }
+    },
     // 获取SDFormList数据
     async searchSDFormList () {
       if (this.SDStartPicker !== '') {
@@ -134,8 +211,29 @@ export default {
     // 切换tabs
     changeTabs (activeName, oldActiveName) {
       // 清空所有TabItem数据
+      // 清空SD
+      this.SDStartString = ''
+      this.SDEndString = ''
+      this.SDStartPicker = ''
+      this.SDEndPicker = ''
+      this.SDFormList = []
+      this.SDO_UniqSearchID = ''
+
+      // 清空RS
+      this.RSStartString = ''
+      this.RSEndString = ''
+      this.RSStartPicker = ''
+      this.RSEndPicker = ''
+      this.RSFormList = []
 
       // 初始化所有tabitem数据
+      // 初始化SD
+      this.initSDStartTime(new Date(), 0)
+      this.initSDEndTime(new Date(), 0)
+
+      // 初始化RS
+      this.initRSStartTime(new Date(), 0)
+      this.initRSEndTime(new Date(), 0)
     }
   }
 }
