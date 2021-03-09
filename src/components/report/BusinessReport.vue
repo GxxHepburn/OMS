@@ -37,6 +37,28 @@
               </el-date-picker>
               <el-button style="margin-left:30px;" type="primary" @click="searchSDFormList">搜索</el-button>
             </div>
+            <el-table :data='SDFormList'
+              :border='true'
+              :stripe="true">
+              <el-table-column label="订单" prop="ouid" width="200"></el-table-column>
+              <el-table-column label="桌台类型" prop="ttname"></el-table-column>
+              <el-table-column label="桌台" prop="tname"></el-table-column>
+              <el-table-column label="下单时间" prop="orderingTime" width="140"></el-table-column>
+              <el-table-column label="支付时间" prop="payTime" width="140"></el-table-column>
+              <el-table-column label="持续时间" prop="continuedTime" width="150"></el-table-column>
+              <el-table-column label="支付方式" prop="payMethod"></el-table-column>
+              <el-table-column label="支付金额" prop="payPrice">
+                <template slot-scope="scope">
+                  {{scope.row.payPrice.toFixed(2)}}
+                </template>
+              </el-table-column>
+              <el-table-column label="人数" prop="numberOfDiners"></el-table-column>
+              <el-table-column label="人均" prop="averageNumberOfDiners">
+                <template slot-scope="scope">
+                  {{scope.row.averageNumberOfDiners.toFixed(2)}}
+                </template>
+              </el-table-column>
+            </el-table>
           </el-tab-pane>
         </el-tabs>
     </div>
