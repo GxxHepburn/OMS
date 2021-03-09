@@ -63,26 +63,58 @@
           <el-tab-pane label="营收统计" name="revenueStatistics">
             <div class="titleDiv">
               <span>统计周期 </span>
-              <span class="statistics_time">{{RSStartString}} ~ {{RSEndString}}</span>
+              <span class="statistics_time">{{RS2StartString}} ~ {{RS2EndString}}</span>
             </div>
             <div class="dividerDiv"></div>
             <div>
               <el-date-picker
-                v-model="RSStartPicker"
+                v-model="RS2StartPicker"
                 type="datetime"
                 :editable="false"
                 :clearable="false"
                 placeholder="开始时间">
               </el-date-picker>
               <el-date-picker style="margin-left:20px;"
-                v-model="RSEndPicker"
+                v-model="RS2EndPicker"
                 type="datetime"
                 :editable="false"
                 :clearable="false"
                 placeholder="结束时间">
               </el-date-picker>
-              <el-button style="margin-left:30px;" type="primary" @click="searchRSFormList">搜索</el-button>
+              <el-button style="margin-left:30px;" type="primary" @click="searchRS2FormList">搜索</el-button>
             </div>
+            <el-table :data='RS2FormList'
+              :border='true'
+              :stripe="true">
+              <el-table-column label="营业金额" prop="totalPrice">
+                <template slot-scope="scope">
+                  {{scope.row.totalPrice.toFixed(2)}}
+                </template>
+              </el-table-column>
+              <el-table-column label="实收金额" prop="getPrice">
+                <template slot-scope="scope">
+                  {{scope.row.getPrice.toFixed(2)}}
+                </template>
+              </el-table-column>
+              <el-table-column label="退款金额" prop="refundPrice">
+                <template slot-scope="scope">
+                  {{scope.row.refundPrice.toFixed(2)}}
+                </template>
+              </el-table-column>
+              <el-table-column label="用户数" prop="userNum"></el-table-column>
+              <el-table-column label="消费人数" prop="numberOfDiners"></el-table-column>
+              <el-table-column label="订单数" prop="orderingCount"></el-table-column>
+              <el-table-column label="单均" prop="averagePOrderingCount">
+                <template slot-scope="scope">
+                  {{scope.row.averagePOrderingCount.toFixed(2)}}
+                </template>
+              </el-table-column>
+              <el-table-column label="人均" prop="averagePNumberOfDiners">
+                <template slot-scope="scope">
+                  {{scope.row.averagePNumberOfDiners.toFixed(2)}}
+                </template>
+              </el-table-column>
+            </el-table>
           </el-tab-pane>
         </el-tabs>
     </div>
@@ -101,11 +133,11 @@ export default {
       SDFormList: [],
       SDO_UniqSearchID: '',
 
-      RSStartString: '',
-      RSEndString: '',
-      RSStartPicker: '',
-      RSEndPicker: '',
-      RSFormList: []
+      RS2StartString: '',
+      RS2EndString: '',
+      RS2StartPicker: '',
+      RS2EndPicker: '',
+      RS2FormList: []
     }
   },
   created () {
@@ -113,27 +145,27 @@ export default {
     this.initSDEndTime(new Date(), 0)
   },
   methods: {
-    // 获取RSFormList数据
-    async searchRSFormList () {
-      if (this.RSStartPicker !== '') {
-        this.initRSStartTime(this.RSStartPicker, 1)
+    // 获取RS2FormList数据
+    async searchRS2FormList () {
+      if (this.RS2StartPicker !== '') {
+        this.initRS2StartTime(this.RS2StartPicker, 1)
       }
-      if (this.RSEndPicker !== '') {
-        this.initRSEndTime(this.RSEndPicker, 1)
+      if (this.RS2EndPicker !== '') {
+        this.initRS2EndTime(this.RS2EndPicker, 1)
       }
-      const { data: res } = await this.$http.post('searchRSFormList', {
+      const { data: res } = await this.$http.post('searchRS2FormList', {
         mmngctUserName: window.sessionStorage.getItem('mmngctUserName'),
-        RSStartString: this.RSStartString,
-        RSEndString: this.RSEndString
+        RS2StartString: this.RS2StartString,
+        RS2EndString: this.RS2EndString
       })
       if (res.meta.status !== 200) {
         this.$message.error('获取营收统计数据失败!')
         return
       }
-      this.RSFormList = res.data.RSFormList
+      this.RS2FormList = res.data.RS2FormList
     },
-    // 初始化RSStartString
-    initRSStartTime (date, index) {
+    // 初始化RS2StartString
+    initRS2StartTime (date, index) {
       var day = date.getDate() <= 9 ? '0' + date.getDate() : date.getDate()
       var month = date.getMonth() <= 9 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1
       var year = date.getFullYear()
@@ -141,13 +173,13 @@ export default {
       var minute = date.getMinutes() <= 10 ? '0' + date.getMinutes() : date.getMinutes()
       var second = date.getSeconds() <= 10 ? '0' + date.getSeconds() : date.getSeconds()
       if (index === 0) {
-        this.RSStartString = year + '-' + month + '-' + day + ' 00:00:00'
+        this.RS2StartString = year + '-' + month + '-' + day + ' 00:00:00'
       } else {
-        this.RSStartString = year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second
+        this.RS2StartString = year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second
       }
     },
-    // 初始化RSEndString
-    initRSEndTime (date, index) {
+    // 初始化RS2EndString
+    initRS2EndTime (date, index) {
       var day = date.getDate() <= 9 ? '0' + date.getDate() : date.getDate()
       var month = date.getMonth() <= 9 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1
       var year = date.getFullYear()
@@ -155,9 +187,9 @@ export default {
       var minute = date.getMinutes() <= 10 ? '0' + date.getMinutes() : date.getMinutes()
       var second = date.getSeconds() <= 10 ? '0' + date.getSeconds() : date.getSeconds()
       if (index === 0) {
-        this.RSEndString = year + '-' + month + '-' + day + ' 23:59:59'
+        this.RS2EndString = year + '-' + month + '-' + day + ' 23:59:59'
       } else {
-        this.RSEndString = year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second
+        this.RS2EndString = year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second
       }
     },
     // 获取SDFormList数据
@@ -220,11 +252,11 @@ export default {
       this.SDO_UniqSearchID = ''
 
       // 清空RS
-      this.RSStartString = ''
-      this.RSEndString = ''
-      this.RSStartPicker = ''
-      this.RSEndPicker = ''
-      this.RSFormList = []
+      this.RS2StartString = ''
+      this.RS2EndString = ''
+      this.RS2StartPicker = ''
+      this.RS2EndPicker = ''
+      this.RS2FormList = []
 
       // 初始化所有tabitem数据
       // 初始化SD
@@ -232,8 +264,8 @@ export default {
       this.initSDEndTime(new Date(), 0)
 
       // 初始化RS
-      this.initRSStartTime(new Date(), 0)
-      this.initRSEndTime(new Date(), 0)
+      this.initRS2StartTime(new Date(), 0)
+      this.initRS2EndTime(new Date(), 0)
     }
   }
 }
