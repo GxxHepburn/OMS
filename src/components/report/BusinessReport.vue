@@ -116,6 +116,23 @@
               </el-table-column>
             </el-table>
           </el-tab-pane>
+          <el-tab-pane label="营业结算" name="businessSettlement">
+            <div class="titleDiv">
+              <span>统计周期 </span>
+              <span class="statistics_time">{{BSStartString}} ~ {{BSEndString}}</span>
+            </div>
+            <div class="dividerDiv"></div>
+            <div>
+              <el-date-picker
+                v-model="BSDayPicker"
+                type="date"
+                :editable="false"
+                :clearable="false"
+                placeholder="选择日期">
+              </el-date-picker>
+              <el-button style="margin-left:30px;" type="primary" @click="searchBSFormList">搜索</el-button>
+            </div>
+          </el-tab-pane>
         </el-tabs>
     </div>
 </template>
@@ -137,7 +154,12 @@ export default {
       RS2EndString: '',
       RS2StartPicker: '',
       RS2EndPicker: '',
-      RS2FormList: []
+      RS2FormList: [],
+
+      BSStartString: '',
+      BSEndString: '',
+      BSDayPicker: '',
+      BSFormList: []
     }
   },
   created () {
@@ -145,6 +167,30 @@ export default {
     this.initSDEndTime(new Date(), 0)
   },
   methods: {
+    // 获取BSFormList数据
+    async searchBSFormList () {
+      if (this.BSDayPicker !== '') {
+        this.initBSTime(this.BSDayPicker)
+      }
+      const { data: res } = await this.$http.post('searchBSFormList', {
+        mmngctUserName: window.sessionStorage.getItem('mmngctUserName'),
+        BSStartString: this.BSStartString,
+        BSEndString: this.BSEndString
+      })
+      if (res.meta.status !== 200) {
+        this.$message.error('获取营业结算数据失败!')
+        return
+      }
+      this.BSFormList = res.data.BSFormList
+    },
+    // 初始化BS时间String
+    initBSTime (date) {
+      var day = date.getDate() <= 9 ? '0' + date.getDate() : date.getDate()
+      var month = date.getMonth() <= 9 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1
+      var year = date.getFullYear()
+      this.BSStartString = year + '-' + month + '-' + day + ' 00:00:00'
+      this.BSEndString = year + '-' + month + '-' + day + ' 23:59:59'
+    },
     // 获取RS2FormList数据
     async searchRS2FormList () {
       if (this.RS2StartPicker !== '') {
@@ -251,21 +297,30 @@ export default {
       this.SDFormList = []
       this.SDO_UniqSearchID = ''
 
-      // 清空RS
+      // 清空RS2
       this.RS2StartString = ''
       this.RS2EndString = ''
       this.RS2StartPicker = ''
       this.RS2EndPicker = ''
       this.RS2FormList = []
 
+      // 清空BS
+      this.BSStartString = ''
+      this.BSEndString = ''
+      this.BSDayPicker = ''
+      this.BSFormList = []
+
       // 初始化所有tabitem数据
       // 初始化SD
       this.initSDStartTime(new Date(), 0)
       this.initSDEndTime(new Date(), 0)
 
-      // 初始化RS
+      // 初始化RS2
       this.initRS2StartTime(new Date(), 0)
       this.initRS2EndTime(new Date(), 0)
+
+      // 初始化BS
+      this.initBSTime(new Date())
     }
   }
 }
