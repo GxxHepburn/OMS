@@ -256,7 +256,7 @@ export default {
         // 修改价格的时候，一定注意，降价的时候，规格中的最低价不能低于0！！！
         F_Name: [
           { required: true, message: '请输入商品名', trigger: 'blur' },
-          { min: 1, max: 10, message: '商品名长度在1~10个字符之间', trigger: 'blur' }
+          { min: 1, max: 20, message: '商品名长度在1~20个字符之间', trigger: 'blur' }
         ],
         F_Price: [
           { required: true, message: '请输入价格', trigger: 'blur' },
