@@ -132,6 +132,25 @@
               </el-date-picker>
               <el-button style="margin-left:30px;" type="primary" @click="searchBSFormList">搜索</el-button>
             </div>
+            <el-table :data='BSFormList'
+              :border='true'
+              :stripe="true">
+              <el-table-column label="营业合计" prop="totalPrice">
+                <template slot-scope="scope">
+                  {{scope.row.totalPrice.toFixed(2)}}
+                </template>
+              </el-table-column>
+              <el-table-column label="实收合计" prop="getPrice">
+                <template slot-scope="scope">
+                  {{scope.row.getPrice.toFixed(2)}}
+                </template>
+              </el-table-column>
+              <el-table-column label="退款合计(非实收合计)" prop="refundPrice">
+                <template slot-scope="scope">
+                  {{scope.row.refundPrice.toFixed(2)}}
+                </template>
+              </el-table-column>
+            </el-table>
           </el-tab-pane>
         </el-tabs>
     </div>
