@@ -73,23 +73,23 @@
               <el-dropdown-menu slot="dropdown" class="editDialogFPDropdownMenu">
                 <el-dropdown-item class="editDialogFPDropdownMenuItem">
                   一：
-                  <el-input placeholder="请输入" class="editDialogFPItemInput" v-model="item.FP_ValueOne" @blur="item.FP_ValueOne = item.FP_ValueOne.trim()"></el-input>
+                  <el-input placeholder="请输入" class="editDialogFPItemInput" v-model="item.FP_ValueOne" @blur="fpblur(0, item)"></el-input>
                 </el-dropdown-item>
                 <el-dropdown-item class="editDialogFPDropdownMenuItem">
                   二：
-                  <el-input placeholder="请输入" class="editDialogFPItemInput" v-model="item.FP_ValueTwo" @blur="item.FP_ValueTwo = item.FP_ValueTwo.trim()"></el-input>
+                  <el-input placeholder="请输入" class="editDialogFPItemInput" v-model="item.FP_ValueTwo" @blur="fpblur(1, item)"></el-input>
                 </el-dropdown-item>
                 <el-dropdown-item class="editDialogFPDropdownMenuItem">
                   三：
-                  <el-input placeholder="请输入" class="editDialogFPItemInput" v-model="item.FP_ValueThree" @blur="item.FP_ValueThree = item.FP_ValueThree.trim()"></el-input>
+                  <el-input placeholder="请输入" class="editDialogFPItemInput" v-model="item.FP_ValueThree" @blur="fpblur(2, item)"></el-input>
                 </el-dropdown-item>
                 <el-dropdown-item class="editDialogFPDropdownMenuItem">
                   四：
-                  <el-input placeholder="请输入" class="editDialogFPItemInput" v-model="item.FP_ValueFour" @blur="item.FP_ValueFour = item.FP_ValueFour.trim()"></el-input>
+                  <el-input placeholder="请输入" class="editDialogFPItemInput" v-model="item.FP_ValueFour" @blur="fpblur(3, item)"></el-input>
                 </el-dropdown-item>
                 <el-dropdown-item class="editDialogFPDropdownMenuItem">
                   五：
-                  <el-input placeholder="请输入" class="editDialogFPItemInput" v-model="item.FP_ValueFive" @blur="item.FP_ValueFive = item.FP_ValueFive.trim()"></el-input>
+                  <el-input placeholder="请输入" class="editDialogFPItemInput" v-model="item.FP_ValueFive" @blur="fpblur(4, item)"></el-input>
                 </el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
@@ -185,6 +185,39 @@ export default {
     this.getCatesList()
   },
   methods: {
+    // 属性项blur
+    fpblur (index, item) {
+      if (index === 0) {
+        if (item.FP_ValueOne.trim().length > 5) {
+          this.$message.error('属性项不能超过5个字符')
+          item.FP_ValueOne = ''
+        }
+      }
+      if (index === 1) {
+        if (item.FP_ValueTwo.trim().length > 5) {
+          this.$message.error('属性项不能超过5个字符')
+          item.FP_ValueTwo = ''
+        }
+      }
+      if (index === 2) {
+        if (item.FP_ValueThree.trim().length > 5) {
+          this.$message.error('属性项不能超过5个字符')
+          item.FP_ValueThree = ''
+        }
+      }
+      if (index === 3) {
+        if (item.FP_ValueFour.trim().length > 5) {
+          this.$message.error('属性项不能超过5个字符')
+          item.FP_ValueFour = ''
+        }
+      }
+      if (index === 4) {
+        if (item.FP_ValueFive.trim().length > 5) {
+          this.$message.error('属性项不能超过5个字符')
+          item.FP_ValueFive = ''
+        }
+      }
+    },
     resetFood () {
       this.$refs.editFormRef.resetFields()
       this.editForm.F_Properties = []
