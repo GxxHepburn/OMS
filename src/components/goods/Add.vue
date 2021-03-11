@@ -425,6 +425,15 @@ export default {
         this.editFormF_Properties_Input_Value = ''
         return
       }
+      // 属性类别名不能超过五个字符
+      if (this.editFormF_Properties_Input_Value.trim().length > 5) {
+        this.$message.error('属性类别名称不能超过5个字符')
+        // FPinput输入框消失
+        this.FPinputVisible = false
+        // 清空FPinput值
+        this.editFormF_Properties_Input_Value = ''
+        return
+      }
       // 不能重名
       if (this.editForm.F_Properties !== undefined && this.editForm.F_Properties.length === 1) {
         if (this.editForm.F_Properties[0].FP_Name === this.editFormF_Properties_Input_Value.trim()) {//eslint-disable-line
