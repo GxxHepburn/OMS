@@ -467,6 +467,15 @@ export default {
         this.editFormF_Specs_Input_Value = ''
         return
       }
+      // 规格名称不超过5个字符
+      if (values[0].trim().length > 5) {
+        this.$message.error('规格名不能超过五个字符')
+        // input输入框消失
+        this.FSinputVisible = false
+        // 清空input值
+        this.editFormF_Specs_Input_Value = ''
+        return
+      }
       if (values[0] === '标准' || values[0] === '原价') {
         this.$message.error('标准规格不必添加')
         // input输入框消失
