@@ -84,6 +84,13 @@ export default {
     async handleFTNameInput (item) {
       // 判断是否需要发送网络请求
       if (this.FT_Name !== '') {
+        // 判断菜品分类名是否超过10个字符
+        if (this.FT_Name.length > 10) {
+          this.$message.error('分类名称不能超过10个字符')
+          item.inputVisible = false
+          this.FT_Name = ''
+          return
+        }
         // 发送请求，修改FTName
         var copyItem = JSON.parse(JSON.stringify(item))
         copyItem.copyFTName = this.FT_Name
