@@ -113,10 +113,10 @@
               <!-- 内容主体区 -->
               <el-form :model="editForm" :rules="editFormRules" ref="editFormRef" label-width="200px">
                 <el-form-item label="商品名称" prop='F_Name'>
-                  <el-input placeholder="请输入商品名称" v-model="editForm.F_Name" @blur="editForm.F_Name = editForm.F_Name.trim()"></el-input>
+                  <el-input class="hasWidthElInput" placeholder="请输入商品名称" v-model="editForm.F_Name" @blur="editForm.F_Name = editForm.F_Name.trim()"></el-input>
                 </el-form-item>
                 <el-form-item label="商品价格 (元)" prop="F_Price">
-                  <el-input placeholder="请输入商品价格" v-model="editForm.F_Price"></el-input>
+                  <el-input class="hasWidthElInput" placeholder="请输入商品价格" v-model="editForm.F_Price"></el-input>
                 </el-form-item>
                 <el-form-item label="原图片 (点击预览)" class="editDialogImgFormItem">
                   <el-image style="width: 30px; height: 30px"
@@ -140,15 +140,15 @@
                 <el-form-item label="商品库存" prop="F_Stock">
                   <el-tag v-if="editForm.F_Stock == -1" :closable="true" @close="removeBottomLess" :disable-transitions="true">不限量</el-tag>
                   <div class="editForm_F_Stock_Bottom_Wrap" v-else>
-                    <el-input placeholder="请输入商品库存" class="editForm_F_Stock_Input" v-model="editForm.F_Stock"></el-input>
+                    <el-input style="width:280px;" placeholder="请输入商品库存" class="editForm_F_Stock_Input" v-model="editForm.F_Stock"></el-input>
                     <el-radio class="editForm_F_Stock_Radio" v-model="editForm.F_Stock" label=-1>不限量</el-radio>
                   </div>
                 </el-form-item>
                 <el-form-item label="商品单位" prop="F_Unit">
-                  <el-input placeholder="请输入商品单位" v-model.trim="editForm.F_Unit" @blur="editForm.F_Unit = editForm.F_Unit.trim()"></el-input>
+                  <el-input class="hasWidthElInput" placeholder="请输入商品单位" v-model.trim="editForm.F_Unit" @blur="editForm.F_Unit = editForm.F_Unit.trim()"></el-input>
                 </el-form-item>
                 <el-form-item label="营销标签 (不超过四个字)" prop="F_Tag">
-                  <el-input placeholder="请输入营销标签" v-model="editForm.F_Tag" @blur="editForm.F_Tag = editForm.F_Tag.trim()"></el-input>
+                  <el-input class="hasWidthElInput" placeholder="请输入营销标签" v-model="editForm.F_Tag" @blur="editForm.F_Tag = editForm.F_Tag.trim()"></el-input>
                 </el-form-item>
                 <el-form-item label="规格">
                   <el-tag class="FS_Tag" size="mini" v-if="editForm.F_Specs == undefined || editForm.F_Specs.length <= 0">原价 : {{editForm.F_Price === undefined ? 0.00 : parseFloat(editForm.F_Price).toFixed(2)}} 元</el-tag>
@@ -742,6 +742,10 @@ export default {
 </script>
 
 <style lang="less" scoped>
+// 限制输入框长度
+.hasWidthElInput {
+  width: 400px;
+}
 .FS_Tag {
   display: inline-block;
   margin-right: 15px;
