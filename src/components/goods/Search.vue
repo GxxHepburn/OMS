@@ -280,7 +280,8 @@ export default {
         ],
         F_Stock: [
           { required: true, message: '请输入库存', trigger: 'change' },
-          { pattern: /^-1$|^0$|(^[1-9]\d*$)/, message: '请输入正确的库存' }
+          { pattern: /^-1$|^0$|(^[1-9]\d*$)/, message: '请输入正确的库存' },
+          { pattern: /^-1$|^0$|(^[1-9]\d{0,2}$)/, message: '库存最多不超过999' }
         ],
         F_Unit: [
           { required: true, message: '请输入商品单位', trigger: 'blur' },
