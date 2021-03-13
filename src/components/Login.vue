@@ -70,9 +70,9 @@ export default {
       loginFormRules: {
         // 验证用户名是否合法
         username: [
-          { required: true, message: '请输入用户名称', trigger: 'blur' },
-          { min: 11, max: 11, message: '手机号码必须为11位', trigger: 'blur' },
-          { pattern: /^1[34578]\d{9}$/, message: '请输入正确的手机号码', trigger: 'blur' }
+          { required: true, message: '请输入用户名称', trigger: 'blur' }
+          // { min: 11, max: 11, message: '手机号码必须为11位', trigger: 'blur' },
+          // { pattern: /^1[34578]\d{9}$/, message: '请输入正确的手机号码', trigger: 'blur' }
         ],
         // 验证秘法是否合法
         password: [
