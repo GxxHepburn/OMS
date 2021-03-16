@@ -527,8 +527,8 @@ export default {
         this.editFormF_Specs_Input_Value = ''
         return
       }
-      if (values[1] >= 1000000) {
-        this.$message.error('价格不能大于1000000')
+      if (values[1] >= 9999.99) {
+        this.$message.error('价格不能大于9999.99')
         // input输入框消失
         this.FSinputVisible = false
         // 清空input值

@@ -365,7 +365,7 @@ export default {
     },
     // editDialogInput失去焦点或回车时触发
     handleInputConfirm () {
-      // 先判断输入是否合法，1，规格名不能为标准，第二，价格不能相同，且不能<0,不能>1000000
+      // 先判断输入是否合法，1，规格名不能为标准，第二，价格不能相同，且不能<0,不能>9999.99
       var values = this.editFormF_Specs_Input_Value.split('/')
       if (values === undefined || values.length !== 2) {
         this.$message.error('请输入正确的格式')
@@ -423,8 +423,8 @@ export default {
         this.editFormF_Specs_Input_Value = ''
         return
       }
-      if (values[1] >= 1000000) {
-        this.$message.error('价格不能大于1000000')
+      if (values[1] > 9999.99) {
+        this.$message.error('价格不能大于9999.99')
         // input输入框消失
         this.FSinputVisible = false
         // 清空input值
