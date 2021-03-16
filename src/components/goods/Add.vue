@@ -155,7 +155,7 @@ export default {
         ],
         F_Price: [
           { required: true, message: '请输入价格', trigger: 'blur' },
-          { pattern: /(^[1-9]\d*(\.\d{1,2})?$)|(^[0]{1}(\.\d{1,2})?$)/, message: '请输入正确的金额' }
+          { pattern: /(^[1-9]\d{0,3}(\.\d{1,2})?$)|(^[0]{1}(\.\d{1,2})?$)/, message: '请输入正确的金额,最大9999.99' }
         ],
         F_Stock: [
           { required: true, message: '请输入库存', trigger: 'change' },

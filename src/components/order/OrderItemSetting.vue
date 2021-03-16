@@ -306,11 +306,11 @@
                     <label style="font-size:20px;">{{item.name}}</label><label style="font-size:17px;margin-left:10px;"><em> {{item.specs}}</em><em v-for="proItem in item.property"> {{proItem}}</em></label><!-- eslint-disable-line -->
                   </p>
                   <p>
-                    <label  style="margin-right:20px;margin-left:100px"><span style="font-size:22px;">【<span style="font-size:20px;">x</span></span><span style="font-size:22px;">{{item.OD_RealNum}}</span><span style="font-size:22px;">】</span></label>￥<label style="font-size:20px">{{item.price}}</label>
+                    <label  style="margin-right:20px;margin-left:80px"><span style="font-size:22px;">【<span style="font-size:20px;">x</span></span><span style="font-size:22px;">{{item.OD_RealNum}}</span><span style="font-size:22px;">】</span></label>￥<label style="font-size:20px">{{item.price}}</label>
                   </p>
                 </div>
                 <div style="border-bottom:#000 dashed 1px;"></div>
-                <p><label style="margin-left:100px;font-size:25px;">合计:</label><label style="font-size:25px;margin-left:20px;">￥{{orderForm.o_TotlePrice}}</label></p>
+                <p><label style="margin-right:50px;margin-left:80px;font-size:25px;">合计:</label><label style="font-size:25px;margin-left:20px;">￥{{orderForm.o_TotlePrice}}</label></p>
                 <p>*************************************</p>
                 <div style="border-bottom:#000 dashed 1px;"></div>
                 <p><label>打印时间:</label><label style="font-size:13px;margin-left:10px;">{{new Date().toLocaleString()}}</label></p>
