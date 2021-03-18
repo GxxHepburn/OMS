@@ -6,7 +6,7 @@ function reconnect () {
   console.log('重连----------未触发锁')
   if (window.reConNum < 10) {
     // 播报语音，弹出窗口
-    window.VueThat.$voicePromptFun.voicePrompt('与服务器断开连接，正在尝试重新连接')
+    // window.VueThat.$voicePromptFun.voicePrompt('与服务器断开连接，正在尝试重新连接')
     console.log('重连----' + window.reConNum + '------未触发锁')
     window.reConNum = window.reConNum + 1
     reconnect.lockReconnect = true
