@@ -78,6 +78,25 @@
         </el-form-item>
        </el-form>
     </el-card>
+
+    <el-card class="merOperate_card">
+      <div class="titleDiv">
+            <span>餐厅管理</span>
+          </div>
+          <div class="dividerDiv"></div>
+      <div>
+      <div class="merOperate_label">餐厅营业状态：</div>
+      <el-switch
+        v-model="merInfo.m_IsInOpenTime"
+        active-color="#13ce66"
+        inactive-color="#ff4949"
+        :active-value=1
+        :inactive-value=0
+        @change="changeMerOperateStatus">
+      </el-switch>
+      <div class="merOperate_info">{{merInfo.m_IsInOpenTime===1?'正常营业':'歇业休息'}}</div>
+      </div>
+    </el-card>
   </div>
 </template>
 
@@ -124,6 +143,19 @@ export default {
     this.getMerInfo()
   },
   methods: {
+    // 修改餐厅营业状态
+    async changeMerOperateStatus () {
+      this.merInfo.mmngctUserName = window.sessionStorage.mmngctUserName
+      const { data: res } = await this.$http.post('changeMerOperateStatus', this.merInfo)
+      if (res.meta.status !== 200) {
+        this.$message.error('修改餐厅营业状态失败')
+        this.getMerInfo()
+        return
+      }
+      // 修改成功
+      this.$message.success('修改餐厅营业状态成功')
+      this.getMerInfo()
+    },
     // 点击修改按钮时，是否还需要trim呢？不需要，因为点击button时，是先触发blur，再触发click
     // 修改按钮
     async changeMerButtonClick () {
@@ -218,6 +250,20 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.merOperate_card {
+  margin-top: 20px;
+  .merOperate_label {
+    display: inline-block;
+    font-weight: bold;
+    margin-right: 50px;
+  }
+  .merOperate_info {
+    display: inline-block;
+    font-size: 15px;
+    font-weight: bold;
+    margin-left: 10px;
+  }
+}
 // 上传图片
 /deep/ .avatar-uploader .el-upload {
   border: 1px dashed #000;
