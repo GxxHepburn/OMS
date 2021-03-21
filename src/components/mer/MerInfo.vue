@@ -85,16 +85,28 @@
           </div>
           <div class="dividerDiv"></div>
       <div>
-      <div class="merOperate_label">餐厅营业状态：</div>
-      <el-switch
-        v-model="merInfo.m_IsInOpenTime"
-        active-color="#13ce66"
-        inactive-color="#ff4949"
-        :active-value=1
-        :inactive-value=0
-        @change="changeMerOperateStatus">
-      </el-switch>
-      <div class="merOperate_info">{{merInfo.m_IsInOpenTime===1?'正常营业':'歇业休息'}}</div>
+        <div class="merOperate_label">餐厅营业状态：</div>
+        <el-switch
+          v-model="merInfo.m_IsInOpenTime"
+          active-color="#13ce66"
+          inactive-color="#ff4949"
+          :active-value=1
+          :inactive-value=0
+          @change="changeMerOperateStatus">
+        </el-switch>
+        <div class="merOperate_info">{{merInfo.m_IsInOpenTime===1?'正常营业':'歇业休息'}}</div>
+      </div>
+      <div class="merIsOrderWithPay_Wrap">
+        <div class="merOperate_label">是否支付后下单：</div>
+        <el-switch
+          v-model="merInfo.m_IsOrderWithPay"
+          active-color="#13ce66"
+          inactive-color="#ff4949"
+          :active-value=1
+          :inactive-value=0
+          @change="changeMerIsOrderWithPay">
+        </el-switch>
+        <div class="merOperate_info">{{merInfo.m_IsOrderWithPay===1?'支付后下单':'下单后支付'}}</div>
       </div>
     </el-card>
   </div>
@@ -117,7 +129,8 @@ export default {
         m_RegisterTime: '',
         m_img: '',
         m_IsInOpenTime: '',
-        m_IsBan: ''
+        m_IsBan: '',
+        m_IsOrderWithPay: ''
       },
       merInfoCopy: {},
       changeButtonStatus: true,
@@ -143,6 +156,19 @@ export default {
     this.getMerInfo()
   },
   methods: {
+    // 修改下单支付顺序
+    async changeMerIsOrderWithPay () {
+      this.merInfo.mmngctUserName = window.sessionStorage.mmngctUserName
+      const { data: res } = await this.$http.post('changeMerIsOrderWithPay', this.merInfo)
+      if (res.meta.status !== 200) {
+        this.$message.error('修改下单支付顺序失败')
+        this.getMerInfo()
+        return
+      }
+      // 修改成功
+      this.$message.success('修改下单支付顺序成功')
+      this.getMerInfo()
+    },
     // 修改餐厅营业状态
     async changeMerOperateStatus () {
       this.merInfo.mmngctUserName = window.sessionStorage.mmngctUserName
@@ -250,6 +276,9 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.merIsOrderWithPay_Wrap {
+  margin-top: 20px;
+}
 .merOperate_card {
   margin-top: 20px;
   .merOperate_label {
