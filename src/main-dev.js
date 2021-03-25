@@ -43,7 +43,7 @@ const options = {
 }
 
 // 配置请求的根路径
-axios.defaults.baseURL = 'https://www.donghuastar.com/OSM'
+axios.defaults.baseURL = 'http://localhost/OSM'
 // 在 request 拦截器中，展示进度条 NProgress.start ()
 axios.interceptors.request.use(config => {
   NProgress.start()
