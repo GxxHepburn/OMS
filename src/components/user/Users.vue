@@ -36,6 +36,7 @@
             <el-table-column label="用户状态">
               <template slot-scope="scope">
                 <el-switch
+                  :disabled="true"
                   v-model="scope.row.U_Status"
                   active-color="#13ce66"
                   inactive-color="#ff4949"
