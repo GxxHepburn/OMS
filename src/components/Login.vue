@@ -18,6 +18,7 @@
                 </el-form-item>
                 <!-- 按钮区域 -->
                 <el-form-item class="btns">
+                    <el-button class="changePWBtn" type="info" @click="changePW">忘记密码</el-button>
                     <el-button type="primary" @click="login">登陆</el-button>
                     <el-button type="info" @click="resetLoginForm">重置</el-button>
                 </el-form-item>
@@ -35,6 +36,25 @@
             </el-form-item>
             <el-form-item>
               <el-button type="primary" class="checkDialogConfirmButton" @click="realCheckNumButtonClick">确 定</el-button>
+            </el-form-item>
+          </el-form>
+        </el-dialog>
+
+        <el-dialog :visible.sync="changePWDialogVisible" :show-close="false" class="changePWDialog" :center="true">
+          <p class="changePWDialogTips">修改密码</p>
+          <el-form ref="changePWFormRef" :model="changePWForm" :rules="changePWFormRules" class="changePWDialogForm">
+            <el-form-item prop="newPasswordOne" label="新 密 码：">
+              <el-input type="password" v-model="changePWForm.newPasswordOne"></el-input>
+            </el-form-item>
+            <el-form-item prop="newPasswordTwo" label="确认密码 :">
+              <el-input type="password" v-model="changePWForm.newPasswordTwo"></el-input>
+            </el-form-item>
+            <el-form-item prop="checkNum" label="验 证 码：">
+              <el-input class="changePWCheckNumInput" v-model="changePWForm.checkNum"></el-input>
+              <el-button class="getchangePWCheckNumButton" :disabled="changePWCheckButtonDisalbe" type="primary" plain @click="getChangePWCheckNumButtonClick">{{changePWCheckNumButtonText}}</el-button>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" class="changePWDialogConfirmButton" @click="realChangePWButtonClick">确 定</el-button>
             </el-form-item>
           </el-form>
         </el-dialog>
@@ -70,19 +90,118 @@ export default {
       loginFormRules: {
         // 验证用户名是否合法
         username: [
-          { required: true, message: '请输入用户名称', trigger: 'blur' }
-          // { min: 11, max: 11, message: '手机号码必须为11位', trigger: 'blur' },
-          // { pattern: /^1[34578]\d{9}$/, message: '请输入正确的手机号码', trigger: 'blur' }
+          { required: true, message: '请输入用户名称', trigger: 'blur' },
+          { min: 11, max: 11, message: '手机号码必须为11位', trigger: 'blur' },
+          { pattern: /^1[34578]\d{9}$/, message: '请输入正确的手机号码', trigger: 'blur' }
         ],
         // 验证秘法是否合法
         password: [
           { required: true, message: '请输入密码', trigger: 'blur' },
           { min: 6, max: 15, message: '长度 6 到 15 个字符', trigger: 'blur' }
         ]
-      }
+      },
+      changePWDialogVisible: false,
+      changePWForm: {
+        newPasswordOne: '',
+        newPasswordTwo: '',
+        checkNum: ''
+      },
+      changePWFormRules: {
+        newPasswordOne: [
+          { required: true, message: '请输入密码', trigger: 'blur' },
+          { min: 6, max: 15, message: '长度 6 到 15 个字符', trigger: 'blur' }
+        ],
+        newPasswordTwo: [
+          { required: true, message: '请再次输入密码', trigger: 'blur' },
+          { min: 6, max: 15, message: '长度 6 到 15 个字符', trigger: 'blur' }
+        ],
+        checkNum: [
+          { required: true, message: '请输入验证码' },
+          { pattern: /^\d{6}$/, message: '请输入正确的验证码' }
+        ]
+      },
+      changePWCheckButtonDisalbe: false,
+      changePWCheckNumButtonText: '获取验证码'
     }
   },
   methods: {
+    // 真正修改密码
+    async realChangePWButtonClick () {
+      // 先验证valid，然后两次密码要相同
+      this.$refs.changePWFormRef.validate(async valid => {
+        if (valid) {
+          const { data: res } = await this.$http.post('realChangePWCheck', this.changePWForm)
+          if (res.meta.status !== 200) {
+            this.$message.error(res.meta.msg)
+            return
+          }
+          this.$message.success('修改密码成功')
+          this.changePWDialogVisible = false
+          // 返回登陆页面，填充登陆密码
+          this.loginForm.password = this.changePWForm.newPasswordOne
+        }
+      })
+    },
+    // 获取修改密码验证码
+    async getChangePWCheckNumButtonClick () {
+      // 发送验证码之前，要先检查formrule，以及两次输入是否相同
+      var isValid = true
+      this.$refs.changePWFormRef.validateField('newPasswordOne', async errMsg => {
+        if (errMsg) {
+          isValid = false
+        }
+      })
+      this.$refs.changePWFormRef.validateField('newPasswordTwo', async errMsg => {
+        if (errMsg) {
+          isValid = false
+        }
+      })
+      // 不达标 就不做相同检测
+      if (!isValid) {
+        return
+      }
+      if (this.changePWForm.newPasswordOne !== this.changePWForm.newPasswordTwo) {
+        this.$message.error('两次输入密码应该相同!')
+        isValid = false
+        return
+      }
+      if (isValid) {
+        // 发送验证码
+        // 发送获取验证码逻辑,没有token
+        this.changePWForm.username = this.loginForm.username
+        const { data: res } = await this.$http.post('sendChangePWCheck', this.changePWForm)
+        if (res.meta.status !== 200) {
+          // 根据阿里云返回的情况，要分别提示
+          this.$message.error(res.meta.msg)
+          return
+        }
+
+        // 计时器计时
+        this.changePWCheckButtonDisalbe = true
+        const TIME_COUNT = 60
+        this.changePWCheckNumButtonText = TIME_COUNT
+        var timer = setInterval(() => {
+          if (this.changePWCheckNumButtonText > 0) {
+            this.changePWCheckNumButtonText--
+          } else {
+            this.changePWCheckButtonDisalbe = false
+            this.changePWCheckNumButtonText = '获取验证码'
+            clearInterval(timer)
+          }
+        }, 1000)
+        this.$message.success(res.meta.msg)
+      }
+    },
+    // 修改密码
+    changePW () {
+      // 检查用户名
+      this.$refs.loginFormRef.validateField('username', async errMsg => {
+        if (!errMsg) {
+          // 在这里进行修改密码操作
+          this.changePWDialogVisible = true
+        }
+      })
+    },
     async realCheckNumButtonClick () {
       // valid验证
       this.$refs.checkFormRef.validate(async valid => {
@@ -186,39 +305,49 @@ export default {
 </script>
 
 <style lang="less" scoped>
-/deep/ .el-dialog{
-  display: flex;
-  flex-direction: column;
-  margin:0 !important;
-  position:absolute;
-  top:50%;
-  left:50%;
-  width: 450px;
-  height: 300px;
-  transform:translate(-50%,-50%);
-  /*height:600px;*/
-  max-height:calc(100% - 30px);
-  max-width:calc(100% - 30px);
-
-  .el-form-item {
+.checkDialog {
+  /deep/ .el-dialog{
     display: flex;
-    margin-bottom: 10px;
-    .el-input {
-      width: 150px;
-      margin-right: 20px;
+    flex-direction: column;
+    margin:0 !important;
+    position:absolute;
+    top:50%;
+    left:50%;
+    width: 450px;
+    height: 300px;
+    transform:translate(-50%,-50%);
+    /*height:600px;*/
+    max-height:calc(100% - 30px);
+    max-width:calc(100% - 30px);
+
+    .el-form-item {
+      display: flex;
+      margin-bottom: 10px;
+      .el-input {
+        width: 150px;
+        margin-right: 20px;
+      }
+    }
+
+    .el-dialog__header {
+      height: 0;
+      padding: 0;
     }
   }
-
-  .el-dialog__header {
-    height: 0;
-    padding: 0;
-  }
 }
+
 .getCheckNumButton {
   width: 112px;
 }
 .checkDialogTips {
   font-size: 13px;
+}
+.changePWDialogTips {
+  font-size: 13px;
+  text-align: center;
+  font-weight: bold;
+  margin-top: 0;
+  margin-bottom: 25px;
 }
 .checkDialogConfirmButton {
   width: 200px;
@@ -270,6 +399,9 @@ export default {
     display: flex;
     justify-content: flex-end;
 }
+.changePWBtn {
+  margin-right: 152px;
+}
 
 .login_form{
     position: absolute;
@@ -277,5 +409,44 @@ export default {
     width: 100%;
     padding: 0 20px;
     box-sizing: border-box;
+}
+/deep/ .changePWDialog {
+  .el-dialog__body {
+    padding-bottom: 10px;
+  }
+}
+.changePWDialogConfirmButton {
+  width: 200px;
+  margin-left: 68px;
+  margin-top: 15px;
+}
+.changePWDialog {
+  /deep/ .el-dialog{
+    display: flex;
+    flex-direction: column;
+    margin:0 !important;
+    position:absolute;
+    top:50%;
+    left:50%;
+    width: 450px;
+    height: 340px;
+    transform:translate(-50%,-50%);
+    /*height:600px;*/
+    max-height:calc(100% - 30px);
+    max-width:calc(100% - 30px);
+
+    .el-form-item {
+      display: flex;
+      .el-input {
+        width: 150px;
+        margin-right: 20px;
+      }
+    }
+
+    .el-dialog__header {
+      height: 0;
+      padding: 0;
+    }
+  }
 }
 </style>
