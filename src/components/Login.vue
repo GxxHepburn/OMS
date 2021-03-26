@@ -130,6 +130,7 @@ export default {
       // 先验证valid，然后两次密码要相同
       this.$refs.changePWFormRef.validate(async valid => {
         if (valid) {
+          this.changePWForm.username = this.loginForm.username
           const { data: res } = await this.$http.post('realChangePWCheck', this.changePWForm)
           if (res.meta.status !== 200) {
             this.$message.error(res.meta.msg)
