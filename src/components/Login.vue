@@ -150,6 +150,11 @@ export default {
         if (valid) {
           const { data: res } = await this.$http.post('login', this.loginForm)
           if (res.meta.status !== 200) {
+            // 判断商家是否被ban
+            if (res.meta.status === 402) {
+              this.$message.error('餐厅已下架,请联系管理员!')
+              return
+            }
             if (res.meta.status === 401) {
               this.$message.error('请输入正确的用户名和密码！')
               return
